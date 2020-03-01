@@ -1,0 +1,24 @@
+[package]
+name = "mastors"
+version = "0.1.0"
+authors = ["kedamaDQ <kedama@foresdon.jp>"]
+edition = "2018"
+
+[dependencies]
+#async-trait = { version = "0.1" }
+#async-tungstenite = { version = "0.4", features = ["tokio-runtime", "tokio-tls"] }
+chrono = { version = "0.4", features = ["serde"] }
+dotenv = { version = "0.15" }
+err-derive = { version = "0.2" }
+eventsource = { version = "0.5" }
+#futures = { version = "0.3" }
+isolang = { version = "1.0" }
+lazy_static = { version = "1.4" }
+reqwest = { version = "0.10", features = ["json", "gzip", "blocking"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0" }
+#tokio = { version = "0.2", features = ["fs", "rt-core"] }
+#tokio-tls = { version = "0.3" }
+url = { version = "2.1", features = ["serde"] }
+
+[dev-dependencies]
