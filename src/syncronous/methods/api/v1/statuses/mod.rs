@@ -1,4 +1,4 @@
-pub mod id;
+//pub mod id;
 
 use serde::Serialize;
 use crate::{
@@ -15,8 +15,17 @@ use crate::{
     methods::{
         Method,
         MethodInternal,
-    }
+    },
 };
+
+/// Create a request to get a status specified by `id`.
+pub fn get(conn: &Connection, id: impl Into<String>) -> GetStatuses {
+    GetStatuses {
+        conn,
+        id: id.into(),
+        authorized: true,
+    }
+}
 
 /// Create a request to post the status.
 pub fn post(
@@ -70,6 +79,47 @@ where
     )
 }
 
+pub fn delete(conn: &Connection, id: impl Into<String>) -> DeleteStatuses {
+    DeleteStatuses {
+        conn,
+        auth: true,
+        id: id.into(),
+    }
+}
+
+/// GET request for /api/v1/statuses/:id
+#[derive(Debug, Serialize, mastors_derive::Method)]
+#[method_params(GET, Status, "/api/v1/statuses/_PATH_PARAM_")]
+pub struct GetStatuses<'a> {
+    #[serde(skip_serializing)]
+    #[mastors(connection)]
+    conn: &'a Connection,
+
+    #[serde(skip_serializing)]
+    #[mastors(authorization)]
+    authorized: bool,
+
+    #[serde(skip_serializing)]
+    #[mastors(path_param)]
+    id: String,
+}
+
+impl<'a> GetStatuses<'a> {
+    /// Add Authorization header to GET request.
+    pub fn authorized(mut self) -> Self {
+        self.authorized = true;
+        self
+    }
+
+    /// Remove Authorization header from GET request.
+    pub fn unauthorized(mut self) -> Self {
+        self.authorized = false;
+        self
+    }
+}
+
+impl<'a> Method<'a, Status> for GetStatuses<'a> {}
+
 // Create POST request.
 fn post_inner(
     conn: &Connection,
@@ -80,6 +130,7 @@ fn post_inner(
 
     PostStatuses {
         conn,
+        auth: true,
         status,
         media_ids,
         poll,
@@ -93,10 +144,17 @@ fn post_inner(
 }
 
 /// POST request for /api/v1/statuses
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, mastors_derive::Method)]
+#[method_params(POST, Status, "/api/v1/statuses")]
 pub struct PostStatuses<'a> {
     #[serde(skip_serializing)]
+    #[mastors(connection)]
     conn: &'a Connection,
+
+    #[serde(skip_serializing)]
+    #[mastors(authorization)]
+    auth: bool,
+
     status: Option<String>,
     media_ids: Option<Vec<String>>,
     poll: Option<Poll>,
@@ -110,13 +168,13 @@ pub struct PostStatuses<'a> {
 
 impl<'a> PostStatuses<'a> {
     /// Add an in_reply_to_id to status.
-    pub fn in_reply_to_id(&mut self, id: impl AsRef<str>) -> &Self {
+    pub fn in_reply_to_id(mut self, id: impl AsRef<str>) -> Self {
         self.in_reply_to_id = str_to_option(id);
         self
     }
 
     /// Set status to sensitive if media_ids is set.
-    pub fn sensitive(&mut self) -> &Self {
+    pub fn sensitive(mut self) -> Self {
         if self.media_ids.is_some() {
             self.sensitive = Some(true);
         }
@@ -124,38 +182,66 @@ impl<'a> PostStatuses<'a> {
     }
 
     /// Add a spoiler_text to status.
-    pub fn spoiler_text(&mut self, spoiler_text: impl AsRef<str>) -> &Self {
+    pub fn spoiler_text(mut self, spoiler_text: impl AsRef<str>) -> Self {
         self.spoiler_text = str_to_option(spoiler_text);
         self
     }
 
     /// Set the `Visibility` to status.
-    pub fn visibility(&mut self, visibility: Visibility) -> &Self {
+    pub fn visibility(mut self, visibility: Visibility) -> Self {
         self.visibility = Some(visibility.to_string());
         self
     }
 
+    /// Set status visibility to `public`.
+    /// This is equivalent to `visibility(Visibility::Public)`.
+    pub fn public(mut self) -> Self {
+        self.visibility = Some(Visibility::Public.to_string());
+        self
+    }
+
+    /// Set status visibility to `unlisted`.
+    /// This is equivalent to `visibility(Visibility::Unlisted)`.
+    pub fn unlisted(mut self) -> Self {
+        self.visibility = Some(Visibility::Unlisted.to_string());
+        self
+    }
+    
+    /// Set status visibility to `private`.
+    /// This is equivalent to `visibility(Visibility::Private)`.
+    pub fn private(mut self) -> Self {
+        self.visibility = Some(Visibility::Private.to_string());
+        self
+    }
+
+    /// Set status visibility to `direct`.
+    /// This is equivalent to `visibility(Visibility::Direct)`.
+    pub fn direct(mut self) -> Self {
+        self.visibility = Some(Visibility::Direct.to_string());
+        self
+    }
+
     /// Set a status to scheduled.
-    pub fn scheduled_at(&mut self, scheduled_at: DateTime<Utc>) -> &Self {
+    pub fn scheduled_at(mut self, scheduled_at: DateTime<Utc>) -> Self {
         self.scheduled_at = Some(scheduled_at);
         self
     }
 
     /// Set language to status.
-    pub fn language(&mut self, language: Language) -> &Self {
+    pub fn language(mut self, language: Language) -> Self {
         self.language = language.to_639_1();
         self
     }
 
     /// Set to allow multiple choices if poll is present.
-    pub fn poll_multiple(&mut self) -> &Self {
-        self.poll.as_mut().map(|p| p.multiple());
+    pub fn poll_multiple(mut self) -> Self {
+        self.poll = self.poll.map(|p| p.multiple());
         self
     }
 
     /// Set to hide number of total votes if poll is present.
-    pub fn poll_hide_totals(&mut self) -> &Self {
-        self.poll.as_mut().map(|p| p.hide_totals());
+    pub fn poll_hide_totals(mut self) -> Self {
+        self.poll = self.poll.map(|p| p.hide_totals());
         self
     }
 }
@@ -235,21 +321,28 @@ impl<'a> Method<'a, Status> for PostStatuses<'a> {
             );
         }
 
-        Ok(self.post()?)
+        Ok(self.send_internal()?)
     }
 }
 
-impl<'a> MethodInternal<'a, Status> for PostStatuses<'a> {
-    const ENDPOINT: &'a str = "/api/v1/statuses";
+/// DELETE request for /api/v1/statuses/:id
+#[derive(Debug, Serialize, mastors_derive::Method)]
+#[method_params(DELETE, Status, "/api/v1/statuses/_PATH_PARAM_")]
+pub struct DeleteStatuses<'a> {
+    #[serde(skip_serializing)]
+    #[mastors(connection)]
+    conn: &'a Connection,
 
-    fn connection(&self) -> &Connection {
-        self.conn
-    }
+    #[serde(skip_serializing)]
+    #[mastors(authorization)]
+    auth: bool,
 
-    fn authorization(&self) -> Option<&str> {
-        Some(self.conn.access_token())
-    }
+    #[serde(skip_serializing)]
+    #[mastors(path_param)]
+    id: String,
 }
+
+impl<'a> Method<'a, Status> for DeleteStatuses<'a> {}
 
 /// Poll options.
 #[derive(Debug, Serialize)]
@@ -283,13 +376,13 @@ impl Poll {
     }
 
     // Set this poll to be able to multiple votes.
-    fn multiple(&mut self) -> &Self {
+    fn multiple(mut self) -> Self {
         self.multiple = true;
         self
     }
 
     // Set this poll to do not show total number of votes.
-    fn hide_totals(&mut self) -> &Self {
+    fn hide_totals(mut self) -> Self {
         self.hide_totals = true;
         self
     }
@@ -325,5 +418,54 @@ fn str_to_option(s: impl AsRef<str>) -> Option<String> {
         None
     } else {
         Some(s.to_owned())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::Local;
+
+    const ENV_TEST: &str = ".env.test";
+    #[test]
+    fn test_post_and_get_statuses() {
+        let conn = Connection::new_with_path(ENV_TEST).unwrap();
+        let posted = post(&conn, body("toot!"))
+            .spoiler_text("spoiler text")
+            .unlisted()
+            .private()
+            .direct()
+            .public()
+            .send()
+            .unwrap();
+
+        let got = get(&conn, posted.id())
+            .authorized()
+            .unauthorized()
+            .authorized()
+            .send()
+            .unwrap();
+
+        assert_eq!(posted.id(), got.id());
+    }
+
+    #[test]
+    fn test_post_statuses_with_poll() {
+        let conn = Connection::new_with_path(ENV_TEST).unwrap();
+        let posted = post_with_poll(&conn, body("with poll!"), vec!["poll1", "poll2", "poll3"], 3600)
+            .poll_multiple()
+            .poll_hide_totals()
+            .send()
+            .unwrap();
+        let got = get(&conn, posted.id())
+            .authorized()
+            .send()
+            .unwrap();
+        
+        assert_eq!(posted.poll().as_ref().unwrap().id(), got.poll().as_ref().unwrap().id())
+    }
+
+    fn body(s: &str) -> String {
+        "Test ".to_string() + s + "\n\n" + Local::now().to_rfc3339().as_str()
     }
 }

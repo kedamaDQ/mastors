@@ -3,44 +3,31 @@ use crate::{
     Connection,
     Result,
     entities::Trends,
-    methods::{
-        Method,
-        MethodInternal,
-    },
+    methods::Method,
 };
 
 pub fn get(conn: &Connection) -> GetTrends {
-    GetTrends { conn, limit: None, }
+    GetTrends {
+        conn,
+        limit: None,
+    }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, mastors_derive::Method)]
+#[method_params(GET, Trends, "/api/v1/trends")]
 pub struct GetTrends<'a> {
     #[serde(skip_serializing)]
+    #[mastors(connection)]
     conn: &'a Connection,
-    limit: Option<u32>,
+
+    limit: Option<usize>,
 }
 
 impl<'a> GetTrends<'a> {
-    pub fn limit(&mut self, limit: u32) -> &Self {
+    pub fn limit(&mut self, limit: usize) -> &Self {
         self.limit = Some(limit);
         self
     }
 }
 
-impl<'a> Method<'a, Trends> for GetTrends<'a> {
-    fn send(&'a self) -> Result<Trends> {
-        Ok(self.get()?)
-    }
-}
-
-impl<'a> MethodInternal<'a, Trends> for GetTrends<'a> {
-    const ENDPOINT: &'a str = "/api/v1/trends";
-
-    fn connection(&self) -> &Connection {
-        self.conn
-    }
-}
-
-#[cfg(test)]
-mod tests {
-}
+impl<'a> Method<'a, Trends> for GetTrends<'a> {}

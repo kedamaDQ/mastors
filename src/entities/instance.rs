@@ -1,5 +1,4 @@
 use serde::Deserialize;
-use crate::utils::transform_string_to_u64;
 use super::Entity;
 
 pub use crate::Url;
@@ -21,6 +20,7 @@ pub struct Instance {
     stats: Stats,
     thumbnail: Option<Url>,
     contact_account: Option<Account>,
+    invites_enabled: Option<bool>,
 }
 
 impl Instance {
@@ -88,6 +88,11 @@ impl Instance {
     pub fn contact_account(&self) -> &Option<Account> {
         &self.contact_account
     }
+
+    /// Get whether the invitation is enabled.(mastodon v3.1.4 or later)
+    pub fn invites_enabled(&self) -> &Option<bool> {
+        &self.invites_enabled
+    }
 }
 
 impl Entity for Instance {}
@@ -108,13 +113,8 @@ impl Urls {
 /// Statistics about how much information the instance contains.
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Copy, Deserialize)]
 pub struct Stats {
-    #[serde(deserialize_with = "transform_string_to_u64")]
     user_count: u64,
-
-    #[serde(deserialize_with = "transform_string_to_u64")]
     status_count: u64,
-
-    #[serde(deserialize_with = "transform_string_to_u64")]
     domain_count: u64,
 }
 

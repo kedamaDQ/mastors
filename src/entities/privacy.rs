@@ -69,7 +69,7 @@ mod tests {
             Ok(_) => String::new(),
             Err(e) => e.to_string(),
         };
-        assert_eq!("'privatte' is not a valid privacy.", result);
+        assert_eq!("'privatte' is not a valid Privacy string", result);
     }
 
 }

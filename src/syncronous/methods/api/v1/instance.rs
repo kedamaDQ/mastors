@@ -3,47 +3,29 @@ use crate::{
     Connection,
     Result,
     entities::Instance,
-    methods::{
-        Method,
-        MethodInternal,
-    }
+    methods::Method,
 };
 
 pub fn get(conn: &Connection) -> GetInstance {
     GetInstance {
         conn,
+        authorization: conn.whitelist_mode(),
     }
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, mastors_derive::Method)]
+#[method_params(GET, Instance, "/api/v1/instance")]
 pub struct GetInstance<'a> {
     #[serde(skip_serializing)]
+    #[mastors(connection)]
     conn: &'a Connection,
+
+    #[serde(skip_serializing)]
+    #[mastors(authorization)]
+    authorization: bool,
 }
 
-impl<'a> GetInstance<'a> {}
-
-impl<'a> Method<'a, Instance> for GetInstance<'a> {
-    fn send(&'a self) -> Result<Instance> {
-        Ok(self.get()?)
-    }
-}
-
-impl<'a> MethodInternal<'a, Instance> for GetInstance<'a> {
-    const ENDPOINT: &'a str = "/api/v1/instance";
-
-    fn connection(&self) -> &Connection {
-        self.conn
-    }
-
-    fn authorization(&self) -> Option<&str> {
-        if self.conn.whitelist_mode() {
-            Some(self.conn.access_token())
-        } else {
-            None
-        }
-    }
-}
+impl<'a> Method<'a, Instance> for GetInstance<'a> {}
 
 pub mod peers {
     use serde::Serialize;
@@ -51,10 +33,7 @@ pub mod peers {
         Connection,
         Result,
         entities::instance::Peers,
-        methods::{
-            Method,
-            MethodInternal,
-        },
+        methods::Method,
     };
 
     pub fn get(conn: &Connection) -> GetPeers {
@@ -63,25 +42,15 @@ pub mod peers {
         }
     }
 
-    #[derive(Debug, Clone, Serialize)]
+    #[derive(Debug, Clone, Serialize, mastors_derive::Method)]
+    #[method_params(GET, Peers, "/api/v1/instance/peers")]
     pub struct GetPeers<'a> {
         #[serde(skip_serializing)]
+        #[mastors(connection)]
         conn: &'a Connection,
     }
 
-    impl<'a> Method<'a, Peers> for GetPeers<'a> {
-        fn send(&'a self) -> Result<Peers> {
-            Ok(self.get()?)
-        }
-    }
-
-    impl<'a> MethodInternal<'a, Peers> for GetPeers<'a> {
-        const ENDPOINT: &'a str = "/api/v1/instance/peers";
-
-        fn connection(&self) -> &Connection {
-            self.conn
-        }
-    }
+    impl<'a> Method<'a, Peers> for GetPeers<'a> {}
 }
 
 pub mod activity {
@@ -90,10 +59,7 @@ pub mod activity {
         Connection,
         Result,
         entities::Activities,
-        methods::{
-            Method,
-            MethodInternal,
-        },
+        methods::Method,
     };
 
     pub fn get(conn: &Connection) -> GetActivity {
@@ -102,23 +68,37 @@ pub mod activity {
         }
     }
 
-    #[derive(Debug, Clone, Serialize)]
+    #[derive(Debug, Clone, Serialize, mastors_derive::Method)]
+    #[method_params(GET, Activities, "/api/v1/instance/activity")]
     pub struct GetActivity<'a> {
         #[serde(skip_serializing)]
+        #[mastors(connection)]
         conn: &'a Connection,
     }
 
-    impl<'a> Method<'a, Activities> for GetActivity<'a> {
-        fn send(&'a self) -> Result<Activities> {
-            Ok(self.get()?)
-        }
+    impl<'a> Method<'a, Activities> for GetActivity<'a> {}
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    const ENV_TEST: &str = ".env.test";
+
+    #[test]
+    fn test_get_instance() {
+        let conn = Connection::new_with_path(ENV_TEST).unwrap();
+        get(&conn).send().unwrap();
     }
 
-    impl<'a> MethodInternal<'a, Activities> for GetActivity<'a> {
-        const ENDPOINT: &'a str = "/api/v1/instance/activity";
+    #[test]
+    fn test_get_peers() {
+        let conn = Connection::new_with_path(ENV_TEST).unwrap();
+        peers::get(&conn).send().unwrap();
+    }
 
-        fn connection(&self) -> &Connection {
-            self.conn
-        }
+    #[test]
+    fn test_get_activity() {
+        let conn = Connection::new_with_path(ENV_TEST).unwrap();
+        activity::get(&conn).send().unwrap();
     }
 }

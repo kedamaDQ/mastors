@@ -5,6 +5,7 @@ authors = ["kedamaDQ <kedama@foresdon.jp>"]
 edition = "2018"
 
 [dependencies]
+mastors-derive = { path = "./mastors-derive" }
 #async-trait = { version = "0.1" }
 #async-tungstenite = { version = "0.4", features = ["tokio-runtime", "tokio-tls"] }
 chrono = { version = "0.4", features = ["serde"] }

@@ -6,7 +6,6 @@ use crate::{
     entities::Attachment,
     methods::{
         Method,
-        MethodInternal,
         UploadInternal,
         FileFormInternal,
     }
@@ -15,6 +14,7 @@ use crate::{
 pub fn post(conn: &Connection, filename: impl Into<String>) -> PostMedia {
     PostMedia {
         conn,
+        auth: true,
         filename: filename.into(),
         description: None,
         focus: None,
@@ -22,10 +22,17 @@ pub fn post(conn: &Connection, filename: impl Into<String>) -> PostMedia {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, mastors_derive::Method)]
+#[method_params(POST, Attachment, "/api/v1/media")]
 pub struct PostMedia<'a> {
     #[serde(skip_serializing)]
+    #[mastors(connection)]
     conn: &'a Connection,
+
+    #[serde(skip_serializing)]
+    #[mastors(authorization)]
+    auth: bool,
+
     filename: String,
     description: Option<String>,
     focus: Option<Focus>,
@@ -52,18 +59,6 @@ impl<'a> Method<'a, Attachment> for PostMedia<'a> {
             focus.validate()?;
         }
         Ok(self.post_with_media()?)
-    }
-}
-
-impl<'a> MethodInternal<'a, Attachment> for PostMedia<'a> {
-    const ENDPOINT: &'a str = "/api/v1/media";
-
-    fn connection(&self) -> &Connection {
-        self.conn
-    }
-
-    fn authorization(&self) -> Option<&str>{
-        Some(self.conn.access_token())
     }
 }
 

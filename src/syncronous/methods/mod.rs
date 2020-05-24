@@ -12,7 +12,9 @@ pub(crate) use private::{
 };
 
 pub trait Method<'a, E: 'a + Entity>: MethodInternal<'a, E> {
-    fn send(&'a self) -> Result<E>;
+    fn send(&'a self) -> Result<E> {
+        self.send_internal()
+    }
 }
 
 pub(crate) mod private {
@@ -45,7 +47,9 @@ pub(crate) mod private {
             None
         }
  
-       fn get(&'a self) -> Result<E> {
+        fn send_internal(&self) -> Result<E>;
+
+        fn get(&'a self) -> Result<E> {
             Ok(
                 send_request(
                     build_request(self, reqwest::Method::GET)?.query(&self)

@@ -29,15 +29,24 @@ pub fn post(
     PostPolls {
         conn,
         id: id.into(),
+        auth: true,
         choices: choices.into(),
     }
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, mastors_derive::Method)]
+#[method_params(GET, Poll, "/api/v1/polls/_PATH_PARAM_")]
 pub struct GetPolls<'a> {
     #[serde(skip_serializing)]
+    #[mastors(connection)]
     conn: &'a Connection,
+
+    #[serde(skip_serializing)]
+    #[mastors(path_param)]
     id: String,
+
+    #[serde(skip_serializing)]
+    #[mastors(authorization)]
     authorized: bool,
 }
 
@@ -53,29 +62,23 @@ impl<'a> GetPolls<'a> {
     }
 }
 
-impl<'a> Method<'a, Poll> for GetPolls<'a> {
-    fn send(&self) -> Result<Poll> {
-        Ok(self.get()?)
-    }
-}
+impl<'a> Method<'a, Poll> for GetPolls<'a> {}
 
-impl<'a> MethodInternal<'a, Poll> for GetPolls<'a> {
-    const ENDPOINT: &'a str = "/api/v1/polls";
-
-    fn connection(&self) -> &Connection {
-        &self.conn
-    }
-
-    fn path(&self) -> String {
-        format!("{}{}", Self::ENDPOINT, &self.id)
-    }
-}
-
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, mastors_derive::Method)]
+#[method_params(POST, Poll, "/api/v1/polls/_PATH_PARAM_")]
 pub struct PostPolls<'a> {
     #[serde(skip_serializing)]
+    #[mastors(connection)]
     conn: &'a Connection,
+
+    #[serde(skip_serializing)]
+    #[mastors(path_param)]
     id: String,
+
+    #[serde(skip_serializing)]
+    #[mastors(authorization)]
+    auth: bool,
+
     choices: HashSet<usize>,
 }
 
@@ -88,22 +91,6 @@ impl<'a> Method<'a, Poll> for PostPolls<'a> {
         if self.choices.len() > self.conn.poll_max_options() {
             return Err(Error::TooManyPollOptionsError(self.choices.len(), self.conn.poll_max_options()));
         }
-        Ok(self.post()?)
-    }
-}
-
-impl<'a> MethodInternal<'a, Poll> for PostPolls<'a> {
-    const ENDPOINT: &'a str = "api/v1/polls";
-
-    fn connection(&self) -> &Connection {
-        &self.conn
-    }
-
-    fn path(&self) -> String {
-        format!("{}{}", Self::ENDPOINT, self.id)
-    }
-
-    fn authorization(&self) -> Option<&'a str> {
-        Some(&self.conn.access_token())
+        Ok(self.send_internal()?)
     }
 }

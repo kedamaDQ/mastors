@@ -1,3 +1,4 @@
+pub mod custom_emojis;
 pub mod instance;
 pub mod media;
 pub mod polls;

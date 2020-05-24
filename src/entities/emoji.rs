@@ -41,3 +41,7 @@ impl Emoji {
 }
 
 impl Entity for Emoji {}
+
+/// Represents a custom emoji array as Emojis.
+pub type Emojis = Vec<Emoji>;
+impl Entity for Emojis {}

@@ -22,7 +22,7 @@ pub use application::Application;
 pub use attachment::Attachment;
 pub use card::Card;
 pub use context::Context;
-pub use emoji::Emoji;
+pub use emoji::{ Emoji, Emojis };
 pub use history::History;
 pub use instance::Instance;
 pub use mention::Mention;
