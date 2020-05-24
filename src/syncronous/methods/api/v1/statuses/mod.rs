@@ -39,17 +39,21 @@ pub fn post(
 /// Create a request to post the status with attached medias.
 /// 
 /// If you want to create the status without the text, set `status` to an empty string such as `""`.
-pub fn post_with_media(
+pub fn post_with_media<T, U>(
     conn: &Connection,
     status: impl AsRef<str>,
-    media_ids: impl Into<Vec<String>>
-) -> PostStatuses {
-
-    let media_ids: Vec<String> = media_ids.into()
-        .iter()
+    media_ids: T,
+) -> PostStatuses
+where
+    T: Into<Vec<U>>,
+    U: Into<String>,
+{
+    let media_ids = media_ids.into()
+        .into_iter()
+        .map(|s| s.into().to_owned())
         .filter(|s| !s.trim().is_empty())
-        .map(|s| s.to_string())
-        .collect();
+        .collect::<Vec<String>>();
+
     let media_ids = if media_ids.is_empty() {
         None
     } else {
@@ -70,7 +74,6 @@ where
     T: Into<Vec<U>>,
     U: Into<String>,
 {
-
     post_inner(
         conn,
         str_to_option(status),
@@ -427,10 +430,12 @@ mod tests {
     use crate::Local;
 
     const ENV_TEST: &str = ".env.test";
+
     #[test]
-    fn test_post_and_get_statuses() {
+    fn test_statuses() {
         let conn = Connection::new_with_path(ENV_TEST).unwrap();
-        let posted = post(&conn, body("toot!"))
+        let content = body("toot!");
+        let posted = post(&conn, &content)
             .spoiler_text("spoiler text")
             .unlisted()
             .private()
@@ -447,22 +452,85 @@ mod tests {
             .unwrap();
 
         assert_eq!(posted.id(), got.id());
+
+        let deleted = delete(&conn, posted.id())
+            .send()
+            .unwrap();
+        
+        assert_eq!(posted.id(), deleted.id());
+        assert_eq!(&content, deleted.text().unwrap());
     }
 
     #[test]
-    fn test_post_statuses_with_poll() {
+    fn test_statuses_with_poll() {
         let conn = Connection::new_with_path(ENV_TEST).unwrap();
-        let posted = post_with_poll(&conn, body("with poll!"), vec!["poll1", "poll2", "poll3"], 3600)
+        let content = body("with poll!");
+        let posted = post_with_poll(&conn, &content, vec!["poll1", "poll2", "poll3"], 3600)
             .poll_multiple()
             .poll_hide_totals()
             .send()
             .unwrap();
+
         let got = get(&conn, posted.id())
             .authorized()
             .send()
             .unwrap();
         
-        assert_eq!(posted.poll().as_ref().unwrap().id(), got.poll().as_ref().unwrap().id())
+        assert_eq!(posted.id(), got.id());
+        assert_eq!(posted.poll().unwrap().id(), got.poll().unwrap().id());
+
+        let deleted = delete(&conn, posted.id())
+            .send()
+            .unwrap();
+        
+        assert_eq!(got.id(), deleted.id());
+        assert_eq!(&content, deleted.text().unwrap());
+        assert_eq!(got.poll().unwrap().id(), deleted.poll().unwrap().id())
+    }
+
+    #[test]
+    fn test_status_with_attachment() {
+        use crate::api::v1::media;
+
+        let conn = Connection::new_with_path(ENV_TEST).unwrap();
+        let content = body("with attachment!");
+
+        let media_ids = vec![
+            media::post(&conn, "./test-resources/test1.png").send().unwrap().id().to_owned(),
+            media::post(&conn, "./test-resources/test2.png").send().unwrap().id().to_owned(),
+        ];
+        let media_ids_cloned = media_ids.clone();
+
+        let posted = post_with_media(&conn, &content, media_ids)
+            .send()
+            .unwrap();
+
+        let got = get(&conn, posted.id())
+            .send()
+            .unwrap();
+        
+        let got_media_ids = got
+            .media_attachments()
+            .iter()
+            .map(|ma| ma.id().to_owned())
+            .collect::<Vec<String>>();
+
+        assert_eq!(posted.id(), got.id());
+        assert_eq!(&media_ids_cloned, &got_media_ids);
+
+        let deleted = delete(&conn, got.id())
+            .send()
+            .unwrap();
+        
+        // AsRef<Vec<String>> にしたいねぇ…… media_ids を食いたくない。
+        assert_eq!(got.id(), deleted.id());
+        assert_eq!(
+            media_ids_cloned,
+            deleted.media_attachments()
+                .iter()
+                .map(|ma| ma.id().to_owned())
+                .collect::<Vec<String>>()
+        );
     }
 
     fn body(s: &str) -> String {

@@ -27,7 +27,7 @@ pub struct Status {
     uri: Url,
     created_at: DateTime<Utc>,
     account: Box<Account>,
-    content: String,
+    content: Option<String>,
     #[serde(deserialize_with = "transform_str_to_enum")]
     visibility: Visibility,
     sensitive: bool,
@@ -85,8 +85,11 @@ impl Status {
     }
 
     /// Get the status content as HTML.
-    pub fn content(&self) -> &str {
-        &self.content
+    /// 
+    /// This method will returns `None` when this status returned by status deletion API.
+    /// In this case, you can use the `text()` method instead to get the non-HTML content.
+    pub fn content(&self) -> Option<&String> {
+        self.content.as_ref()
     }
 
     /// Get the `Visibility` of this status.
@@ -105,6 +108,8 @@ impl Status {
     }
 
     /// Get medias that is attached to this status.
+    /// 
+    /// This method returns one or more `Attachment` only if this status is returned by the status deletion API and this status has `Attachment`.
     pub fn media_attachments(&self) -> &Vec<Attachment> {
         &self.media_attachments
     }
@@ -145,44 +150,45 @@ impl Status {
     }
 
     /// Get a link to this status's HTML representation.
-    pub fn url(&self) -> &Option<Url> {
-        &self.url
+    pub fn url(&self) -> Option<&Url> {
+        self.url.as_ref()
     }
 
     /// Get an ID of the status being replied.
-    pub fn in_reply_to_id(&self) -> &Option<String> {
-        &self.in_reply_to_id
+    pub fn in_reply_to_id(&self) -> Option<&String> {
+        self.in_reply_to_id.as_ref()
     }
 
     /// Get an ID of the account being replied to.
-    pub fn in_reply_to_account_id(&self) -> &Option<String> {
-        &self.in_reply_to_account_id
+    pub fn in_reply_to_account_id(&self) -> Option<&String> {
+        self.in_reply_to_account_id.as_ref()
     }
 
     /// Get the status being reblogged.
-    pub fn reblog(&self) -> &Option<Box<Status>> {
-        &self.reblog
+    pub fn reblog(&self) -> Option<&Box<Status>> {
+        self.reblog.as_ref()
     }
 
     /// Get the poll attached this status.
-    pub fn poll(&self) -> &Option<Poll> {
-        &self.poll
+    pub fn poll(&self) -> Option<&Poll> {
+        self.poll.as_ref()
     }
 
     /// Get the preview card for links included within this status content.
-    pub fn card(&self) -> &Option<Card> {
-        &self.card
+    pub fn card(&self) -> Option<&Card> {
+        self.card.as_ref()
     }
 
     /// Get primary language of this status which is compliant to ISO 639-1.
-    pub fn language(&self) -> &Option<String> {
-        &self.language
+    pub fn language(&self) -> Option<&String> {
+        self.language.as_ref()
     }
 
     /// Get plain-text source of this status. 
-    /// This method will return instead of `content()` when status is deleted, so the user may redraft from the source text without the client having to reverse-engineer the original text from the HTML content.
-    pub fn text(&self) -> &Option<String> {
-        &self.text
+    /// 
+    /// This method will return non-HTML content instead of `content()` only if this status returned by status deletion API, so the user may redraft from the source text without the client having to reverse-engineer the original text from the HTML content.
+    pub fn text(&self) -> Option<&String> {
+        self.text.as_ref()
     }
 
     /// Get whether authorized user has favourited this status.
@@ -212,4 +218,3 @@ impl Status {
 }
 
 impl Entity for Status {}
-
