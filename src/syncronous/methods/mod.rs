@@ -67,6 +67,15 @@ pub(crate) mod private {
             )
         }
 
+        fn put(&'a self) -> Result<E> {
+            Ok(
+                send_request(
+                    build_request(self, reqwest::Method::PUT)?.json(&self)
+                )?
+                .json::<E>()?
+            )
+        }
+
         fn delete(&'a self) -> Result<E> {
             Ok(
                 send_request(

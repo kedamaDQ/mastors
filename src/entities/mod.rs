@@ -13,6 +13,7 @@ pub(crate) mod mention;
 pub(crate) mod notification;
 pub(crate) mod privacy;
 pub(crate) mod poll;
+pub(crate) mod scheduled_status;
 pub(crate) mod status;
 pub(crate) mod tag;
 
@@ -29,5 +30,6 @@ pub use mention::Mention;
 pub use notification::{ Notification, NotificationType };
 pub use poll::Poll;
 pub use privacy::{ Privacy, Visibility };
-pub use status:: Status;
+pub use scheduled_status::{ ScheduledStatus, ScheduledStatuses };
+pub use status::Status;
 pub use tag::{ Tag, Trends };
