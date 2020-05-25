@@ -50,8 +50,8 @@ where
 {
     let media_ids = media_ids.as_ref()
         .into_iter()
-        .map(|s| s.as_ref())
-        .filter(|s| !s.trim().is_empty())
+        .map(|s| s.as_ref().trim())
+        .filter(|s| !s.is_empty())
         .map(|s| s.to_owned())
         .collect::<Vec<String>>();
 
@@ -367,7 +367,9 @@ impl Poll {
     {
         let options = options.as_ref()
             .into_iter()
-            .map(|u| u.as_ref().trim().to_owned())
+            .map(|u| u.as_ref().trim())
+            .filter(|u| !u.is_empty())
+            .map(|u| u.to_owned())
             .collect::<Vec<String>>();
 
         Poll {
@@ -522,7 +524,6 @@ mod tests {
             .send()
             .unwrap();
         
-        // AsRef<Vec<String>> にしたいねぇ…… media_ids を食いたくない。
         assert_eq!(got.id(), deleted.id());
         assert_eq!(
             media_ids,
@@ -531,6 +532,33 @@ mod tests {
                 .map(|ma| ma.id().to_owned())
                 .collect::<Vec<String>>()
         );
+    }
+
+    #[test]
+    fn test_poll() {
+        let options = ["", "", "a", "b", "c"];
+
+        let poll = Poll::new(&options, 3600, 4);
+        assert_eq!(poll.options.len(), 3);
+
+        let poll = Poll::new(options, 3600, 4);
+        assert_eq!(poll.options.len(), 3);
+
+        let options = vec!["a".to_owned(), "b".to_owned(), "c".to_owned(), String::new()];
+
+        let poll = Poll::new(&options, 3600, 4);
+        assert_eq!(poll.options.len(), 3);
+
+        let poll = Poll::new(options, 3600, 4);
+        assert_eq!(poll.options.len(), 3);
+
+        let options = vec!["a", "b", "", "c"];
+
+        let poll = Poll::new(&options, 3600, 4);
+        assert_eq!(poll.options.len(), 3);
+
+        let poll = Poll::new(options, 3600, 4);
+        assert_eq!(poll.options.len(), 3);
     }
 
     fn body(s: &str) -> String {
