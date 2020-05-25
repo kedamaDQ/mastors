@@ -45,13 +45,14 @@ pub fn post_with_media<T, U>(
     media_ids: T,
 ) -> PostStatuses
 where
-    T: Into<Vec<U>>,
-    U: Into<String>,
+    T: AsRef<[U]>,
+    U: AsRef<str>,
 {
-    let media_ids = media_ids.into()
+    let media_ids = media_ids.as_ref()
         .into_iter()
-        .map(|s| s.into().to_owned())
+        .map(|s| s.as_ref())
         .filter(|s| !s.trim().is_empty())
+        .map(|s| s.to_owned())
         .collect::<Vec<String>>();
 
     let media_ids = if media_ids.is_empty() {
@@ -71,8 +72,8 @@ pub fn post_with_poll<T, U>(
     poll_expires_in: u64,
 ) -> PostStatuses
 where
-    T: Into<Vec<U>>,
-    U: Into<String>,
+    T: AsRef<[U]>,
+    U: AsRef<str>,
 {
     post_inner(
         conn,
@@ -361,12 +362,12 @@ struct Poll {
 impl Poll {
     fn new<T, U>(options: T, expires_in: u64, max_options: usize) -> Self
     where
-        T: Into<Vec<U>>,
-        U: Into<String>,
+        T: AsRef<[U]>,
+        U: AsRef<str>,
     {
-        let options = options.into()
+        let options = options.as_ref()
             .into_iter()
-            .map(|u| u.into().trim().to_owned())
+            .map(|u| u.as_ref().trim().to_owned())
             .collect::<Vec<String>>();
 
         Poll {
@@ -465,7 +466,7 @@ mod tests {
     fn test_statuses_with_poll() {
         let conn = Connection::new_with_path(ENV_TEST).unwrap();
         let content = body("with poll!");
-        let posted = post_with_poll(&conn, &content, vec!["poll1", "poll2", "poll3"], 3600)
+        let posted = post_with_poll(&conn, &content, &(vec!["poll1", "poll2", "poll3"]), 3600)
             .poll_multiple()
             .poll_hide_totals()
             .send()
@@ -499,9 +500,8 @@ mod tests {
             media::post(&conn, "./test-resources/test1.png").send().unwrap().id().to_owned(),
             media::post(&conn, "./test-resources/test2.png").send().unwrap().id().to_owned(),
         ];
-        let media_ids_cloned = media_ids.clone();
 
-        let posted = post_with_media(&conn, &content, media_ids)
+        let posted = post_with_media(&conn, &content, &media_ids)
             .send()
             .unwrap();
 
@@ -516,7 +516,7 @@ mod tests {
             .collect::<Vec<String>>();
 
         assert_eq!(posted.id(), got.id());
-        assert_eq!(&media_ids_cloned, &got_media_ids);
+        assert_eq!(&media_ids, &got_media_ids);
 
         let deleted = delete(&conn, got.id())
             .send()
@@ -525,7 +525,7 @@ mod tests {
         // AsRef<Vec<String>> にしたいねぇ…… media_ids を食いたくない。
         assert_eq!(got.id(), deleted.id());
         assert_eq!(
-            media_ids_cloned,
+            media_ids,
             deleted.media_attachments()
                 .iter()
                 .map(|ma| ma.id().to_owned())
