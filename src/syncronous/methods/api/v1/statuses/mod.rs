@@ -48,20 +48,13 @@ where
     T: AsRef<[U]>,
     U: AsRef<str>,
 {
-    let media_ids = media_ids.as_ref()
-        .into_iter()
-        .map(|s| s.as_ref().trim())
-        .filter(|s| !s.is_empty())
-        .map(|s| s.to_owned())
-        .collect::<Vec<String>>();
 
-    let media_ids = if media_ids.is_empty() {
+    post_inner(
+        conn,
+        str_to_option(status),
+        Some(MediaIds::new(media_ids, conn.status_max_medias())),
         None
-    } else {
-        Some(media_ids)
-    };
-
-    post_inner(conn, str_to_option(status), media_ids, None)
+    )
 }
 
 /// Create a request to post the status with poll.
@@ -128,7 +121,7 @@ impl<'a> Method<'a, Status> for GetStatuses<'a> {}
 fn post_inner(
     conn: &Connection,
     status: Option<String>,
-    media_ids: Option<Vec<String>>,
+    media_ids: Option<MediaIds>,
     poll: Option<Poll>,
 ) -> PostStatuses {
 
@@ -160,7 +153,7 @@ pub struct PostStatuses<'a> {
     auth: bool,
 
     status: Option<String>,
-    media_ids: Option<Vec<String>>,
+    media_ids: Option<MediaIds>,
     poll: Option<Poll>,
     in_reply_to_id: Option<String>,
     sensitive: Option<bool>,
@@ -265,7 +258,6 @@ impl<'a> Method<'a, Status> for PostStatuses<'a> {
     /// - `poll_options` contains duplicate option
     /// - Total number of characters of `status` and `spoiler_text` exceeds `STATUS_MAX_CHARACTERS`
     fn send(&'a self) -> Result<Status> {
-        use std::collections::HashSet;
 
         if self.media_ids.is_some() && self.poll.is_some() {
             panic!("Cannot attach both media and poll.");
@@ -276,24 +268,10 @@ impl<'a> Method<'a, Status> for PostStatuses<'a> {
                 Error::InvalidStatusError("There is neither status nor media".to_owned())
             );
         }
-    
+ 
         // Check media_ids
         if let Some(media_ids) = &self.media_ids {
-            if media_ids.is_empty() {
-                return Err(Error::NoAttachmentMediaError);
-            }
-        
-            if media_ids.len() > self.conn.status_max_medias() {
-                return Err(
-                    Error::TooManyAttachmentMediasError(media_ids.len(), self.conn.status_max_medias())
-                );
-            }
-
-            if media_ids.iter().collect::<HashSet<&String>>().len() != media_ids.len() {
-                return Err(
-                    Error::DuplicateMediaError
-                );
-            }
+            media_ids.validate()?;
         }
 
         // Check shceduled date time is future
@@ -348,6 +326,80 @@ pub struct DeleteStatuses<'a> {
 
 impl<'a> Method<'a, Status> for DeleteStatuses<'a> {}
 
+/// Wrapper for media_ids.
+#[derive(Debug, Clone)]
+struct MediaIds {
+    media_ids: Vec<String>,
+    status_max_medias: usize,
+}
+
+impl MediaIds {
+    fn new<T, U>(media_ids: T, status_max_medias: usize) -> Self
+    where
+        T: AsRef<[U]>,
+        U: AsRef<str>,
+    {
+        let media_ids = media_ids.as_ref()
+            .into_iter()
+            .map(|u| u.as_ref().trim())
+            .filter(|u| !u.is_empty())
+            .map(|u| u.to_owned())
+            .collect::<Vec<String>>();
+
+        MediaIds {
+            media_ids,
+            status_max_medias,
+        }
+    }
+
+    #[allow(dead_code)]
+    fn is_empty(&self) -> bool {
+        self.media_ids.is_empty()
+    }
+
+    #[allow(dead_code)]
+    fn len(&self) -> usize {
+        self.media_ids.len()
+    }
+
+    fn validate(&self) -> Result<()> {
+        use std::collections::HashSet;
+
+        if self.media_ids.is_empty() {
+            return Err(Error::NoAttachmentMediaError);
+        }
+    
+        if self.media_ids.len() > self.status_max_medias {
+            return Err(
+                Error::TooManyAttachmentMediasError(self.media_ids.len(), self.status_max_medias)
+            );
+        }
+
+        if self.media_ids.iter().collect::<HashSet<&String>>().len() != self.media_ids.len() {
+            return Err(
+                Error::DuplicateMediaError
+            );
+        }
+
+        Ok(())
+    }
+}
+
+impl serde::ser::Serialize for MediaIds {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: serde::ser::Serializer,
+    {
+        use serde::ser::SerializeSeq;
+
+        let mut seq = serializer.serialize_seq(Some(self.len()))?;
+        for media_id in self.media_ids.iter() {
+            seq.serialize_element(&media_id)?;
+        }
+        seq.end()
+    }
+}
+
 /// Poll options.
 #[derive(Debug, Serialize)]
 struct Poll {
@@ -379,6 +431,16 @@ impl Poll {
             hide_totals: false,
             max_options,
         }
+    }
+
+    #[allow(dead_code)]
+    fn len(&self) -> usize {
+        self.options.len()
+    }
+
+    #[allow(dead_code)]
+    fn is_empty(&self) -> bool {
+        self.options.is_empty()
     }
 
     // Set this poll to be able to multiple votes.
@@ -535,30 +597,69 @@ mod tests {
     }
 
     #[test]
+    fn test_media_ids() {
+        let ids = ["", "", "a", "b", "c"];
+
+        // &[str]
+        let media_ids = MediaIds::new(&ids, 4);
+        assert_eq!(media_ids.len(), 3);
+
+        // [str]
+        let media_ids = MediaIds::new(ids, 4);
+        assert_eq!(media_ids.len(), 3);
+
+        let ids = vec!["a".to_owned(), "b".to_owned(), "c".to_owned(), String::new()];
+
+        // &Vec<String>
+        let media_ids = MediaIds::new(&ids, 4);
+        assert_eq!(media_ids.len(), 3);
+
+        // Vec<String>
+        let media_ids = MediaIds::new(ids, 4);
+        assert_eq!(media_ids.len(), 3);
+
+        let ids = vec!["a", "b", "", "c"];
+
+        // &Vec<&str>
+        let media_ids = MediaIds::new(&ids, 4);
+        assert_eq!(media_ids.len(), 3);
+
+        // Vec<&str>
+        let media_ids = MediaIds::new(ids, 4);
+        assert_eq!(media_ids.len(), 3);
+    }
+
+    #[test]
     fn test_poll() {
         let options = ["", "", "a", "b", "c"];
 
+        // &[str]
         let poll = Poll::new(&options, 3600, 4);
-        assert_eq!(poll.options.len(), 3);
+        assert_eq!(poll.len(), 3);
 
+        // [str]
         let poll = Poll::new(options, 3600, 4);
-        assert_eq!(poll.options.len(), 3);
+        assert_eq!(poll.len(), 3);
 
         let options = vec!["a".to_owned(), "b".to_owned(), "c".to_owned(), String::new()];
 
+        // &Vec<String>
         let poll = Poll::new(&options, 3600, 4);
-        assert_eq!(poll.options.len(), 3);
+        assert_eq!(poll.len(), 3);
 
+        // Vec<String>
         let poll = Poll::new(options, 3600, 4);
-        assert_eq!(poll.options.len(), 3);
+        assert_eq!(poll.len(), 3);
 
         let options = vec!["a", "b", "", "c"];
 
+        // &Vec<&str>
         let poll = Poll::new(&options, 3600, 4);
-        assert_eq!(poll.options.len(), 3);
+        assert_eq!(poll.len(), 3);
 
+        // Vec<&str>
         let poll = Poll::new(options, 3600, 4);
-        assert_eq!(poll.options.len(), 3);
+        assert_eq!(poll.len(), 3);
     }
 
     fn body(s: &str) -> String {
