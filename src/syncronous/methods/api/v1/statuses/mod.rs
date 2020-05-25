@@ -597,7 +597,7 @@ mod tests {
     }
 
     #[test]
-    fn test_media_ids() {
+    fn test_media_ids_construction() {
         let ids = ["", "", "a", "b", "c"];
 
         // &[str]
@@ -630,7 +630,24 @@ mod tests {
     }
 
     #[test]
-    fn test_poll() {
+    fn test_media_ids_validation() {
+        let ids: Vec<String> = Vec::new();
+
+        // no id
+        let media_ids = MediaIds::new(ids, 4);
+        assert!(media_ids.validate().is_err());
+
+        // too many ids
+        let media_ids = MediaIds::new(["a", "b", "c", "d", "", "e"], 4);
+        assert!(media_ids.validate().is_err());
+
+        // id duplication
+        let media_ids = MediaIds::new(["a", "b", "c", "a"], 4);
+        assert!(media_ids.validate().is_err());
+    }
+
+    #[test]
+    fn test_poll_construction() {
         let options = ["", "", "a", "b", "c"];
 
         // &[str]
@@ -660,6 +677,27 @@ mod tests {
         // Vec<&str>
         let poll = Poll::new(options, 3600, 4);
         assert_eq!(poll.len(), 3);
+    }
+
+    #[test]
+    fn test_poll_validation() {
+        let options: Vec<String> = Vec::new();
+
+        // no option
+        let poll = Poll::new(options, 3600, 4);
+        assert!(poll.validate().is_err());
+
+        // too little options
+        let poll = Poll::new(["a"], 3600, 4);
+        assert!(poll.validate().is_err());
+
+        // too many options
+        let poll = Poll::new(["a", "b", "c", "d", "", "e"], 3600, 4);
+        assert!(poll.validate().is_err());
+
+        // option duplication
+        let poll = Poll::new(["a", "b", "c", "", "a"], 3600, 4);
+        assert!(poll.validate().is_err());
     }
 
     fn body(s: &str) -> String {
