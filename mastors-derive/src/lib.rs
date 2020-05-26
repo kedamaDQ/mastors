@@ -56,7 +56,9 @@ pub fn derive_method(input: TokenStream) -> TokenStream {
     } else if http_method == "POST" {
         quote! { Ok(self.post()?) }
     } else if http_method == "DELETE" {
-        quote! {Ok(self.delete()?)}
+        quote! { Ok(self.delete()?) }
+    } else if http_method == "PUT" {
+        quote! { Ok(self.put()?) }
     } else {
         panic!("Unexpected HTTP method");
     };

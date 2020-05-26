@@ -32,7 +32,7 @@ pub mod scope;
 pub use connection::Connection;
 pub use error::{ Error, Result };
 
-pub use chrono::{ DateTime, Local, Utc };
+pub use chrono::{ DateTime, Duration, Local, Utc };
 pub use isolang::Language;
 pub use url::Url;
 
