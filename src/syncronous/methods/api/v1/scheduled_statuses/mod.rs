@@ -3,7 +3,6 @@ pub mod id;
 use serde::Serialize;
 use crate::{
     Connection,
-    Result,
     entities::ScheduledStatuses,
     methods::Method,
 };

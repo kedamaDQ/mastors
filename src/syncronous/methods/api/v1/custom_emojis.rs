@@ -1,7 +1,6 @@
 use serde::Serialize;
 use crate::{
     Connection,
-    Result,
     entities::Emojis,
     methods::Method,
 };

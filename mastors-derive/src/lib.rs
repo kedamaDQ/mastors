@@ -75,7 +75,7 @@ pub fn derive_method(input: TokenStream) -> TokenStream {
 
             #fn_authorization
 
-            fn send_internal(&self) -> Result<#entity> {
+            fn send_internal(&self) -> crate::Result<#entity> {
                 #fn_send_internal_impl
             }
         }
