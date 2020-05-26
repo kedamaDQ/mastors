@@ -6,6 +6,7 @@ use crate::{
 use super::{
     Attachment,
     Entity,
+    Nothing,
     Visibility,
 };
 
@@ -45,17 +46,15 @@ impl Entity for ScheduledStatus {}
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Params {
-    // Required attributes
     text: String,
-    visibility: Visibility,
-    application_id: String,
-
-    // Optional attributes
+    application_id: u64,
+    visibility: Option<Visibility>,
     in_reply_to_id: Option<String>,
     media_ids: Option<Vec<String>>,
     sensitive: Option<bool>,
     spoiler_text: Option<String>,
     scheduled_at: Option<DateTime<Utc>>,
+    poll: Option<ScheduledPoll>,
 }
 
 impl Params {
@@ -64,14 +63,14 @@ impl Params {
         &self.text
     }
 
-    /// Get a visibility of status that will posted at scheduled date and time.
-    pub fn visibility(&self) -> Visibility {
-        self.visibility
+    /// Get an application ID that used to create this scheduled status.
+    pub fn application_id(&self) -> u64 {
+        self.application_id
     }
 
-    /// Get an application ID that used to create this scheduled status.
-    pub fn application_id(&self) -> &str {
-        &self.application_id
+    /// Get a visibility of status that will posted at scheduled date and time.
+    pub fn visibility(&self) -> Option<Visibility> {
+        self.visibility
     }
 
     /// Get a status ID that is this scheduled status will reply to.
@@ -104,7 +103,47 @@ impl Params {
     pub fn scheduled_at(&self) -> Option<&DateTime<Utc>> {
         self.scheduled_at.as_ref()
     }
+
+    pub fn poll(&self) -> Option<&ScheduledPoll> {
+        self.poll.as_ref()
+    }
 }
 
+#[derive(Debug, Clone, Deserialize)]
+pub struct ScheduledPoll {
+    multiple: bool,
+    hide_totals: bool,
+    expires_in: u64,
+    options: Vec<String>,
+}
+
+impl ScheduledPoll {
+    /// Get whether this poll allows multiple-choice votes.
+    pub fn multiple(&self) -> bool {
+        self.multiple
+    }
+
+    /// Get whether this poll do not show the total number of votes.
+    pub fn hide_totals(&self) -> bool {
+        self.hide_totals
+    }
+
+    /// Get the validity period of this poll as second.
+    pub fn expires_in(&self) -> u64 {
+        self.expires_in
+    }
+
+    /// Get possible answers for the poll.
+    pub fn options(&self) -> &Vec<String> {
+        &self.options
+    }
+}
+
+/// Represent an array of `ScheculedStatus`.
 pub type ScheduledStatuses = Vec<ScheduledStatus>;
 impl Entity for ScheduledStatuses {}
+
+/// Represent a no body response.
+/// 
+/// API method `DELETE /api/v1/scheduled_statuses/:id` returns nothing.
+pub type DeletedScheduledStatus = Nothing;

@@ -9,6 +9,8 @@ use crate::{
     Result,
     Utc,
     entities::{
+        PostedStatus,
+        ScheduledStatus,
         Status,
         Visibility,
     },
@@ -17,6 +19,8 @@ use crate::{
         MethodInternal,
     },
 };
+
+pub const LEAST_SCHEDULABLE_PERIOD: i64 = 300;
 
 /// Create a request to get a status specified by `id`.
 pub fn get(conn: &Connection, id: impl Into<String>) -> GetStatuses {
@@ -48,7 +52,6 @@ where
     T: AsRef<[U]>,
     U: AsRef<str>,
 {
-
     post_inner(
         conn,
         str_to_option(status),
@@ -76,6 +79,32 @@ where
     )
 }
 
+// Create POST request.
+fn post_inner(
+    conn: &Connection,
+    status: Option<String>,
+    media_ids: Option<MediaIds>,
+    poll: Option<Poll>,
+) -> PostStatuses {
+
+    PostStatuses::Status(
+        PostNormalStatuses {
+            conn,
+            auth: true,
+            status,
+            media_ids,
+            poll,
+            in_reply_to_id: None,
+            sensitive: None,
+            spoiler_text: None,
+            visibility: None,
+            scheduled_at: None,
+            language: conn.default_language().and_then(|lang| lang.to_639_1()),
+        }
+    )
+}
+
+/// Create a request to delete the status for authenticated user.
 pub fn delete(conn: &Connection, id: impl Into<String>) -> DeleteStatuses {
     DeleteStatuses {
         conn,
@@ -117,33 +146,178 @@ impl<'a> GetStatuses<'a> {
 
 impl<'a> Method<'a, Status> for GetStatuses<'a> {}
 
-// Create POST request.
-fn post_inner(
-    conn: &Connection,
-    status: Option<String>,
-    media_ids: Option<MediaIds>,
-    poll: Option<Poll>,
-) -> PostStatuses {
 
-    PostStatuses {
-        conn,
-        auth: true,
-        status,
-        media_ids,
-        poll,
-        in_reply_to_id: None,
-        sensitive: None,
-        spoiler_text: None,
-        visibility: None,
-        scheduled_at: None,
-        language: conn.default_language().and_then(|lang| lang.to_639_1()),
+pub enum PostStatuses<'a> {
+    Status(PostNormalStatuses<'a>),
+    ScheduledStatus(PostScheduledStatuses<'a>),
+}
+
+impl<'a> PostStatuses<'a> {
+    /// Add an in_reply_to_id to status.
+    pub fn in_reply_to_id(mut self, in_reply_to_id: impl AsRef<str>) -> Self {
+        match self {
+            Self::Status(ref mut s) => s.in_reply_to_id = str_to_option(in_reply_to_id),
+            Self::ScheduledStatus(ref mut s) => s.in_reply_to_id = str_to_option(in_reply_to_id),
+        };
+        self
+    }
+
+    /// Set status to sensitive if media_ids is set.
+    pub fn sensitive(mut self) -> Self {
+        match self {
+            Self::Status(ref mut s) => {
+                if s.media_ids.is_some() {
+                    s.sensitive = Some(true)
+                }
+            },
+            Self::ScheduledStatus(ref mut s) => {
+                if s.media_ids.is_some() {
+                    s.sensitive = Some(true)
+                }
+            },
+        };
+        self
+    }
+
+    /// Add a spoiler_text to status.
+    pub fn spoiler_text(mut self, spoiler_text: impl AsRef<str>) -> Self {
+        match self {
+            Self::Status(ref mut s) => s.spoiler_text = str_to_option(spoiler_text),
+            Self::ScheduledStatus(ref mut s) => s.spoiler_text = str_to_option(spoiler_text),
+        };
+        self
+    }
+
+    /// Set the `Visibility` to status.
+    pub fn visibility(mut self, visibility: Visibility) -> Self {
+        match self {
+            Self::Status(ref mut s) => s.visibility = Some(visibility.to_string()),
+            Self::ScheduledStatus(ref mut s) => s.visibility = Some(visibility.to_string()),
+        };
+        self
+    }
+
+    /// Set status visibility to `public`.
+    /// This is equivalent to `visibility(Visibility::Public)`.
+    pub fn public(mut self) -> Self {
+        match self {
+            Self::Status(ref mut s) => s.visibility = Some(Visibility::Public.to_string()),
+            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Public.to_string()),
+        };
+        self
+    }
+
+    /// Set status visibility to `unlisted`.
+    /// This is equivalent to `visibility(Visibility::Unlisted)`.
+    pub fn unlisted(mut self) -> Self {
+        match self {
+            Self::Status(ref mut s) => s.visibility = Some(Visibility::Unlisted.to_string()),
+            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Unlisted.to_string()),
+        };
+        self
+    }
+
+    /// Set status visibility to `private`.
+    /// This is equivalent to `visibility(Visibility::Private)`.
+    pub fn private(mut self) -> Self {
+        match self {
+            Self::Status(ref mut s) => s.visibility = Some(Visibility::Private.to_string()),
+            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Private.to_string()),
+        };
+        self
+    }
+
+    /// Set status visibility to `direct`.
+    /// This is equivalent to `visibility(Visibility::Direct)`.
+    pub fn direct(mut self) -> Self {
+        match self {
+            Self::Status(ref mut s) => s.visibility = Some(Visibility::Direct.to_string()),
+            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Direct.to_string()),
+        };
+        self
+    }
+
+    /// Set a status to scheduled.
+    pub fn scheduled_at(mut self, scheduled_at: DateTime<Utc>) -> Self {
+        match self {
+            Self::Status(s) => {
+                return Self::ScheduledStatus(
+                    PostScheduledStatuses {
+                        conn: s.conn,
+                        auth: true,
+                        status: s.status,
+                        media_ids: s.media_ids,
+                        poll: s.poll,
+                        in_reply_to_id: s.in_reply_to_id,
+                        sensitive: s.sensitive,
+                        spoiler_text: s.spoiler_text,
+                        visibility: s.visibility,
+                        scheduled_at: Some(scheduled_at),
+                        language: s.language,
+                    }
+                );
+            },
+            Self::ScheduledStatus(ref mut s) => {
+                s.scheduled_at = Some(scheduled_at)
+            },
+        };
+        self
+    }
+
+    /// Set language to status.
+    pub fn language(mut self, language: Language) -> Self {
+        match self {
+            Self::Status(ref mut s) => s.language = language.to_639_1(),
+            Self::ScheduledStatus(ref mut s) => s.language = language.to_639_1(),
+        };
+        self
+    }
+
+    /// Set to allow multiple choices if poll is present.
+    pub fn poll_multiple(mut self) -> Self {
+        match self {
+            Self::Status(ref mut s) => s.poll.as_mut().map(|p| p.multiple = true),
+            Self::ScheduledStatus(ref mut s) => s.poll.as_mut().map(|p| p.multiple = true),
+        };
+        self
+    }
+
+    /// Set to hide number of total votes if poll is present.
+    pub fn poll_hide_totals(mut self) -> Self {
+        match self {
+            Self::Status(ref mut s) => s.poll.as_mut().map(|p| p.hide_totals = true),
+            Self::ScheduledStatus(ref mut s) => s.poll.as_mut().map(|p| p.hide_totals = true),
+        };
+        self
+    }
+
+    ///
+    /// Send a status to the server.
+    /// 
+    /// # Errors
+    /// 
+    /// This method will return the error if:
+    /// 
+    /// - Both of `status` and media_ids are nothing
+    /// - `media_ids` is empty or contains number of elements more than `STATUS_MAX_MEDIAS`
+    /// - `media_ids` contains duplicate media_id
+    /// - `scheduled_at` is set a date time in the past
+    /// - `poll_options` contains options less than 2 or more than `POLL_MAX_OPTIONS`
+    /// - `poll_options` contains duplicate option
+    /// - Total number of characters of `status` and `spoiler_text` exceeds `STATUS_MAX_CHARACTERS`
+    ///
+    pub fn send(&self) -> Result<PostedStatus> {
+        match self {
+            Self::Status(status) => Ok(PostedStatus::Status(status.send()?)),
+            Self::ScheduledStatus(status) => Ok(PostedStatus::ScheduledStatus(status.send()?)),
+        }
     }
 }
 
 /// POST request for /api/v1/statuses
 #[derive(Debug, Serialize, mastors_derive::Method)]
 #[method_params(POST, Status, "/api/v1/statuses")]
-pub struct PostStatuses<'a> {
+pub struct PostNormalStatuses<'a> {
     #[serde(skip_serializing)]
     #[mastors(connection)]
     conn: &'a Connection,
@@ -163,144 +337,58 @@ pub struct PostStatuses<'a> {
     language: Option<&'a str>,
 }
 
-impl<'a> PostStatuses<'a> {
-    /// Add an in_reply_to_id to status.
-    pub fn in_reply_to_id(mut self, id: impl AsRef<str>) -> Self {
-        self.in_reply_to_id = str_to_option(id);
-        self
-    }
+impl<'a> Method<'a, Status> for PostNormalStatuses<'a> {
+   fn send(&'a self) -> Result<Status> {
+        validate_status(
+            &self.status,
+            &self.media_ids,
+            &self.poll,
+            &self.spoiler_text,
+            self.conn.status_max_characters()
+        )?;
 
-    /// Set status to sensitive if media_ids is set.
-    pub fn sensitive(mut self) -> Self {
-        if self.media_ids.is_some() {
-            self.sensitive = Some(true);
-        }
-        self
-    }
-
-    /// Add a spoiler_text to status.
-    pub fn spoiler_text(mut self, spoiler_text: impl AsRef<str>) -> Self {
-        self.spoiler_text = str_to_option(spoiler_text);
-        self
-    }
-
-    /// Set the `Visibility` to status.
-    pub fn visibility(mut self, visibility: Visibility) -> Self {
-        self.visibility = Some(visibility.to_string());
-        self
-    }
-
-    /// Set status visibility to `public`.
-    /// This is equivalent to `visibility(Visibility::Public)`.
-    pub fn public(mut self) -> Self {
-        self.visibility = Some(Visibility::Public.to_string());
-        self
-    }
-
-    /// Set status visibility to `unlisted`.
-    /// This is equivalent to `visibility(Visibility::Unlisted)`.
-    pub fn unlisted(mut self) -> Self {
-        self.visibility = Some(Visibility::Unlisted.to_string());
-        self
-    }
-    
-    /// Set status visibility to `private`.
-    /// This is equivalent to `visibility(Visibility::Private)`.
-    pub fn private(mut self) -> Self {
-        self.visibility = Some(Visibility::Private.to_string());
-        self
-    }
-
-    /// Set status visibility to `direct`.
-    /// This is equivalent to `visibility(Visibility::Direct)`.
-    pub fn direct(mut self) -> Self {
-        self.visibility = Some(Visibility::Direct.to_string());
-        self
-    }
-
-    /// Set a status to scheduled.
-    pub fn scheduled_at(mut self, scheduled_at: DateTime<Utc>) -> Self {
-        self.scheduled_at = Some(scheduled_at);
-        self
-    }
-
-    /// Set language to status.
-    pub fn language(mut self, language: Language) -> Self {
-        self.language = language.to_639_1();
-        self
-    }
-
-    /// Set to allow multiple choices if poll is present.
-    pub fn poll_multiple(mut self) -> Self {
-        self.poll = self.poll.map(|p| p.multiple());
-        self
-    }
-
-    /// Set to hide number of total votes if poll is present.
-    pub fn poll_hide_totals(mut self) -> Self {
-        self.poll = self.poll.map(|p| p.hide_totals());
-        self
+        Ok(self.send_internal()?)
     }
 }
 
-impl<'a> Method<'a, Status> for PostStatuses<'a> {
-    /// Send a status to the server.
-    /// 
-    /// # Errors
-    /// 
-    /// This method will return the error if:
-    /// 
-    /// - Both of `status` and media_ids are nothing
-    /// - `media_ids` is empty or contains number of elements more than `STATUS_MAX_MEDIAS`
-    /// - `media_ids` contains duplicate media_id
-    /// - `scheduled_at` is set a date time in the past
-    /// - `poll_options` contains options less than 2 or more than `POLL_MAX_OPTIONS`
-    /// - `poll_options` contains duplicate option
-    /// - Total number of characters of `status` and `spoiler_text` exceeds `STATUS_MAX_CHARACTERS`
-    fn send(&'a self) -> Result<Status> {
+/// POST with scheduled date and time request for /api/v1/statuses
+#[derive(Debug, Serialize, mastors_derive::Method)]
+#[method_params(POST, ScheduledStatus, "/api/v1/statuses")]
+pub struct PostScheduledStatuses<'a> {
+    #[serde(skip_serializing)]
+    #[mastors(connection)]
+    conn: &'a Connection,
 
-        if self.media_ids.is_some() && self.poll.is_some() {
-            panic!("Cannot attach both media and poll.");
-        }
-    
-        if self.status.is_none() && self.media_ids.is_none() {
-            return Err(
-                Error::InvalidStatusError("There is neither status nor media".to_owned())
-            );
-        }
- 
-        // Check media_ids
-        if let Some(media_ids) = &self.media_ids {
-            media_ids.validate()?;
-        }
+    #[serde(skip_serializing)]
+    #[mastors(authorization)]
+    auth: bool,
+
+    status: Option<String>,
+    media_ids: Option<MediaIds>,
+    poll: Option<Poll>,
+    in_reply_to_id: Option<String>,
+    sensitive: Option<bool>,
+    spoiler_text: Option<String>,
+    visibility: Option<String>,
+    scheduled_at: Option<DateTime<Utc>>,
+    language: Option<&'a str>,
+}
+
+impl<'a> Method<'a, ScheduledStatus> for PostScheduledStatuses<'a> {
+    fn send(&'a self) -> Result<ScheduledStatus> {
+        validate_status(
+            &self.status,
+            &self.media_ids,
+            &self.poll,
+            &self.spoiler_text,
+            self.conn.status_max_characters()
+        )?;
 
         // Check shceduled date time is future
         if let Some(scheduled_at) = self.scheduled_at {
-            if scheduled_at < Utc::now() {
+            if scheduled_at < Utc::now() + chrono::Duration::seconds(LEAST_SCHEDULABLE_PERIOD) {
                 return Err(Error::PastDateTimeError(scheduled_at));
             }
-        }
-
-        // Check poll options
-        if let Some(poll) = &self.poll {
-            poll.validate()?;
-        }
-
-        // Check number of chars.
-        let mut total_chars: usize = 0;
-
-        if let Some(status) = &self.status {
-            total_chars += status.len();
-        }
-
-        if let Some(spoiler_text) = &self.spoiler_text {
-            total_chars += spoiler_text.len();
-        }
-
-        if total_chars > self.conn.status_max_characters() {
-            return Err(
-                Error::TooManyCharactersError(total_chars, self.conn.status_max_characters())
-            );
         }
 
         Ok(self.send_internal()?)
@@ -326,7 +414,7 @@ pub struct DeleteStatuses<'a> {
 
 impl<'a> Method<'a, Status> for DeleteStatuses<'a> {}
 
-/// Wrapper for media_ids.
+/// Wrapper for the media_ids.
 #[derive(Debug, Clone)]
 struct MediaIds {
     media_ids: Vec<String>,
@@ -368,7 +456,7 @@ impl MediaIds {
         if self.media_ids.is_empty() {
             return Err(Error::NoAttachmentMediaError);
         }
-    
+
         if self.media_ids.len() > self.status_max_medias {
             return Err(
                 Error::TooManyAttachmentMediasError(self.media_ids.len(), self.status_max_medias)
@@ -443,13 +531,13 @@ impl Poll {
         self.options.is_empty()
     }
 
-    // Set this poll to be able to multiple votes.
+    #[allow(dead_code)]
     fn multiple(mut self) -> Self {
         self.multiple = true;
         self
     }
 
-    // Set this poll to do not show total number of votes.
+    #[allow(dead_code)]
     fn hide_totals(mut self) -> Self {
         self.hide_totals = true;
         self
@@ -478,6 +566,54 @@ impl Poll {
 
         Ok(())
     }
+}
+
+fn validate_status(
+    status: &Option<String>,
+    media_ids: &Option<MediaIds>,
+    poll: &Option<Poll>,
+    spoiler_text: &Option<String>,
+    status_max_characters: usize,
+) -> Result<()> {
+
+    if media_ids.is_some() && poll.is_some() {
+        panic!("Cannot attach both media and poll.");
+    }
+
+    if status.is_none() && media_ids.is_none() {
+        return Err(
+            Error::InvalidStatusError("There is neither status nor media".to_owned())
+        );
+    }
+
+    // Check media_ids
+    if let Some(media_ids) = media_ids {
+        media_ids.validate()?;
+    }
+
+    // Check poll options
+    if let Some(poll) = poll {
+        poll.validate()?;
+    }
+
+    // Check total number of characters
+    let mut total_chars: usize = 0;
+
+    if let Some(status) = status.as_ref() {
+        total_chars += status.len();
+    }
+
+    if let Some(spoiler_text) = spoiler_text.as_ref() {
+        total_chars += spoiler_text.len();
+    }
+
+    if total_chars > status_max_characters {
+        return Err(
+            Error::TooManyCharactersError(total_chars, status_max_characters)
+        );
+    }
+
+    Ok(())
 }
 
 fn str_to_option(s: impl AsRef<str>) -> Option<String> {
@@ -521,7 +657,7 @@ mod tests {
         let deleted = delete(&conn, posted.id())
             .send()
             .unwrap();
-        
+
         assert_eq!(posted.id(), deleted.id());
         assert_eq!(&content, deleted.text().unwrap());
     }
@@ -535,19 +671,20 @@ mod tests {
             .poll_hide_totals()
             .send()
             .unwrap();
+        let posted = posted.status().unwrap();
 
         let got = get(&conn, posted.id())
             .authorized()
             .send()
             .unwrap();
-        
+
         assert_eq!(posted.id(), got.id());
         assert_eq!(posted.poll().unwrap().id(), got.poll().unwrap().id());
 
         let deleted = delete(&conn, posted.id())
             .send()
             .unwrap();
-        
+
         assert_eq!(got.id(), deleted.id());
         assert_eq!(&content, deleted.text().unwrap());
         assert_eq!(got.poll().unwrap().id(), deleted.poll().unwrap().id())
@@ -572,7 +709,7 @@ mod tests {
         let got = get(&conn, posted.id())
             .send()
             .unwrap();
-        
+
         let got_media_ids = got
             .media_attachments()
             .iter()
@@ -585,7 +722,7 @@ mod tests {
         let deleted = delete(&conn, got.id())
             .send()
             .unwrap();
-        
+
         assert_eq!(got.id(), deleted.id());
         assert_eq!(
             media_ids,
@@ -594,6 +731,97 @@ mod tests {
                 .map(|ma| ma.id().to_owned())
                 .collect::<Vec<String>>()
         );
+    }
+
+    #[test]
+    fn test_scheduled_status() {
+        let conn = Connection::new_with_path(ENV_TEST).unwrap();
+        let scheduled_at = Utc::now() + crate::Duration::seconds(310);
+        let posted = post(&conn, body("scheduled!"))
+            .scheduled_at(scheduled_at)
+            .send()
+            .unwrap()
+            .scheduled_status()
+            .unwrap();
+
+        // Mastodon rounds down nano-secs, following:
+        //  left: `2020-05-26T11:11:34.730Z`'
+        //  right: `2020-05-26T11:11:34.730011387Z`,
+//      assert_eq!(posted.scheduled_at().clone(), scheduled_at);
+
+        let got = crate::api::v1::scheduled_statuses::id::get(&conn, posted.id())
+            .send()
+            .unwrap();
+
+        assert_eq!(posted.id(), got.id());
+        assert_eq!(posted.scheduled_at(), got.scheduled_at());
+
+        let extended_scheduled_at = got.scheduled_at().clone() + crate::Duration::seconds(100);
+        let put = crate::api::v1::scheduled_statuses::id::put(&conn, got.id())
+            .scheduled_at(extended_scheduled_at.clone())
+            .send()
+            .unwrap();
+
+        assert_eq!(got.id(), put.id());
+        assert_eq!(put.scheduled_at().clone(), extended_scheduled_at);
+
+        let _deleted = crate::api::v1::scheduled_statuses::id::delete(&conn, put.id())
+            .send()
+            .unwrap();
+
+        let got = crate::api::v1::scheduled_statuses::id::get(&conn, got.id())
+            .send();
+
+        assert!(got.is_err());
+    }
+
+    #[test]
+    fn test_scheduled_status_with_media() {
+        let conn = Connection::new_with_path(ENV_TEST).unwrap();
+        let scheduled_at = Utc::now() + crate::Duration::seconds(310);
+        let media_ids = vec![
+            crate::api::v1::media::post(&conn, "./test-resources/test1.png").send().unwrap().id().to_owned(),
+            crate::api::v1::media::post(&conn, "./test-resources/test2.png").send().unwrap().id().to_owned(),
+        ];
+
+        let posted = post_with_media(&conn, "scheduled status with media", media_ids)
+            .scheduled_at(scheduled_at)
+            .send()
+            .unwrap()
+            .scheduled_status()
+            .unwrap();
+
+        let _deleted = crate::api::v1::scheduled_statuses::id::delete(&conn, posted.id())
+            .send()
+            .unwrap();
+
+        let got = crate::api::v1::scheduled_statuses::id::get(&conn, posted.id())
+            .send();
+        
+        assert!(got.is_err());
+    }
+
+    #[test]
+    fn test_scheduled_status_with_poll() {
+        let conn = Connection::new_with_path(ENV_TEST).unwrap();
+        let scheduled_at = Utc::now() + crate::Duration::seconds(310);
+        let posted = post_with_poll(&conn, "scheduled status with poll", ["a", "b"], 3600)
+            .scheduled_at(scheduled_at)
+            .poll_hide_totals()
+            .poll_multiple()
+            .send()
+            .unwrap()
+            .scheduled_status()
+            .unwrap();
+
+        let _deleted = crate::api::v1::scheduled_statuses::id::delete(&conn, posted.id())
+            .send()
+            .unwrap();
+
+        let got = crate::api::v1::scheduled_statuses::id::get(&conn, posted.id())
+            .send();
+        
+        assert!(got.is_err());
     }
 
     #[test]
