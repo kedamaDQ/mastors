@@ -1,7 +1,6 @@
 use serde::Serialize;
 use crate::{
     Connection,
-    Result,
     entities::Instance,
     methods::Method,
 };
@@ -31,7 +30,6 @@ pub mod peers {
     use serde::Serialize;
     use crate::{
         Connection,
-        Result,
         entities::instance::Peers,
         methods::Method,
     };
@@ -57,7 +55,6 @@ pub mod activity {
     use serde::Serialize;
     use crate::{
         Connection,
-        Result,
         entities::Activities,
         methods::Method,
     };

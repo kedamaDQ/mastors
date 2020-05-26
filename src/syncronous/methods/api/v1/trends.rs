@@ -1,7 +1,6 @@
 use serde::Serialize;
 use crate::{
     Connection,
-    Result,
     entities::Trends,
     methods::Method,
 };

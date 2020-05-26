@@ -2,7 +2,6 @@ use serde::Serialize;
 use crate::{
     Connection,
     DateTime,
-    Result,
     Utc,
     entities::{
         DeletedScheduledStatus,
