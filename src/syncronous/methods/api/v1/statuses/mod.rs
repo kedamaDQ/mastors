@@ -1,4 +1,4 @@
-//pub mod id;
+pub mod id;
 
 use serde::Serialize;
 use crate::{
@@ -21,15 +21,6 @@ use crate::{
 };
 
 pub const LEAST_SCHEDULABLE_PERIOD: i64 = 300;
-
-/// Create a request to get a status specified by `id`.
-pub fn get(conn: &Connection, id: impl Into<String>) -> GetStatuses {
-    GetStatuses {
-        conn,
-        id: id.into(),
-        authorized: true,
-    }
-}
 
 /// Create a request to post the status.
 pub fn post(
@@ -103,49 +94,6 @@ fn post_inner(
         }
     )
 }
-
-/// Create a request to delete the status for authenticated user.
-pub fn delete(conn: &Connection, id: impl Into<String>) -> DeleteStatuses {
-    DeleteStatuses {
-        conn,
-        auth: true,
-        id: id.into(),
-    }
-}
-
-/// GET request for /api/v1/statuses/:id
-#[derive(Debug, Serialize, mastors_derive::Method)]
-#[method_params(GET, Status, "/api/v1/statuses/_PATH_PARAM_")]
-pub struct GetStatuses<'a> {
-    #[serde(skip_serializing)]
-    #[mastors(connection)]
-    conn: &'a Connection,
-
-    #[serde(skip_serializing)]
-    #[mastors(authorization)]
-    authorized: bool,
-
-    #[serde(skip_serializing)]
-    #[mastors(path_param)]
-    id: String,
-}
-
-impl<'a> GetStatuses<'a> {
-    /// Add Authorization header to GET request.
-    pub fn authorized(mut self) -> Self {
-        self.authorized = true;
-        self
-    }
-
-    /// Remove Authorization header from GET request.
-    pub fn unauthorized(mut self) -> Self {
-        self.authorized = false;
-        self
-    }
-}
-
-impl<'a> Method<'a, Status> for GetStatuses<'a> {}
-
 
 pub enum PostStatuses<'a> {
     Status(PostNormalStatuses<'a>),
@@ -395,25 +343,6 @@ impl<'a> Method<'a, ScheduledStatus> for PostScheduledStatuses<'a> {
     }
 }
 
-/// DELETE request for /api/v1/statuses/:id
-#[derive(Debug, Serialize, mastors_derive::Method)]
-#[method_params(DELETE, Status, "/api/v1/statuses/_PATH_PARAM_")]
-pub struct DeleteStatuses<'a> {
-    #[serde(skip_serializing)]
-    #[mastors(connection)]
-    conn: &'a Connection,
-
-    #[serde(skip_serializing)]
-    #[mastors(authorization)]
-    auth: bool,
-
-    #[serde(skip_serializing)]
-    #[mastors(path_param)]
-    id: String,
-}
-
-impl<'a> Method<'a, Status> for DeleteStatuses<'a> {}
-
 /// Wrapper for the media_ids.
 #[derive(Debug, Clone)]
 struct MediaIds {
@@ -645,7 +574,7 @@ mod tests {
             .send()
             .unwrap();
 
-        let got = get(&conn, posted.id())
+        let got = get_by_id(&conn, posted.id())
             .authorized()
             .unauthorized()
             .authorized()
@@ -654,7 +583,7 @@ mod tests {
 
         assert_eq!(posted.id(), got.id());
 
-        let deleted = delete(&conn, posted.id())
+        let deleted = delete_by_id(&conn, posted.id())
             .send()
             .unwrap();
 
@@ -673,7 +602,7 @@ mod tests {
             .unwrap();
         let posted = posted.status().unwrap();
 
-        let got = get(&conn, posted.id())
+        let got = get_by_id(&conn, posted.id())
             .authorized()
             .send()
             .unwrap();
@@ -681,7 +610,7 @@ mod tests {
         assert_eq!(posted.id(), got.id());
         assert_eq!(posted.poll().unwrap().id(), got.poll().unwrap().id());
 
-        let deleted = delete(&conn, posted.id())
+        let deleted = delete_by_id(&conn, posted.id())
             .send()
             .unwrap();
 
@@ -706,7 +635,7 @@ mod tests {
             .send()
             .unwrap();
 
-        let got = get(&conn, posted.id())
+        let got = get_by_id(&conn, posted.id())
             .send()
             .unwrap();
 
@@ -719,7 +648,7 @@ mod tests {
         assert_eq!(posted.id(), got.id());
         assert_eq!(&media_ids, &got_media_ids);
 
-        let deleted = delete(&conn, got.id())
+        let deleted = delete_by_id(&conn, got.id())
             .send()
             .unwrap();
 
@@ -931,4 +860,18 @@ mod tests {
     fn body(s: &str) -> String {
         "Test ".to_string() + s + "\n\n" + Local::now().to_rfc3339().as_str()
     }
+}
+
+/// Create a request to get a status specified by `id`.
+/// 
+/// This method is an alias of `mastors::api::v1::statues::id::get()`.
+pub fn get_by_id(conn: &Connection, id: impl Into<String>) -> id::GetStatuses {
+    id::get(conn, id)
+}
+
+/// Create a request to delete a status specified by `id`.
+/// 
+/// This method is an alias of `mastors::api::v1::statues::id::delete()`.
+pub fn delete_by_id(conn: &Connection, id: impl Into<String>) -> id::DeleteStatuses {
+    id::delete(conn, id)
 }
