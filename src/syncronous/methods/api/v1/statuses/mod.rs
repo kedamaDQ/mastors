@@ -1,3 +1,4 @@
+//! This module provides features related to status that are post a status, get a status, and reaction to status.
 pub mod id;
 
 use serde::Serialize;
@@ -28,7 +29,7 @@ pub fn post(
     status: impl AsRef<str>,
 ) -> PostStatuses {
 
-    post_inner(conn, str_to_option(status), None, None)
+    post_internal(conn, str_to_option(status), None, None)
 }
 
 /// Create a request to post the status with attached medias.
@@ -43,7 +44,7 @@ where
     T: AsRef<[U]>,
     U: AsRef<str>,
 {
-    post_inner(
+    post_internal(
         conn,
         str_to_option(status),
         Some(MediaIds::new(media_ids, conn.status_max_medias())),
@@ -62,7 +63,7 @@ where
     T: AsRef<[U]>,
     U: AsRef<str>,
 {
-    post_inner(
+    post_internal(
         conn,
         str_to_option(status),
         None,
@@ -81,7 +82,7 @@ pub use id::get as get_by_id;
 pub use id::delete as delete_by_id;
 
 // Create POST request.
-fn post_inner(
+fn post_internal(
     conn: &Connection,
     status: Option<String>,
     media_ids: Option<MediaIds>,
@@ -105,6 +106,10 @@ fn post_inner(
     )
 }
 
+/// POST request for `/api/v1/statuses`.
+/// 
+/// The endpoint `/api/v1/statuses` returns response that are `Status` or `ScheduledStatus`.
+/// This request absorbs those differences, but you need to get the true response using either `mastors::entities::PostedStatus.status()` or `mastors::entities::PostedStatus.scheduled_status()` on the response.
 pub enum PostStatuses<'a> {
     Status(PostNormalStatuses<'a>),
     ScheduledStatus(PostScheduledStatuses<'a>),
@@ -249,7 +254,6 @@ impl<'a> PostStatuses<'a> {
         self
     }
 
-    ///
     /// Send a status to the server.
     /// 
     /// # Errors
@@ -263,7 +267,6 @@ impl<'a> PostStatuses<'a> {
     /// - `poll_options` contains options less than 2 or more than `POLL_MAX_OPTIONS`
     /// - `poll_options` contains duplicate option
     /// - Total number of characters of `status` and `spoiler_text` exceeds `STATUS_MAX_CHARACTERS`
-    ///
     pub fn send(&self) -> Result<PostedStatus> {
         match self {
             Self::Status(status) => Ok(PostedStatus::Status(status.send()?)),
@@ -272,7 +275,7 @@ impl<'a> PostStatuses<'a> {
     }
 }
 
-/// POST request for /api/v1/statuses
+/// POST request for `/api/v1/statuses`.
 #[derive(Debug, Serialize, mastors_derive::Method)]
 #[method_params(POST, Status, "/api/v1/statuses")]
 pub struct PostNormalStatuses<'a> {
@@ -309,7 +312,7 @@ impl<'a> Method<'a, Status> for PostNormalStatuses<'a> {
     }
 }
 
-/// POST with scheduled date and time request for /api/v1/statuses
+/// POST request with scheduled date and time request for `/api/v1/statuses`.
 #[derive(Debug, Serialize, mastors_derive::Method)]
 #[method_params(POST, ScheduledStatus, "/api/v1/statuses")]
 pub struct PostScheduledStatuses<'a> {
@@ -342,7 +345,7 @@ impl<'a> Method<'a, ScheduledStatus> for PostScheduledStatuses<'a> {
             self.conn.status_max_characters()
         )?;
 
-        // Check shceduled date time is future
+        // Check shceduled date time is future.
         if let Some(scheduled_at) = self.scheduled_at {
             if scheduled_at < Utc::now() + chrono::Duration::seconds(LEAST_SCHEDULABLE_PERIOD) {
                 return Err(Error::PastDateTimeError(scheduled_at));
@@ -569,11 +572,9 @@ mod tests {
     use super::*;
     use crate::Local;
 
-    const ENV_TEST: &str = ".env.test";
-
     #[test]
     fn test_statuses() {
-        let conn = Connection::new_with_path(ENV_TEST).unwrap();
+        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
         let content = body("toot!");
         let posted = post(&conn, &content)
             .spoiler_text("spoiler text")
@@ -603,7 +604,7 @@ mod tests {
 
     #[test]
     fn test_statuses_with_poll() {
-        let conn = Connection::new_with_path(ENV_TEST).unwrap();
+        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
         let content = body("with poll!");
         let posted = post_with_poll(&conn, &content, &(vec!["poll1", "poll2", "poll3"]), 3600)
             .poll_multiple()
@@ -633,7 +634,7 @@ mod tests {
     fn test_status_with_attachment() {
         use crate::api::v1::media;
 
-        let conn = Connection::new_with_path(ENV_TEST).unwrap();
+        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
         let content = body("with attachment!");
 
         let media_ids = vec![
@@ -674,7 +675,7 @@ mod tests {
 
     #[test]
     fn test_scheduled_status() {
-        let conn = Connection::new_with_path(ENV_TEST).unwrap();
+        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
         let scheduled_at = Utc::now() + crate::Duration::seconds(310);
         let posted = post(&conn, body("scheduled!"))
             .scheduled_at(scheduled_at)
@@ -716,7 +717,7 @@ mod tests {
 
     #[test]
     fn test_scheduled_status_with_media() {
-        let conn = Connection::new_with_path(ENV_TEST).unwrap();
+        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
         let scheduled_at = Utc::now() + crate::Duration::seconds(310);
         let media_ids = vec![
             crate::api::v1::media::post(&conn, "./test-resources/test1.png").send().unwrap().id().to_owned(),
@@ -742,7 +743,7 @@ mod tests {
 
     #[test]
     fn test_scheduled_status_with_poll() {
-        let conn = Connection::new_with_path(ENV_TEST).unwrap();
+        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
         let scheduled_at = Utc::now() + crate::Duration::seconds(310);
         let posted = post_with_poll(&conn, "scheduled status with poll", ["a", "b"], 3600)
             .scheduled_at(scheduled_at)

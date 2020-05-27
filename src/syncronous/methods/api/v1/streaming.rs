@@ -1,3 +1,4 @@
+//! This module provides features related to get streaming timelines.
 use eventsource::{
     event::Event,
     reqwest::Client,
@@ -69,6 +70,7 @@ impl<'a> GetStreaming<'a> {
     }
 }
 
+/// Stream of each timeline.
 pub struct SseStream {
     client: Client,
 }
@@ -152,28 +154,35 @@ impl fmt::Display for StreamType {
     }
 }
 
-
+/// This module provides features related to check about streaming of the server is alives.
 pub mod health {
     use super::*;
 
+    /// Gets whether the server's streaming is alive.
     pub fn get(conn: &Connection) -> GetHealth {
         GetHealth {
             conn
         }       
     }
 
+    /// GET request for `/api/v1/streaming/health`.
     pub struct GetHealth<'a> {
         conn: &'a Connection,
     }
 
     impl<'a> GetHealth<'a> {
-
         const ENDPOINT: &'a str = "/api/v1/streaming/health";
 
+        /// If streaming of the server is alive, will returns a text 'OK'.
         pub fn send(&self) -> Result<String>{
             Ok(utils::extract_response(
                self.conn.client().get(self.conn.url(Self::ENDPOINT)?).send()?
             )?.text()?)
         }
     }
+}
+
+#[cfg(test)]
+mod tests {
+
 }

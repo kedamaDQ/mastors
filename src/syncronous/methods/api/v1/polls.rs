@@ -1,3 +1,4 @@
+//! This module provides features related to poll attached to status.
 use std::collections::HashSet;
 use serde::Serialize;
 use crate::{
@@ -11,6 +12,7 @@ use crate::{
     },
 };
 
+/// Get a request to vote to the poll.
 pub fn post(
     conn: &Connection,
     id: impl Into<String>,
@@ -30,6 +32,9 @@ pub fn post(
 /// This method is an alias of `mastors::api::v1::polls::id::get()`.
 pub use id::get as get_by_id;
 
+/// POST request for `/api/v1/polls/:id`.
+/// 
+/// This request votes to poll specified by `id`.
 #[derive(Debug, Clone, Serialize, mastors_derive::Method)]
 #[method_params(POST, Poll, "/api/v1/polls/_PATH_PARAM_")]
 pub struct PostPolls<'a> {
@@ -61,6 +66,7 @@ impl<'a> Method<'a, Poll> for PostPolls<'a> {
     }
 }
 
+/// This module provides features related to status of a poll.
 pub mod id {
     use serde::Serialize;
     use crate:: {
@@ -78,6 +84,7 @@ pub mod id {
         }
     }
 
+    /// GET request for `/api/v1/polls/:id`.
     #[derive(Debug, Clone, Serialize, mastors_derive::Method)]
     #[method_params(GET, Poll, "/api/v1/polls/_PATH_PARAM_")]
     pub struct GetPolls<'a> {
@@ -107,4 +114,9 @@ pub mod id {
     }
 
     impl<'a> Method<'a, Poll> for GetPolls<'a> {}
+}
+
+#[cfg(test)]
+mod tests {
+
 }

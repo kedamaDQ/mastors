@@ -39,7 +39,7 @@ pub fn delete(conn: &Connection, id: impl Into<String>) -> DeleteStatuses {
     }
 }
 
-/// GET request for /api/v1/statuses/:id
+/// GET request for `/api/v1/statuses/:id`.
 #[derive(Debug, Serialize, mastors_derive::Method)]
 #[method_params(GET, Status, "/api/v1/statuses/_PATH_PARAM_")]
 pub struct GetStatuses<'a> {
@@ -72,7 +72,7 @@ impl<'a> GetStatuses<'a> {
 
 impl<'a> Method<'a, Status> for GetStatuses<'a> {}
 
-/// DELETE request for /api/v1/statuses/:id
+/// DELETE request for `/api/v1/statuses/:id`.
 #[derive(Debug, Serialize, mastors_derive::Method)]
 #[method_params(DELETE, Status, "/api/v1/statuses/_PATH_PARAM_")]
 pub struct DeleteStatuses<'a> {

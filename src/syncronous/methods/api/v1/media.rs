@@ -1,3 +1,4 @@
+//! This module provides features related to uploading media attached to status.
 use serde::Serialize;
 use crate::{
     Connection,
@@ -11,6 +12,7 @@ use crate::{
     }
 };
 
+/// Get a request to upload the media that will attach to status.
 pub fn post(conn: &Connection, filename: impl Into<String>) -> PostMedia {
     PostMedia {
         conn,
@@ -22,6 +24,7 @@ pub fn post(conn: &Connection, filename: impl Into<String>) -> PostMedia {
     }
 }
 
+/// POST request for `/api/v1/media`.
 #[derive(Debug, Serialize, mastors_derive::Method)]
 #[method_params(POST, Attachment, "/api/v1/media")]
 pub struct PostMedia<'a> {
@@ -40,12 +43,14 @@ pub struct PostMedia<'a> {
 }
 
 impl<'a> PostMedia<'a> {
-    pub fn description(&mut self, description: impl Into<String>) -> &Self {
+    /// Set a description text of this media attachment.
+    pub fn description(mut self, description: impl Into<String>) -> Self {
         self.description = Some(description.into());
         self
     }
 
-    pub fn focus(&mut self, x: f64, y: f64) -> &Self {
+    /// Sets the focal point of this media attachment when viewed in a cropped thumbnail view.
+    pub fn focus(mut self, x: f64, y: f64) -> Self {
         let focus = Focus::new(x, y);
         self.focus_str = Some(focus.to_string());
         self.focus = Some(focus);
@@ -118,4 +123,9 @@ impl fmt::Display for Focus {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "({},{})", self.x, self.y)
     }
+}
+
+#[cfg(test)]
+mod tests {
+
 }
