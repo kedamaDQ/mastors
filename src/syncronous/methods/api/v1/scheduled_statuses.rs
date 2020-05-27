@@ -17,6 +17,21 @@ pub fn get(conn: &Connection) -> GetScheduledStatuses {
     }
 }
 
+/// Get a request to get a scheduled status specified by `id`.
+/// 
+/// This method is an alias of `mastors::api::v1::scheduled_statuses::id::get()`.
+pub use id::get as get_by_id;
+
+/// Get a request to update a scheduled status specified by `id`.
+/// 
+/// This method is an alias of `mastors::api::v1::scheduled_statuses::id::put()`.
+pub use id::put as put_by_id;
+
+/// Get a request to delete a scheduled status specified by `id`.
+/// 
+/// This method is an alias of `mastors::api::v1::scheduled_statuses::id::delete()`.
+pub use id::delete as delete_by_id;
+
 /// GET request for scheduled statuses that are created by authenticated user.
 #[derive(Debug, Clone, Serialize, mastors_derive::Method)]
 #[method_params(GET, ScheduledStatuses, "/api/v1/scheduled_statuses")]
@@ -62,27 +77,6 @@ impl<'a> GetScheduledStatuses<'a> {
 }
 
 impl<'a> Method<'a, ScheduledStatuses> for GetScheduledStatuses<'a> {}
-
-/// Get a request to get a scheduled status specified by `id`.
-/// 
-/// This method is an alias of `mastors::api::v1::scheduled_statuses::id::get()`.
-pub fn get_by_id(conn: &Connection, id: impl Into<String>) -> id::GetScheduledStatuses {
-    id::get(conn, id)
-}
-
-/// Get a request to update a scheduled status specified by `id`.
-/// 
-/// This method is an alias of `mastors::api::v1::scheduled_statuses::id::put()`.
-pub fn put_by_id(conn: &Connection, id: impl Into<String>) -> id::PutScheduledStatuses {
-    id::put(conn, id)
-}
-
-/// Get a request to delete a scheduled status specified by `id`.
-/// 
-/// This method is an alias of `mastors::api::v1::scheduled_statuses::id::delete()`.
-pub fn delete_by_id(conn: &Connection, id: impl Into<String>) -> id::DeleteScheduledStatuses {
-    id::delete(conn, id)
-}
 
 pub mod id {
     use serde::Serialize;

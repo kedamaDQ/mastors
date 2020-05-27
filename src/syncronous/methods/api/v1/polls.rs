@@ -25,6 +25,11 @@ pub fn post(
     }
 }
 
+/// Get a request to get a poll specified by ID.
+/// 
+/// This method is an alias of `mastors::api::v1::polls::id::get()`.
+pub use id::get as get_by_id;
+
 #[derive(Debug, Clone, Serialize, mastors_derive::Method)]
 #[method_params(POST, Poll, "/api/v1/polls/_PATH_PARAM_")]
 pub struct PostPolls<'a> {
@@ -64,7 +69,7 @@ pub mod id {
         methods::Method,
     };
 
-    /// Get a poll specified by ID.
+    /// Get a request to get a poll specified by ID.
     pub fn get(conn: &Connection, id: impl Into<String>) -> GetPolls {
         GetPolls {
             conn,

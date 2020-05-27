@@ -70,6 +70,16 @@ where
     )
 }
 
+/// Create a request to get a status specified by `id`.
+/// 
+/// This method is an alias of `mastors::api::v1::statues::id::get()`.
+pub use id::get as get_by_id;
+
+/// Create a request to delete a status specified by `id`.
+/// 
+/// This method is an alias of `mastors::api::v1::statues::id::delete()`.
+pub use id::delete as delete_by_id;
+
 // Create POST request.
 fn post_inner(
     conn: &Connection,
@@ -860,18 +870,4 @@ mod tests {
     fn body(s: &str) -> String {
         "Test ".to_string() + s + "\n\n" + Local::now().to_rfc3339().as_str()
     }
-}
-
-/// Create a request to get a status specified by `id`.
-/// 
-/// This method is an alias of `mastors::api::v1::statues::id::get()`.
-pub fn get_by_id(conn: &Connection, id: impl Into<String>) -> id::GetStatuses {
-    id::get(conn, id)
-}
-
-/// Create a request to delete a status specified by `id`.
-/// 
-/// This method is an alias of `mastors::api::v1::statues::id::delete()`.
-pub fn delete_by_id(conn: &Connection, id: impl Into<String>) -> id::DeleteStatuses {
-    id::delete(conn, id)
 }
