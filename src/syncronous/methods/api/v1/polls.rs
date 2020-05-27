@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use serde::Serialize;
 use crate::{
     Connection,
@@ -9,16 +10,6 @@ use crate::{
         MethodInternal,
     },
 };
-
-pub fn get(conn: &Connection, id: impl Into<String>) -> GetPolls {
-    GetPolls {
-        conn,
-        id: id.into(),
-        authorized: false,
-    }
-}
-
-use std::collections::HashSet;
 
 pub fn post(
     conn: &Connection,
@@ -33,36 +24,6 @@ pub fn post(
         choices: choices.into(),
     }
 }
-
-#[derive(Debug, Clone, Serialize, mastors_derive::Method)]
-#[method_params(GET, Poll, "/api/v1/polls/_PATH_PARAM_")]
-pub struct GetPolls<'a> {
-    #[serde(skip_serializing)]
-    #[mastors(connection)]
-    conn: &'a Connection,
-
-    #[serde(skip_serializing)]
-    #[mastors(path_param)]
-    id: String,
-
-    #[serde(skip_serializing)]
-    #[mastors(authorization)]
-    authorized: bool,
-}
-
-impl<'a> GetPolls<'a> {
-    pub fn authorized(&mut self) -> &Self {
-        self.authorized = true;
-        self
-    }
-
-    pub fn unauthorized(&mut self) -> &Self {
-        self.authorized = false;
-        self
-    }
-}
-
-impl<'a> Method<'a, Poll> for GetPolls<'a> {}
 
 #[derive(Debug, Clone, Serialize, mastors_derive::Method)]
 #[method_params(POST, Poll, "/api/v1/polls/_PATH_PARAM_")]
@@ -87,10 +48,58 @@ impl<'a> Method<'a, Poll> for PostPolls<'a> {
         if self.choices.is_empty() {
             return Err(Error::TooLittlePollOptionsError);
         }
-    
+
         if self.choices.len() > self.conn.poll_max_options() {
             return Err(Error::TooManyPollOptionsError(self.choices.len(), self.conn.poll_max_options()));
         }
         Ok(self.send_internal()?)
     }
+}
+
+pub mod id {
+    use serde::Serialize;
+    use crate:: {
+        Connection,
+        entities::Poll,
+        methods::Method,
+    };
+
+    /// Get a poll specified by ID.
+    pub fn get(conn: &Connection, id: impl Into<String>) -> GetPolls {
+        GetPolls {
+            conn,
+            id: id.into(),
+            authorized: false,
+        }
+    }
+
+    #[derive(Debug, Clone, Serialize, mastors_derive::Method)]
+    #[method_params(GET, Poll, "/api/v1/polls/_PATH_PARAM_")]
+    pub struct GetPolls<'a> {
+        #[serde(skip_serializing)]
+        #[mastors(connection)]
+        conn: &'a Connection,
+
+        #[serde(skip_serializing)]
+        #[mastors(path_param)]
+        id: String,
+
+        #[serde(skip_serializing)]
+        #[mastors(authorization)]
+        authorized: bool,
+    }
+
+    impl<'a> GetPolls<'a> {
+        pub fn authorized(&mut self) -> &Self {
+            self.authorized = true;
+            self
+        }
+
+        pub fn unauthorized(&mut self) -> &Self {
+            self.authorized = false;
+            self
+        }
+    }
+
+    impl<'a> Method<'a, Poll> for GetPolls<'a> {}
 }
