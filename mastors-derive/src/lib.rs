@@ -2,8 +2,6 @@
 use proc_macro::TokenStream;
 use syn;
 
-mod internals;
-
 const IDENT_MASTORS: &str = "mastors";
 const IDENT_CONNECTION: &str = "connection";
 const IDENT_PATH_PARAM: &str = "path_param";
