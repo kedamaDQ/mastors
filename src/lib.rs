@@ -46,3 +46,6 @@ pub use current_mode::{
     },
     streaming_timeline,
 };
+
+#[cfg(test)]
+pub(crate) const ENV_TEST: &str = ".env.test";

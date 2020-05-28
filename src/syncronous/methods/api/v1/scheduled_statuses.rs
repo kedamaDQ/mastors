@@ -1,3 +1,4 @@
+//! This module provides features related to scheduled statuses that is posted by authenticated user.
 use serde::Serialize;
 use crate::{
     Connection,
@@ -78,6 +79,7 @@ impl<'a> GetScheduledStatuses<'a> {
 
 impl<'a> Method<'a, ScheduledStatuses> for GetScheduledStatuses<'a> {}
 
+/// This module provides features related to manipulate a scheduled status that is specified by `id` posted by authenticated user.
 pub mod id {
     use serde::Serialize;
     use crate::{
@@ -119,6 +121,7 @@ pub mod id {
         }
     }
 
+    /// GET request for `/api/v1/scheduled_statuses/:id`.
     #[derive(Debug, Clone, Serialize, mastors_derive::Method)]
     #[method_params(GET, ScheduledStatus, "/api/v1/scheduled_statuses/_PATH_PARAM_")]
     pub struct GetScheduledStatuses<'a> {
@@ -137,6 +140,7 @@ pub mod id {
 
     impl<'a> Method<'a, ScheduledStatus> for GetScheduledStatuses<'a> {}
 
+    /// PUT request for `/api/v1/scheduled_statuses/:id`.
     #[derive(Debug, Clone, Serialize, mastors_derive::Method)]
     #[method_params(PUT, ScheduledStatus, "/api/v1/scheduled_statuses/_PATH_PARAM_")]
     pub struct PutScheduledStatuses<'a> {
@@ -165,6 +169,7 @@ pub mod id {
 
     impl<'a> Method<'a, ScheduledStatus> for PutScheduledStatuses<'a> {}
 
+    /// DELETE request for `/api/v1/scheduled_statuses/:id`.
     #[derive(Debug, Clone, Serialize, mastors_derive::Method)]
     #[method_params(DELETE, DeletedScheduledStatus, "/api/v1/scheduled_statuses/_PATH_PARAM_")]
     pub struct DeleteScheduledStatuses<'a> {
@@ -199,11 +204,9 @@ mod tests {
         Utc,
     };
 
-    const TEST_ENV: &str = ".env.test";
-
     #[test]
     fn test_get_scheduled_status() {
-        let conn = Connection::new_with_path(TEST_ENV).unwrap();
+        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
         let scheduled_at = Utc::now() + Duration::seconds(310);
 
         // Clear all existing scheduled statuses.
