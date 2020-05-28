@@ -176,5 +176,9 @@ mod tests {
             .unwrap();
 
         assert!(got.voted().is_none());
+
+        let _deleted = crate::api::v1::statuses::delete_by_id(&conn, posted.id())
+            .send()
+            .unwrap();
     }
 }
