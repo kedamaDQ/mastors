@@ -49,28 +49,28 @@ impl Attachment {
     }
 
     /// Get the location of the full-size original attachment on the remote website.
-    pub fn remote_url(&self) -> &Option<Url> {
-        &self.remote_url
+    pub fn remote_url(&self) -> Option<&Url> {
+        self.remote_url.as_ref()
     }
 
     /// Get a shorter URL for this attachment.
-    pub fn text_url(&self) -> &Option<Url> {
-        &self.text_url
+    pub fn text_url(&self) -> Option<&Url> {
+        self.text_url.as_ref()
     }
 
     /// Get a metadata returned by Paperclip.
-    pub fn meta(&self) -> &Option<AttachmentMeta> {
-        &self.meta
+    pub fn meta(&self) -> Option<&AttachmentMeta> {
+        self.meta.as_ref()
     }
 
     /// Get an alternate text that describes what is in the media attachment, to be used for the visually impaired or when media attachments do not load.
-    pub fn description(&self) -> &Option<String> {
-        &self.description
+    pub fn description(&self) -> Option<&String> {
+        self.description.as_ref()
     }
 
     /// Get a hash computed by the BlurHash algorithm, for generating colorful preview thumbnails when media has not been downloaded yet.
-    pub fn blurhash(&self) -> &Option<String> {
-        &self.blurhash
+    pub fn blurhash(&self) -> Option<&String> {
+        self.blurhash.as_ref()
     }
 }
 
@@ -96,68 +96,68 @@ pub struct AttachmentMeta {
 
 impl AttachmentMeta {
     /// For example: "0:01:28.65"
-    pub fn length(&self) -> &Option<String> {
-        &self.length
+    pub fn length(&self) -> Option<&String> {
+        self.length.as_ref()
     }
 
     /// For example: 88.65
-    pub fn duration(&self) -> &Option<f64> {
-        &self.duration
+    pub fn duration(&self) -> Option<f64> {
+        self.duration
     }
 
     /// For example: 24
-    pub fn fps(&self) -> &Option<u64> {
-        &self.fps
+    pub fn fps(&self) -> Option<u64> {
+        self.fps
     }
 
     /// For example: "1280x720"
-    pub fn size(&self) -> &Option<String> {
-        &self.size
+    pub fn size(&self) -> Option<&String> {
+        self.size.as_ref()
     }
 
     /// For example: 1280
-    pub fn width(&self) -> &Option<u64> {
-        &self.width
+    pub fn width(&self) -> Option<u64> {
+        self.width
     }
 
     /// For example: 720
-    pub fn height(&self) -> &Option<u64> {
-        &self.height
+    pub fn height(&self) -> Option<u64> {
+        self.height
     }
 
     /// For example: 1.7777777777777777
-    pub fn aspect(&self) -> &Option<f64> {
-        &self.aspect
+    pub fn aspect(&self) -> Option<f64> {
+        self.aspect
     }
 
     /// For example: "aac (LC) (mp4a / 0x6134706D)"
-    pub fn audio_encode(&self) -> &Option<String> {
-        &self.audio_encode
+    pub fn audio_encode(&self) -> Option<&String> {
+        self.audio_encode.as_ref()
     }
 
     /// For example: "44100 Hz"
-    pub fn audio_bitrate(&self) -> &Option<String> {
-        &self.audio_bitrate
+    pub fn audio_bitrate(&self) -> Option<&String> {
+        self.audio_bitrate.as_ref()
     }
 
     /// For example: "stereo"
-    pub fn audio_channels(&self) -> &Option<String> {
-        &self.audio_channels
+    pub fn audio_channels(&self) -> Option<&String> {
+        self.audio_channels.as_ref()
     }
 
     /// Get the `AttachmentMetaSub`.
-    pub fn original(&self) -> &Option<AttachmentMetaSub> {
-        &self.original
+    pub fn original(&self) -> Option<&AttachmentMetaSub> {
+        self.original.as_ref()
     }
 
     /// Get the `AttachmentMetaSub`.
-    pub fn small(&self) -> &Option<AttachmentMetaSub> {
-        &self.small
+    pub fn small(&self) -> Option<&AttachmentMetaSub> {
+        self.small.as_ref()
     }
 
     /// Get the focal points as `Focus`.
-    pub fn focus(&self) -> &Option<Focus> {
-        &self.focus
+    pub fn focus(&self) -> Option<&Focus> {
+        self.focus.as_ref()
     }
 }
 
@@ -179,42 +179,47 @@ pub struct AttachmentMetaSub {
 
 impl AttachmentMetaSub {
     /// For example: 640
-    pub fn width(&self) -> &Option<u64> {
-        &self.width
+    pub fn width(&self) -> Option<u64> {
+        self.width
     }
 
     /// For example: 480
-    pub fn height(&self) -> &Option<u64> {
-        &self.height
+    pub fn height(&self) -> Option<u64> {
+        self.height
     }
 
     /// For example: "640x480"
-    pub fn size(&self) -> &Option<String> {
-        &self.size
+    pub fn size(&self) -> Option<&String> {
+        self.size.as_ref()
     }
 
     /// For example: 1.3333333333333333
-    pub fn aspect(&self) -> &Option<f64> {
-        &self.aspect
+    pub fn aspect(&self) -> Option<f64> {
+        self.aspect
     }
 
     /// For example: 88.654
-    pub fn duration(&self) -> &Option<f64> {
-        &self.duration
+    pub fn duration(&self) -> Option<f64> {
+        self.duration
     }
 
     /// For example: 862056
-    pub fn bitrate(&self) -> &Option<u64> {
-        &self.bitrate
+    pub fn bitrate(&self) -> Option<u64> {
+        self.bitrate
     }
 
     /// For example: "6159375/249269"
-    pub fn frame_rate(&self) -> &Option<String> {
-        &self.frame_rate
+    pub fn frame_rate(&self) -> Option<&String> {
+        self.frame_rate.as_ref()
     }
 }
 
-/// In summary, floating points range from -1.0 to 1.0, left-to-right or bottom-to-top. (0,0) is the center of the image. (0.5, 0.5) would be in the center of the upper-right quadrant. (-0.5, -0.5) would be in the center of the lower-left quadrant. For reference, thumbnails in the Mastodon frontend are most commonly 16:9.
+/// In summary, floating points range from -1.0 to 1.0, left-to-right or bottom-to-top.
+/// 
+/// (0,0) is the center of the image.
+/// (0.5, 0.5) would be in the center of the upper-right quadrant.
+/// (-0.5, -0.5) would be in the center of the lower-left quadrant.
+/// For reference, thumbnails in the Mastodon frontend are most commonly 16:9.
 #[derive(Debug, PartialEq, PartialOrd, Clone, Copy, Deserialize)]
 pub struct Focus {
     x: f64,
@@ -222,10 +227,16 @@ pub struct Focus {
 }
 
 impl Focus {
+    /// Get a horizontal focal point.
+    /// 
+    /// The focal point value range from -1.0 to 1.0, left-to-right.
     pub fn x(&self) -> f64 {
         self.x
     }
 
+    /// Get a vertical focal point.
+    /// 
+    /// The focal point value range from -1.0 to 1.0, bottom-to-top.
     pub fn y(&self) -> f64 {
         self.y
     }

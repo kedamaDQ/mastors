@@ -19,7 +19,7 @@ pub struct Poll {
     votes_count: u64,
     voters_count: Option<u64>,
     voted: Option<bool>,
-    own_votes: Vec<u8>,
+    own_votes: Option<Vec<u8>>,
     options: Vec<PollOption>,
     emojis: Vec<Emoji>,
 }
@@ -51,8 +51,8 @@ impl Poll {
     }
 
     /// Get the number of unique accounts have voted if `multiple()` is `true`.
-    pub fn voters_count(&self) -> &Option<u64> {
-        &self.voters_count
+    pub fn voters_count(&self) -> Option<u64> {
+        self.voters_count
     }
 
     /// Get whether voted if authorized user.
@@ -61,8 +61,8 @@ impl Poll {
     }
 
     /// Get indices of options which are your chosen if authorized user.
-    pub fn own_votes(&self) -> &Vec<u8> {
-        &self.own_votes
+    pub fn own_votes(&self) -> Option<&Vec<u8>> {
+        self.own_votes.as_ref()
     }
 
     /// Get possible answers for the poll.

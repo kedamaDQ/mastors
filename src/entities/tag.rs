@@ -13,7 +13,7 @@ pub struct Tag {
 }
 
 impl Tag {
-    /// Get the value of the hashtag. This method will return string without # sign.
+    /// Get the value of the hashtag. This method will return string without "#" sign.
     pub fn name(&self) -> &str {
         &self.name
     }

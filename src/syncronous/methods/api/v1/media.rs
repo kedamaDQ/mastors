@@ -127,5 +127,30 @@ impl fmt::Display for Focus {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
+    #[test]
+    fn test_upload_image() {
+        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
+        let posted = post(&conn, "./test-resources/test1.png")
+            .description("bar board")
+            .focus(0f64, 1.0f64)
+            .send()
+            .unwrap();
+        
+        println!("{:#?}", posted);
+
+        assert_eq!(posted.description().unwrap(), "bar board");
+        assert_eq!(posted.meta().unwrap().focus().unwrap().x(), 0f64);
+        assert_eq!(posted.meta().unwrap().focus().unwrap().y(), 1.0f64);
+    }
+
+    #[test]
+    fn test_focus_to_fail_to_validation() {
+        assert!(Focus::new(-1.0, 1.0).validate().is_ok());
+        assert!(Focus::new(-1.0001, 0.0).validate().is_err());
+        assert!(Focus::new(1.0001, 0.0).validate().is_err());
+        assert!(Focus::new(0.0, -1.0001).validate().is_err());
+        assert!(Focus::new(0.0, 1.0001).validate().is_err());
+    }
 }

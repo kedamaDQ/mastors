@@ -31,6 +31,7 @@ pub fn get(conn: &Connection, stream_type: StreamType) -> GetStreaming {
     }
 }
 
+/// Get request for `/api/v1/streaming`.
 pub struct GetStreaming<'a> {
     conn: &'a Connection,
     stream_type: StreamType,

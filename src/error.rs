@@ -138,6 +138,9 @@ pub enum Error {
 
     #[error(display = "{} is a past date time", _0)]
     PastDateTimeError(crate::DateTime<crate::Utc>),
+
+    #[error(display = "Voted option is duplicate")]
+    DuplicateVoteOptionError,
 }
 
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize)]
