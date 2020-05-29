@@ -269,8 +269,8 @@ impl<'a> PostStatuses<'a> {
     /// - Total number of characters of `status` and `spoiler_text` exceeds `STATUS_MAX_CHARACTERS`
     pub fn send(&self) -> Result<PostedStatus> {
         match self {
-            Self::Status(status) => Ok(PostedStatus::Status(status.send()?)),
-            Self::ScheduledStatus(status) => Ok(PostedStatus::ScheduledStatus(status.send()?)),
+            Self::Status(status) => Ok(PostedStatus::Status(Box::new(status.send()?))),
+            Self::ScheduledStatus(status) => Ok(PostedStatus::ScheduledStatus(Box::new(status.send()?))),
         }
     }
 }
