@@ -370,7 +370,7 @@ impl MediaIds {
         U: AsRef<str>,
     {
         let media_ids = media_ids.as_ref()
-            .into_iter()
+            .iter()
             .map(|u| u.as_ref().trim())
             .filter(|u| !u.is_empty())
             .map(|u| u.to_owned())
@@ -448,7 +448,7 @@ impl Poll {
         U: AsRef<str>,
     {
         let options = options.as_ref()
-            .into_iter()
+            .iter()
             .map(|u| u.as_ref().trim())
             .filter(|u| !u.is_empty())
             .map(|u| u.to_owned())
@@ -574,7 +574,7 @@ mod tests {
 
     #[test]
     fn test_statuses() {
-        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
+        let conn = Connection::from_file(crate::ENV_TEST).unwrap();
         let content = body("toot!");
         let posted = post(&conn, &content)
             .spoiler_text("spoiler text")
@@ -604,7 +604,7 @@ mod tests {
 
     #[test]
     fn test_statuses_with_poll() {
-        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
+        let conn = Connection::from_file(crate::ENV_TEST).unwrap();
         let content = body("with poll!");
         let posted = post_with_poll(&conn, &content, &(vec!["poll1", "poll2", "poll3"]), 3600)
             .poll_multiple()
@@ -634,7 +634,7 @@ mod tests {
     fn test_status_with_attachment() {
         use crate::api::v1::media;
 
-        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
+        let conn = Connection::from_file(crate::ENV_TEST).unwrap();
         let content = body("with attachment!");
 
         let media_ids = vec![
@@ -675,7 +675,7 @@ mod tests {
 
     #[test]
     fn test_scheduled_status() {
-        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
+        let conn = Connection::from_file(crate::ENV_TEST).unwrap();
         let scheduled_at = Utc::now() + crate::Duration::seconds(310);
         let posted = post(&conn, body("scheduled!"))
             .scheduled_at(scheduled_at)
@@ -696,7 +696,7 @@ mod tests {
         assert_eq!(posted.id(), got.id());
         assert_eq!(posted.scheduled_at(), got.scheduled_at());
 
-        let extended_scheduled_at = got.scheduled_at().clone() + crate::Duration::seconds(100);
+        let extended_scheduled_at = *got.scheduled_at() + crate::Duration::seconds(100);
         let put = crate::api::v1::scheduled_statuses::id::put(&conn, got.id())
             .scheduled_at(extended_scheduled_at.clone())
             .send()
@@ -717,7 +717,7 @@ mod tests {
 
     #[test]
     fn test_scheduled_status_with_media() {
-        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
+        let conn = Connection::from_file(crate::ENV_TEST).unwrap();
         let scheduled_at = Utc::now() + crate::Duration::seconds(310);
         let media_ids = vec![
             crate::api::v1::media::post(&conn, "./test-resources/test1.png").send().unwrap().id().to_owned(),
@@ -743,7 +743,7 @@ mod tests {
 
     #[test]
     fn test_scheduled_status_with_poll() {
-        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
+        let conn = Connection::from_file(crate::ENV_TEST).unwrap();
         let scheduled_at = Utc::now() + crate::Duration::seconds(310);
         let posted = post_with_poll(&conn, "scheduled status with poll", ["a", "b"], 3600)
             .scheduled_at(scheduled_at)

@@ -30,7 +30,7 @@ mod tests {
 
     #[test]
     fn test_custom_emojis() {
-        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
+        let conn = Connection::from_file(crate::ENV_TEST).unwrap();
         get(&conn).send().unwrap();
     }
 }

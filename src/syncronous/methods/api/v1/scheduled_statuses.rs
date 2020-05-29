@@ -206,7 +206,7 @@ mod tests {
 
     #[test]
     fn test_get_scheduled_status() {
-        let conn = Connection::new_with_path(crate::ENV_TEST).unwrap();
+        let conn = Connection::from_file(crate::ENV_TEST).unwrap();
         let scheduled_at = Utc::now() + Duration::seconds(310);
 
         // Clear all existing scheduled statuses.

@@ -12,7 +12,7 @@
 //! # fn main() -> Result<(), Box<dyn Error>> {
 //!     use mastors::Method;
 //! 
-//!     let conn = mastors::Connection::new_with_path(".env")?;
+//!     let conn = mastors::Connection::from_file(".env")?;
 //! 
 //!     let instance = mastors::api::v1::instance::get(&conn).send()?;
 //! 
@@ -57,7 +57,7 @@
 //! # use std::error::Error;
 //! #
 //! # fn main() -> Result<(), Box<dyn Error> {
-//! let conn = mastors::Connection::new_with_path(".env")?;
+//! let conn = mastors::Connection::from_file(".env")?;
 //! let home_timeline = get(&conn, StreamType::User).send()?;
 //! 
 //! for event in home_timeline {
@@ -94,7 +94,7 @@
 //! 
 //! Also, currently, a series of tests must be run serialized.
 //! 
-//! ```
+//! ```no-run
 //! cargo test -- --test-threads=1
 //! ```
 //! 
