@@ -1,12 +1,12 @@
 //! This module provides features related to status that are post a status, get a status, and reaction to status.
 pub mod id;
 
+use isolang::Language;
 use serde::Serialize;
 use crate::{
     Connection,
     DateTime,
     Error,
-    Language,
     Result,
     Utc,
     entities::{
@@ -101,7 +101,7 @@ fn post_internal(
             spoiler_text: None,
             visibility: None,
             scheduled_at: None,
-            language: conn.default_language().and_then(|lang| lang.to_639_1()),
+            language: conn.default_language().and_then(|lang| lang.to_639_1().map(|lang| lang.to_owned())),
         }
     )
 }
@@ -228,10 +228,10 @@ impl<'a> PostStatuses<'a> {
     }
 
     /// Set language to status.
-    pub fn language(mut self, language: Language) -> Self {
+    pub fn language(mut self, language: impl Into<String>) -> Self {
         match self {
-            Self::Status(ref mut s) => s.language = language.to_639_1(),
-            Self::ScheduledStatus(ref mut s) => s.language = language.to_639_1(),
+            Self::Status(ref mut s) => s.language = Some(language.into()),
+            Self::ScheduledStatus(ref mut s) => s.language = Some(language.into()),
         };
         self
     }
@@ -295,7 +295,7 @@ pub struct PostNormalStatuses<'a> {
     spoiler_text: Option<String>,
     visibility: Option<String>,
     scheduled_at: Option<DateTime<Utc>>,
-    language: Option<&'a str>,
+    language: Option<String>,
 }
 
 impl<'a> Method<'a, Status> for PostNormalStatuses<'a> {
@@ -304,6 +304,7 @@ impl<'a> Method<'a, Status> for PostNormalStatuses<'a> {
             &self.status,
             &self.media_ids,
             &self.poll,
+            &self.language,
             &self.spoiler_text,
             self.conn.status_max_characters()
         )?;
@@ -332,7 +333,7 @@ pub struct PostScheduledStatuses<'a> {
     spoiler_text: Option<String>,
     visibility: Option<String>,
     scheduled_at: Option<DateTime<Utc>>,
-    language: Option<&'a str>,
+    language: Option<String>,
 }
 
 impl<'a> Method<'a, ScheduledStatus> for PostScheduledStatuses<'a> {
@@ -341,6 +342,7 @@ impl<'a> Method<'a, ScheduledStatus> for PostScheduledStatuses<'a> {
             &self.status,
             &self.media_ids,
             &self.poll,
+            &self.language,
             &self.spoiler_text,
             self.conn.status_max_characters()
         )?;
@@ -514,6 +516,7 @@ fn validate_status(
     status: &Option<String>,
     media_ids: &Option<MediaIds>,
     poll: &Option<Poll>,
+    language: &Option<String>,
     spoiler_text: &Option<String>,
     status_max_characters: usize,
 ) -> Result<()> {
@@ -536,6 +539,15 @@ fn validate_status(
     // Check poll options
     if let Some(poll) = poll {
         poll.validate()?;
+    }
+
+    // Check language
+    if let Some(lang) = language {
+        if Language::from_639_1(lang).is_none() {
+            return Err(
+                Error::ParseIso639_1Error(lang.to_owned())
+            );
+        }
     }
 
     // Check total number of characters
@@ -582,6 +594,7 @@ mod tests {
             .private()
             .direct()
             .public()
+            .language("ja")
             .send()
             .unwrap();
 

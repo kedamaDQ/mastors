@@ -112,7 +112,6 @@ pub use connection::Connection;
 pub use error::{ Error, Result };
 
 pub use chrono::{ DateTime, Duration, Local, Utc };
-pub use isolang::Language;
 pub use url::Url;
 
 use syncronous as current_mode;
