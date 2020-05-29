@@ -165,8 +165,8 @@ impl Status {
     }
 
     /// Get the status being reblogged.
-    pub fn reblog(&self) -> Option<&Box<Status>> {
-        self.reblog.as_ref()
+    pub fn reblog(&self) -> Option<&Status> {
+        self.reblog.as_deref()
     }
 
     /// Get the poll attached this status.

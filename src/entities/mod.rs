@@ -49,8 +49,8 @@ impl Entity for Nothing {}
 /// This endpoint returns `Status` or `ScheduledStatus` depending on whether the posted `Status` has a `scheduled_at` set.
 #[derive(Debug, Clone, serde::Deserialize)]
 pub enum PostedStatus {
-    Status(Status),
-    ScheduledStatus(ScheduledStatus),
+    Status(Box<Status>),
+    ScheduledStatus(Box<ScheduledStatus>),
 }
 
 impl PostedStatus {
@@ -71,7 +71,7 @@ impl PostedStatus {
     }
 
     /// Unwrap this `Posted` and get `Status` if this enum is Posted::Status.
-    pub fn status(self) -> Option<crate::entities::Status> {
+    pub fn status(self) -> Option<Box<crate::entities::Status>> {
         match self {
             Self::Status(s) => Some(s),
             Self::ScheduledStatus(_) => None,
@@ -79,7 +79,7 @@ impl PostedStatus {
     }
 
     /// Unwrap this `Posted` and get `ScheduledStatus` if this enum is Posted::ScheduledStatus.
-    pub fn scheduled_status(self) -> Option<crate::entities::ScheduledStatus> {
+    pub fn scheduled_status(self) -> Option<Box<crate::entities::ScheduledStatus>> {
         match self {
             Self::Status(_) => None,
             Self::ScheduledStatus(s) => Some(s),
