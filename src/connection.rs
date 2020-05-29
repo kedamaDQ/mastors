@@ -78,11 +78,11 @@ impl Connection {
     /// - STATUS_MAX_MEDIAS is not a number
     /// - POLL_MAX_OPTIONS is not a number
     pub fn new() -> Result<Self> {
-        Self::new_with_path(DEFAULT_ENV_PATH)
+        Self::from_file(DEFAULT_ENV_PATH)
     }
 
     /// Constructs a new `Connection` using specified configuration file.
-    pub fn new_with_path(env_path: &str) -> Result<Self> {
+    pub fn from_file(env_path: &str) -> Result<Self> {
         use std::env;
 
         dotenv::from_filename(env_path).ok();
