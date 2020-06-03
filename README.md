@@ -46,17 +46,16 @@ fn main() -> Result<(), Box<dyn Error>> {
 Mastors provides streaming timeline with server-sent events as `Iterator`.
 
 ```rust
-    //! This is a simple streaming timeline on the command-line terminal.
-    use mastors::Method;
-    use mastors::api::v1::streaming::{
-        EventType,
-        StreamType,
-        get,
-    };
-    //!
-    use std::error::Error;
+//! This is a simple streaming timeline on the command-line terminal.
+use mastors::Method;
+use mastors::api::v1::streaming::{
+    EventType,
+    StreamType,
+    get,
+};
+use std::error::Error;
 
-    fn main() -> Result<(), Box<dyn Error> {
+fn main() -> Result<(), Box<dyn Error> {
     let conn = mastors::Connection::new_with_path(".env")?;
     let home_timeline = get(&conn, StreamType::User).send()?;
 
@@ -85,7 +84,7 @@ SERVER_URL="http://localhost:3000"
 ACCESS_TOKEN="aabbcc"
 ```
 
-See [`Connection`](struct.Connection.html) for other optional settings.
+See `Connection` for other optional settings.
 
 # Run tests
 
