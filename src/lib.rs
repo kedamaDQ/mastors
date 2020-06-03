@@ -47,7 +47,7 @@
 //! 
 //! Mastors provides streaming timeline with server-sent events as `Iterator`.
 //! 
-//! ```no-run
+//! ```no_run
 //! //! This is a simple streaming timeline on the command-line terminal.
 //! use mastors::Method;
 //! use mastors::api::v1::streaming::{
@@ -99,7 +99,7 @@
 //! 
 //! Also, currently, a series of tests must be run serialized.
 //! 
-//! ```no-run
+//! ```no_run
 //! cargo test -- --test-threads=1
 //! ```
 //! 
