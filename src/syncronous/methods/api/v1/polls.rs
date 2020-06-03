@@ -146,7 +146,7 @@ mod tests {
 
     #[test]
     fn test_vote_to_poll() {
-        let conn = Connection::from_file(crate::ENV_TEST).unwrap();
+        let conn = Connection::new().unwrap();
         let posted = crate::api::v1::statuses::post_with_poll(&conn, "test_vote_to_poll", ["a", "b", "c"], 3600)
             .poll_multiple()
             .send()

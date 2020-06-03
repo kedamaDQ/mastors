@@ -60,7 +60,6 @@ impl<'a> GetStreaming<'a> {
 
         let custom_client = ReqwestClient::builder()
             .default_headers(headers)
-            .tcp_nodelay()
             .user_agent(self.conn.user_agent())
             .build()
             .map_err(Error::HttpClientError)?;
