@@ -740,7 +740,6 @@ mod tests {
     fn test_scheduled_status_with_media() {
         let conn = Connection::new().unwrap();
         let scheduled_at = Utc::now() + chrono::Duration::seconds(310);
-        let scheduled_at = Utc::now() + crate::Duration::seconds(310);
 
         let media_ids = vec![
             crate::api::v1::media::post(&conn, "./test-resources/test1.png").send().unwrap().id().to_owned(),
