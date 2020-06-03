@@ -91,19 +91,19 @@ mod tests {
 
     #[test]
     fn test_get_instance() {
-        let conn = Connection::from_file(crate::ENV_TEST).unwrap();
+        let conn = Connection::new().unwrap();
         get(&conn).send().unwrap();
     }
 
     #[test]
     fn test_get_peers() {
-        let conn = Connection::from_file(crate::ENV_TEST).unwrap();
+        let conn = Connection::new().unwrap();
         peers::get(&conn).send().unwrap();
     }
 
     #[test]
     fn test_get_activity() {
-        let conn = Connection::from_file(crate::ENV_TEST).unwrap();
+        let conn = Connection::new().unwrap();
         activity::get(&conn).send().unwrap();
     }
 }

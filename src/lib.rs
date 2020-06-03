@@ -10,32 +10,34 @@
 //! # use std::error::Error;
 //! #
 //! # fn main() -> Result<(), Box<dyn Error>> {
-//!     use mastors::Method;
+//! use mastors::Method;
 //! 
-//!     let conn = mastors::Connection::new()?;
+//! # // cfg(test) is not set during doctests
+//! # // https://github.com/rust-lang/rust/issues/45599
+//! let conn = mastors::Connection::from_file(".env.test")?;
 //! 
-//!     let instance = mastors::api::v1::instance::get(&conn).send()?;
+//! let instance = mastors::api::v1::instance::get(&conn).send()?;
 //! 
-//!     println!("{:#?}", instance);
+//! println!("{:#?}", instance);
 //! 
-//!     let posted_status = mastors::api::v1::statuses::post(&conn, "Toot!")
-//!         .spoiler_text("Spoiler!")
-//!         .unlisted()
-//!         .send()?
-//!         .status()
-//!         .unwrap();
+//! let posted_status = mastors::api::v1::statuses::post(&conn, "Toot!")
+//!     .spoiler_text("Spoiler!")
+//!     .unlisted()
+//!     .send()?
+//!     .status()
+//!     .unwrap();
 //! 
-//!     println!("{:#?}", posted_status);
+//! println!("{:#?}", posted_status);
 //! 
-//!     let got_status = mastors::api::v1::statuses::id::get(&conn, posted_status.id())
-//!         .send()?;
+//! let got_status = mastors::api::v1::statuses::id::get(&conn, posted_status.id())
+//!     .send()?;
 //! 
-//!     assert_eq!(posted_status.id(), got_status.id());
+//! assert_eq!(posted_status.id(), got_status.id());
 //! 
-//!     let deleted_status = mastors::api::v1::statuses::id::get(&conn, got_status.id())
-//!         .send()?;
+//! let deleted_status = mastors::api::v1::statuses::id::get(&conn, got_status.id())
+//!     .send()?;
 //! 
-//!     assert_eq!(got_status.id(), deleted_status.id());
+//! assert_eq!(got_status.id(), deleted_status.id());
 //! #
 //! # Ok(())
 //! # }
@@ -57,7 +59,10 @@
 //! # use std::error::Error;
 //! #
 //! # fn main() -> Result<(), Box<dyn Error> {
-//! let conn = mastors::Connection::new()?;
+//! 
+//! # // cfg(test) is not set during doctests
+//! # // https://github.com/rust-lang/rust/issues/45599
+//! let conn = mastors::Connection::from_file(".env.test")?;
 //! let home_timeline = get(&conn, StreamType::User).send()?;
 //! 
 //! for event in home_timeline {
@@ -125,6 +130,3 @@ pub use current_mode::{
     },
     streaming_timeline,
 };
-
-#[cfg(test)]
-pub(crate) const ENV_TEST: &str = ".env.test";
