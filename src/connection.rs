@@ -123,7 +123,6 @@ impl Connection {
 
         let client = Client::builder()
             .gzip(true)
-            .tcp_nodelay()
             .user_agent(&user_agent)
             .build()
             .map_err(Error::HttpClientError)?;
