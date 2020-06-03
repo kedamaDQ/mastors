@@ -1,7 +1,7 @@
+use isolang::Language;
 use reqwest::blocking::Client;
 use crate::{
     Error,
-    Language,
     Result,
     Url,
 };
