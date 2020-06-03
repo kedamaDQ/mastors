@@ -8,6 +8,7 @@ use crate::{
 
 
 const DEFAULT_ENV_PATH: &str = ".env";
+const DEFAULT_ENV_TEST_PATH: &str = ".env.test";
 const ENV_SERVER_URL: &str = "SERVER_URL";
 const ENV_ACCESS_TOKEN: &str = "ACCESS_TOKEN";
 const ENV_USER_AGENT: &str = "USER_AGENT";
@@ -78,7 +79,11 @@ impl Connection {
     /// - STATUS_MAX_MEDIAS is not a number
     /// - POLL_MAX_OPTIONS is not a number
     pub fn new() -> Result<Self> {
-        Self::from_file(DEFAULT_ENV_PATH)
+        if cfg!(test) {
+            Self::from_file(DEFAULT_ENV_TEST_PATH)
+        } else {
+            Self::from_file(DEFAULT_ENV_PATH)
+        }
     }
 
     /// Constructs a new `Connection` using specified configuration file.
