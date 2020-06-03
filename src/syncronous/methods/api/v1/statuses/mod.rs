@@ -201,6 +201,14 @@ impl<'a> PostStatuses<'a> {
     }
 
     /// Set a status to scheduled.
+    /// `DateTime<Utc>`, the type of `scheduled_at`, is re-export from [`chrono`](https://docs.rs/chrono/). For example to create a `DateTime<Utc>` of **NOW**:
+    /// 
+    /// ```rust
+    /// use mastors::{ DateTime, Utc };
+    /// 
+    /// let now: DateTime<Utc> = Utc::now();
+    /// ```
+    /// Refer to the [original document](https://docs.rs/chrono/) for details.
     pub fn scheduled_at(mut self, scheduled_at: DateTime<Utc>) -> Self {
         match self {
             Self::Status(s) => {
@@ -582,7 +590,6 @@ fn str_to_option(s: impl AsRef<str>) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Local;
 
     #[test]
     fn test_statuses() {
@@ -689,7 +696,7 @@ mod tests {
     #[test]
     fn test_scheduled_status() {
         let conn = Connection::from_file(crate::ENV_TEST).unwrap();
-        let scheduled_at = Utc::now() + crate::Duration::seconds(310);
+        let scheduled_at = Utc::now() + chrono::Duration::seconds(310);
         let posted = post(&conn, body("scheduled!"))
             .scheduled_at(scheduled_at)
             .send()
@@ -709,7 +716,7 @@ mod tests {
         assert_eq!(posted.id(), got.id());
         assert_eq!(posted.scheduled_at(), got.scheduled_at());
 
-        let extended_scheduled_at = *got.scheduled_at() + crate::Duration::seconds(100);
+        let extended_scheduled_at = *got.scheduled_at() + chrono::Duration::seconds(100);
         let put = crate::api::v1::scheduled_statuses::id::put(&conn, got.id())
             .scheduled_at(extended_scheduled_at.clone())
             .send()
@@ -731,7 +738,7 @@ mod tests {
     #[test]
     fn test_scheduled_status_with_media() {
         let conn = Connection::from_file(crate::ENV_TEST).unwrap();
-        let scheduled_at = Utc::now() + crate::Duration::seconds(310);
+        let scheduled_at = Utc::now() + chrono::Duration::seconds(310);
         let media_ids = vec![
             crate::api::v1::media::post(&conn, "./test-resources/test1.png").send().unwrap().id().to_owned(),
             crate::api::v1::media::post(&conn, "./test-resources/test2.png").send().unwrap().id().to_owned(),
@@ -757,7 +764,7 @@ mod tests {
     #[test]
     fn test_scheduled_status_with_poll() {
         let conn = Connection::from_file(crate::ENV_TEST).unwrap();
-        let scheduled_at = Utc::now() + crate::Duration::seconds(310);
+        let scheduled_at = Utc::now() + chrono::Duration::seconds(310);
         let posted = post_with_poll(&conn, "scheduled status with poll", ["a", "b"], 3600)
             .scheduled_at(scheduled_at)
             .poll_hide_totals()
@@ -882,6 +889,6 @@ mod tests {
     }
 
     fn body(s: &str) -> String {
-        "Test ".to_string() + s + "\n\n" + Local::now().to_rfc3339().as_str()
+        "Test ".to_string() + s + "\n\n" + chrono::Local::now().to_rfc3339().as_str()
     }
 }

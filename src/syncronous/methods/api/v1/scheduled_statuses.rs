@@ -161,6 +161,15 @@ pub mod id {
 
     impl<'a> PutScheduledStatuses<'a> {
         /// Update `scheduled_at` of this scheduled status.
+        /// 
+        /// `DateTime<Utc>`, the type of `scheduled_at`, is re-export from [`chrono`](https://docs.rs/chrono/). For example to create a `DateTime<Utc>` of **NOW**:
+        /// 
+        /// ```rust
+        /// use mastors::{ DateTime, Utc };
+        /// 
+        /// let now: DateTime<Utc> = Utc::now();
+        /// ```
+        /// Refer to the [original document](https://docs.rs/chrono/) for details.
         pub fn scheduled_at(mut self, scheduled_at: DateTime<Utc>) -> Self {
             self.scheduled_at = Some(scheduled_at);
             self
@@ -198,16 +207,13 @@ pub mod id {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::Utc;
     use crate::api::v1::statuses;
-    use crate::{
-        Duration,
-        Utc,
-    };
 
     #[test]
     fn test_get_scheduled_status() {
         let conn = Connection::from_file(crate::ENV_TEST).unwrap();
-        let scheduled_at = Utc::now() + Duration::seconds(310);
+        let scheduled_at = Utc::now() + chrono::Duration::seconds(310);
 
         // Clear all existing scheduled statuses.
         let got = get(&conn)

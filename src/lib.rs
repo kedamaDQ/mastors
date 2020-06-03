@@ -111,7 +111,8 @@ pub mod scope;
 pub use connection::Connection;
 pub use error::{ Error, Result };
 
-pub use chrono::{ DateTime, Duration, Local, Utc };
+pub use chrono::DateTime;
+pub use chrono::Utc;
 pub use url::Url;
 
 use syncronous as current_mode;
