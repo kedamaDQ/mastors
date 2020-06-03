@@ -11,7 +11,9 @@ pub(crate) use private::{
     UploadInternal,
 };
 
+/// The common sets of methods for API methods of the Mastodon.
 pub trait Method<'a, E: 'a + Entity>: MethodInternal<'a, E> {
+    /// Send a request to the REST API endpoint of the Mastodon.
     fn send(&'a self) -> Result<E> {
         self.send_internal()
     }
