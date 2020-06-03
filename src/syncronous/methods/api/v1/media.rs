@@ -131,7 +131,7 @@ mod tests {
 
     #[test]
     fn test_upload_image() {
-        let conn = Connection::from_file(crate::ENV_TEST).unwrap();
+        let conn = Connection::new().unwrap();
         let posted = post(&conn, "./test-resources/test1.png")
             .description("bar board")
             .focus(0f64, 1.0f64)
