@@ -44,6 +44,7 @@ impl ScheduledStatus {
 
 impl Entity for ScheduledStatus {}
 
+/// Represent parameters of ScheduledStatus that will toot at scheduled date and time.
 #[derive(Debug, Clone, Deserialize)]
 pub struct Params {
     text: String,
@@ -107,6 +108,7 @@ impl Params {
     }
 }
 
+/// Represents a poll that is containd in ScheduledStatus and will toot at scheduled date and time.
 #[derive(Debug, Clone, Deserialize)]
 pub struct ScheduledPoll {
     multiple: bool,
