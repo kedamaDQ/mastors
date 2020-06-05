@@ -18,19 +18,8 @@ pub fn get(conn: &Connection) -> GetScheduledStatuses {
     }
 }
 
-/// Get a request to get a scheduled status specified by `id`.
-/// 
-/// This method is an alias of `mastors::api::v1::scheduled_statuses::id::get()`.
 pub use id::get as get_by_id;
-
-/// Get a request to update a scheduled status specified by `id`.
-/// 
-/// This method is an alias of `mastors::api::v1::scheduled_statuses::id::put()`.
 pub use id::put as put_by_id;
-
-/// Get a request to delete a scheduled status specified by `id`.
-/// 
-/// This method is an alias of `mastors::api::v1::scheduled_statuses::id::delete()`.
 pub use id::delete as delete_by_id;
 
 /// GET request for scheduled statuses that are created by authenticated user.
@@ -79,7 +68,7 @@ impl<'a> GetScheduledStatuses<'a> {
 
 impl<'a> Method<'a, ScheduledStatuses> for GetScheduledStatuses<'a> {}
 
-/// This module provides features related to manipulate a scheduled status that is specified by `id` posted by authenticated user.
+/// This module provides features related to manipulate a scheduled status that is specified by ID posted by authenticated user.
 pub mod id {
     use serde::Serialize;
     use crate::{
@@ -102,7 +91,7 @@ pub mod id {
         }
     }
 
-    /// Update a `scheduled_at` of scheduled status specified by `id`.
+    /// Update a scheduled date and time of scheduled status specified by `id`.
     pub fn put(conn: &Connection, id: impl Into<String>) -> PutScheduledStatuses {
         PutScheduledStatuses {
             conn,

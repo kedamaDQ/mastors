@@ -141,17 +141,17 @@ mod tests {
     use super::*;
 
     #[test]
-    fn deconvert_scope() {
+    fn test_deconvert_scope() {
         assert_eq!("read", Scope::Read.to_string());
     }
     
     #[test]
-    fn convert_scope() {
+    fn test_convert_scope() {
         assert_eq!(Scope::Write, Scope::try_from("write").unwrap());
     }
 
     #[test]
-    fn convert_and_deconvert_scope() {
+    fn test_convert_and_deconvert_read_scopes() {
         assert_eq!(Scope::Read, Scope::try_from(Scope::Read).unwrap());
         assert_eq!(Scope::ReadAccounts, Scope::try_from(Scope::ReadAccounts).unwrap());
         assert_eq!(Scope::ReadBlocks, Scope::try_from(Scope::ReadBlocks).unwrap());
@@ -164,6 +164,10 @@ mod tests {
         assert_eq!(Scope::ReadNotifications, Scope::try_from(Scope::ReadNotifications).unwrap());
         assert_eq!(Scope::ReadSearch, Scope::try_from(Scope::ReadSearch).unwrap());
         assert_eq!(Scope::ReadStatuses, Scope::try_from(Scope::ReadStatuses).unwrap());
+    }
+
+    #[test]
+    fn test_convert_and_deconvert_write_scopes() {
         assert_eq!(Scope::Write, Scope::try_from(Scope::Write).unwrap());
         assert_eq!(Scope::WriteAccounts, Scope::try_from(Scope::WriteAccounts).unwrap());
         assert_eq!(Scope::WriteBlocks, Scope::try_from(Scope::WriteBlocks).unwrap());
@@ -178,6 +182,10 @@ mod tests {
         assert_eq!(Scope::WriteNotifications, Scope::try_from(Scope::WriteNotifications).unwrap());
         assert_eq!(Scope::WriteReports, Scope::try_from(Scope::WriteReports).unwrap());
         assert_eq!(Scope::WriteStatuses, Scope::try_from(Scope::WriteStatuses).unwrap());
+    }
+
+    #[test]
+    fn test_convert_and_deconver_other_scopes() {
         assert_eq!(Scope::Follow, Scope::try_from(Scope::Follow).unwrap());
         assert_eq!(Scope::Push, Scope::try_from(Scope::Push).unwrap());
         assert_eq!(Scope::AdminRead, Scope::try_from(Scope::AdminRead).unwrap());

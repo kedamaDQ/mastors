@@ -71,14 +71,7 @@ where
     )
 }
 
-/// Create a request to get a status specified by `id`.
-/// 
-/// This method is an alias of `mastors::api::v1::statues::id::get()`.
 pub use id::get as get_by_id;
-
-/// Create a request to delete a status specified by `id`.
-/// 
-/// This method is an alias of `mastors::api::v1::statues::id::delete()`.
 pub use id::delete as delete_by_id;
 
 // Create POST request.

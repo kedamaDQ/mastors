@@ -44,6 +44,7 @@ impl ScheduledStatus {
 
 impl Entity for ScheduledStatus {}
 
+/// Represents parameters of ScheduledStatus that will toot at scheduled date and time.
 #[derive(Debug, Clone, Deserialize)]
 pub struct Params {
     text: String,
@@ -98,8 +99,6 @@ impl Params {
     }
 
     /// Get a scheduled date and time of this scheduled status.
-    /// 
-    /// ...What is the difference with `ScheduledStatus.scheduled_at`? :thinking:
     pub fn scheduled_at(&self) -> Option<&DateTime<Utc>> {
         self.scheduled_at.as_ref()
     }
@@ -109,6 +108,7 @@ impl Params {
     }
 }
 
+/// Represents a poll that is containd in ScheduledStatus and will toot at scheduled date and time.
 #[derive(Debug, Clone, Deserialize)]
 pub struct ScheduledPoll {
     multiple: bool,
@@ -139,11 +139,11 @@ impl ScheduledPoll {
     }
 }
 
-/// Represent an array of `ScheculedStatus`.
+/// Represent an array of [`ScheculedStatus`](./struct.ScheduledStatus.html)es.
 pub type ScheduledStatuses = Vec<ScheduledStatus>;
 impl Entity for ScheduledStatuses {}
 
-/// Represent a no body response.
+/// Represents a no body response.
 /// 
 /// API method `DELETE /api/v1/scheduled_statuses/:id` returns nothing.
 pub type DeletedScheduledStatus = Nothing;

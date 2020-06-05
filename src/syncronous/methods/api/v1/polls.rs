@@ -10,7 +10,7 @@ pub use id::get as get_by_id;
 /// This function is an alias of `mastors::api::v1::polls::id::votes::post()`.
 pub use id::votes::post as post_with_id;
 
-/// This module provides features related to status of a poll.
+/// This module provides features related to poll specified by ID.
 pub mod id {
     use serde::Serialize;
     use crate:: {

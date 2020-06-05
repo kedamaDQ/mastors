@@ -30,7 +30,7 @@ pub use mention::Mention;
 pub use notification::{ Notification, NotificationType };
 pub use poll::Poll;
 pub use privacy::{ Privacy, Visibility };
-pub use scheduled_status::{ DeletedScheduledStatus, ScheduledStatus, ScheduledStatuses, ScheduledPoll };
+pub use scheduled_status::{ DeletedScheduledStatus, Params, ScheduledStatus, ScheduledStatuses, ScheduledPoll };
 pub use status::Status;
 pub use tag::{ Tag, Trends };
 
@@ -39,7 +39,7 @@ use crate::{
     Utc,
 };
 
-/// Represent a no body response.
+/// Represents a no body response.
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct Nothing {}
 impl Entity for Nothing {}

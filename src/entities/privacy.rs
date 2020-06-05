@@ -4,7 +4,7 @@ use serde::{
     Deserialize,
 };
 
-/// Represents a visibility of the status.
+/// Represents a privacy setting of the status.
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy, Serialize, Deserialize)]
 pub enum Privacy {
     /// Visible to everyone, shown in public timelines.
@@ -45,6 +45,8 @@ impl std::str::FromStr for Privacy {
 }
 
 /// Represents a visibility of the status.
+/// 
+/// This enum is an alias of `Privacy`
 pub type Visibility = Privacy;
 
 #[cfg(test)]

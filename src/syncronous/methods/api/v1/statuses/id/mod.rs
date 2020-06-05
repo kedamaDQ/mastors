@@ -1,3 +1,4 @@
+//! This module provides features related to status specified by ID.
 /*
 pub mod bookmark;
 pub mod context;
@@ -30,7 +31,7 @@ pub fn get(conn: &Connection, id: impl Into<String>) -> GetStatuses {
     }
 }
 
-/// Create a request to delete the status for authenticated user.
+/// Create a request to delete the status specified by `id`.
 pub fn delete(conn: &Connection, id: impl Into<String>) -> DeleteStatuses {
     DeleteStatuses {
         conn,

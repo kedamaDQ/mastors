@@ -47,7 +47,7 @@
 //! 
 //! Mastors provides streaming timeline with server-sent events as `Iterator`.
 //! 
-//! ```no-run
+//! ```no_run
 //! //! This is a simple streaming timeline on the command-line terminal.
 //! use mastors::Method;
 //! use mastors::api::v1::streaming::{
@@ -58,7 +58,7 @@
 //!
 //! # use std::error::Error;
 //! #
-//! # fn main() -> Result<(), Box<dyn Error> {
+//! # fn main() -> Result<(), Box<dyn Error>> {
 //! 
 //! # // cfg(test) is not set during doctests
 //! # // https://github.com/rust-lang/rust/issues/45599
@@ -69,7 +69,7 @@
 //!     if let EventType::Update(status) = event? {
 //!         println!(
 //!             "{}\n\n{} Posted by {}",
-//!             status.content()?, // As HTML
+//!             status.content().unwrap(), // As HTML
 //!             status.created_at(),
 //!             status.account().username(),
 //!         );
@@ -99,7 +99,7 @@
 //! 
 //! Also, currently, a series of tests must be run serialized.
 //! 
-//! ```no-run
+//! ```bash
 //! cargo test -- --test-threads=1
 //! ```
 //! 
