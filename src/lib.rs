@@ -99,7 +99,7 @@
 //! 
 //! Also, currently, a series of tests must be run serialized.
 //! 
-//! ```ignore
+//! ```bash
 //! cargo test -- --test-threads=1
 //! ```
 //! 
