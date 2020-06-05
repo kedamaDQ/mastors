@@ -31,7 +31,7 @@ pub use notification::{ Notification, NotificationType };
 pub use poll::Poll;
 pub use privacy::{ Privacy, Visibility };
 pub use scheduled_status::{ DeletedScheduledStatus, Params, ScheduledStatus, ScheduledStatuses, ScheduledPoll };
-pub use status::Status;
+pub use status::{ Status, Statuses };
 pub use tag::{ Tag, Trends };
 
 use crate::{

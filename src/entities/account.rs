@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use crate::utils::transform_option_str_to_enum;
 use super::Entity;
 
 pub use crate::{
@@ -186,6 +187,7 @@ pub struct Source {
     fields: Option<Vec<Field>>,
 
     // Nullable attributes
+    #[serde(deserialize_with="transform_option_str_to_enum")]
     privacy: Option<Privacy>,
     sensitive: Option<bool>,
     language: Option<String>, // ISO 639-1 language two-letter code

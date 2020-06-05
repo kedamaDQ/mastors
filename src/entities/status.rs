@@ -218,3 +218,7 @@ impl Status {
 }
 
 impl Entity for Status {}
+
+/// Represents an array of [`Status`](./struct.Status.html)es.
+pub type Statuses = Vec<Status>;
+impl Entity for Statuses {}
