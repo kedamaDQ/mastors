@@ -139,11 +139,11 @@ impl ScheduledPoll {
     }
 }
 
-/// Represent an array of `ScheculedStatus`.
+/// Represent an array of [`ScheculedStatus`](./struct.ScheduledStatus.html)es.
 pub type ScheduledStatuses = Vec<ScheduledStatus>;
 impl Entity for ScheduledStatuses {}
 
-/// Represent a no body response.
+/// Represents a no body response.
 /// 
 /// API method `DELETE /api/v1/scheduled_statuses/:id` returns nothing.
 pub type DeletedScheduledStatus = Nothing;

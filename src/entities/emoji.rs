@@ -42,6 +42,6 @@ impl Emoji {
 
 impl Entity for Emoji {}
 
-/// Represents a custom emoji array as Emojis.
+/// Represents an array of [`Emoji`](./struct.Emoji.html)s.
 pub type Emojis = Vec<Emoji>;
 impl Entity for Emojis {}

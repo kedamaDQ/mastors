@@ -39,7 +39,7 @@ use crate::{
     Utc,
 };
 
-/// Represent a no body response.
+/// Represents a no body response.
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct Nothing {}
 impl Entity for Nothing {}

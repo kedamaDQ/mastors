@@ -31,6 +31,6 @@ impl Tag {
 
 impl Entity for Tag {}
 
-/// Represents a hashtag array as `Trends`.
+/// Represents an array of [`Tag`](./struct.Tag.html)s.
 pub type Trends = Vec<Tag>;
 impl Entity for Trends {}

@@ -42,6 +42,6 @@ impl Activity {
 
 impl Entity for Activity {}
 
-/// Represents an array of weekly bucket of instance activity.
+/// Represents an array of [`Activity`](./struct.Activity.html)s.
 pub type Activities = Vec<Activity>;
 impl Entity for Activities {}
