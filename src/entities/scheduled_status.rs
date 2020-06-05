@@ -98,8 +98,6 @@ impl Params {
     }
 
     /// Get a scheduled date and time of this scheduled status.
-    /// 
-    /// ...What is the difference with `ScheduledStatus.scheduled_at`? :thinking:
     pub fn scheduled_at(&self) -> Option<&DateTime<Utc>> {
         self.scheduled_at.as_ref()
     }
