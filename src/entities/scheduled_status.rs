@@ -44,7 +44,7 @@ impl ScheduledStatus {
 
 impl Entity for ScheduledStatus {}
 
-/// Represent parameters of ScheduledStatus that will toot at scheduled date and time.
+/// Represents parameters of ScheduledStatus that will toot at scheduled date and time.
 #[derive(Debug, Clone, Deserialize)]
 pub struct Params {
     text: String,
