@@ -2,6 +2,13 @@
 
 The `mastors` crate provides client API for Mastodon.
 
+Currently, mastors is not in relase version. Add mastors to your Cargo.toml with github URL.
+
+```toml
+[dependencies]
+mastors = { git = "https://github.com/kedamaDQ/mastors", branch = "master" }
+```
+
 ## REST API
 
 The structure of the Mastors module is consistent with the REST API path on the Mastodon server.
