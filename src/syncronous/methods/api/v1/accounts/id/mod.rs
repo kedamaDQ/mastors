@@ -1,6 +1,7 @@
 //! This module provides features related to account specified by ID.
 
 pub mod statuses;
+pub mod followers;
 
 use serde::Serialize;
 use crate::{

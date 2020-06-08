@@ -86,6 +86,12 @@ pub enum Error {
         reqwest::header::InvalidHeaderValue,
     ),
 
+    #[error(display = "HTTP header value error: {}", _0)]
+    HeaderValueToStrError(
+        #[error(source, from)]
+        reqwest::header::ToStrError,
+    ),
+
     #[error(display = "Server-sent events error")]
     SseStreamError(
         #[error(source, from)]

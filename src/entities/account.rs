@@ -28,9 +28,9 @@ pub struct Account {
     avatar_static: Url,
     header: Url,
     header_static: Url,
-    locked: bool,
+    locked: Option<bool>,
     emojis: Vec<Emoji>,
-    discoverable: bool,
+    discoverable: Option<bool>,
 
     // Statistical attributes
     created_at: DateTime<Utc>,
@@ -99,7 +99,7 @@ impl Account {
     }
 
     /// Get whether this account manually approves follow requests.
-    pub fn locked(&self) -> bool {
+    pub fn locked(&self) -> Option<bool> {
         self.locked
     }
 
@@ -109,7 +109,7 @@ impl Account {
     }
 
     /// Get whether this account has opted into discovery features such as the profile directory.
-    pub fn discoverable(&self) -> bool {
+    pub fn discoverable(&self) -> Option<bool> {
         self.discoverable
     }
 
@@ -229,3 +229,27 @@ impl Source {
 /// Represents an array of [`Account`](./struct.Account.html)s.
 pub type Accounts = Vec<Account>;
 impl Entity for Accounts {}
+
+/// Represents an array of [`Account`](./struct.Accont.html)s with pagination information.
+/// 
+/// First element is a pagination information as HTML.
+/// Second element is an array of [`Account`](./struct.Accont.html)s.
+#[derive(Debug, Clone, Deserialize)]
+pub struct PaginatedAccounts (
+    pub(crate) String,
+    pub(crate) Accounts
+);
+
+impl PaginatedAccounts {
+    /// Get the `Link` HTTP response header for using pagination.
+    pub fn link_header(&self) -> &str {
+        &self.0
+    }
+
+    /// Get an array of follower [`Account`](./struct.Account.html)s.
+    pub fn accounts(&self) -> &Accounts {
+        &self.1
+    }
+}
+
+impl Entity for PaginatedAccounts {}
