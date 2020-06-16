@@ -72,8 +72,7 @@ impl<'a> Method<'a, PaginatedAccounts> for GetAccountFollowers<'a> {
             build_request(self, reqwest::Method::GET)?.json(&self)
         )?;
 
-        let link = resp.headers().get("Link");
-        match link {
+        match resp.headers().get("Link") {
             Some(link) => {
                 Ok(
                     PaginatedAccounts(
