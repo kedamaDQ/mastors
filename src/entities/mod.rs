@@ -17,7 +17,7 @@ pub(crate) mod scheduled_status;
 pub(crate) mod status;
 pub(crate) mod tag;
 
-pub use account::{ Account, Accounts, PaginatedAccounts };
+pub use account::{ Account, Accounts };
 pub use activity::{ Activity, Activities };
 pub use application::Application;
 pub use attachment::Attachment;

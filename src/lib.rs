@@ -125,6 +125,7 @@ use syncronous as current_mode;
 pub use current_mode::{
     methods::{
         Method,
+        MethodWithRespHeader,
         api,
         self,
     },

@@ -229,27 +229,3 @@ impl Source {
 /// Represents an array of [`Account`](./struct.Account.html)s.
 pub type Accounts = Vec<Account>;
 impl Entity for Accounts {}
-
-/// Represents an array of [`Account`](./struct.Accont.html)s with pagination information.
-/// 
-/// First element is a pagination information as HTML.
-/// Second element is an array of [`Account`](./struct.Accont.html)s.
-#[derive(Debug, Clone, Deserialize)]
-pub struct PaginatedAccounts (
-    pub(crate) String,
-    pub(crate) Accounts
-);
-
-impl PaginatedAccounts {
-    /// Get the `Link` HTTP response header for using pagination.
-    pub fn link_header(&self) -> &str {
-        &self.0
-    }
-
-    /// Get an array of follower [`Account`](./struct.Account.html)s.
-    pub fn accounts(&self) -> &Accounts {
-        &self.1
-    }
-}
-
-impl Entity for PaginatedAccounts {}

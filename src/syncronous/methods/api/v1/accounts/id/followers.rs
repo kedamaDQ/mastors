@@ -2,10 +2,8 @@
 use serde::Serialize;
 use crate::{
     Connection,
-    Method,
-    Result,
+    MethodWithRespHeader as Method,
     entities::Accounts,
-    entities::PaginatedAccounts,
 };
 
 /// Get a request to get followers of an account specified by `id`.
@@ -22,7 +20,7 @@ pub fn get(conn: &Connection, id: impl Into<String>) -> GetAccountFollowers {
 
 /// GET request for `/api/v1/accounts/:id/followers`.
 #[derive(Debug, Clone, Serialize, mastors_derive::Method)]
-#[method_params(GET, PaginatedAccounts, "/api/v1/accounts/_PATH_PARAM_/followers")]
+#[method_params(GET, Accounts, "/api/v1/accounts/_PATH_PARAM_/followers", "Link")]
 pub struct GetAccountFollowers<'a> {
     #[serde(skip_serializing)]
     #[mastors(connection)]
@@ -61,33 +59,7 @@ impl<'a> GetAccountFollowers<'a> {
     }
 }
 
-impl<'a> Method<'a, PaginatedAccounts> for GetAccountFollowers<'a> {
-    fn send(&self) -> Result<PaginatedAccounts> {
-        use crate::methods::private::{
-            build_request,
-            send_request,
-        };
-
-        let resp = send_request(
-            build_request(self, reqwest::Method::GET)?.json(&self)
-        )?;
-
-        let link = resp.headers().get("Link");
-        match link {
-            Some(link) => {
-                Ok(
-                    PaginatedAccounts(
-                        link.to_str()?.to_owned(),
-                        resp.json::<Accounts>()?
-                    )
-                )
-            },
-            None => {
-                panic!("It is unexpected that the HTTP response header \"Link\" does not exist in response from `/api/v1/accounts/:id/followers`.");
-            }
-        }
-    }
-}
+impl<'a> Method<'a, Accounts> for GetAccountFollowers<'a> {}
 
 #[cfg(test)]
 mod tests {
