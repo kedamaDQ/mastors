@@ -66,7 +66,7 @@ pub fn derive_method(input: TokenStream) -> TokenStream {
             impl<'a> crate::syncronous::methods::private::MethodInternalWithRespHeader<'a, #entity> for #name<'a> {
                 const RESPONSE_HEADER_NAME: &'a str = #response_header;
 
-                fn send_internal(&self) -> crate::Result<(String, #entity)> {
+                fn send_internal(&self) -> crate::Result<(std::option::Option<String>, #entity)> {
                     #fn_send_internal_impl
                 }
             }

@@ -20,12 +20,12 @@ pub trait Method<'a, E: 'a + Entity>: MethodInternalWithoutRespHeader<'a, E> {
     }
 }
 
-/// An alternative to [`Method`](./trait.Method.html) and returns a tuple of `String` and `Entity` instead of just an Entity.
+/// An alternative to [`Method`](./trait.Method.html) and returns a tuple of `Option<String>` and `Entity` instead of just an Entity.
 /// 
 /// The returned String is the HTTP response header value associated with the Entity.
 /// For example /api/v1/accounts/:id/followers returns array of Account and `Link` HTTP response header contains pagination controll information.
 pub trait MethodWithRespHeader<'a, E: 'a + Entity>: MethodInternalWithRespHeader<'a, E> {
-    fn send(&'a self) -> Result<(String, E)> {
+    fn send(&'a self) -> Result<(Option<String>, E)> {
         self.send_internal()
     }
 }
@@ -108,9 +108,9 @@ pub(crate) mod private {
             Self::RESPONSE_HEADER_NAME
         }
 
-        fn send_internal(&self) -> Result<(String, E)>;
+        fn send_internal(&self) -> Result<(Option<String>, E)>;
 
-        fn get(&'a self) -> Result<(String, E)> {
+        fn get(&'a self) -> Result<(Option<String>, E)> {
             let resp = send_request(
                 build_request(self, reqwest::Method::GET)?.query(&self)
             )?;
@@ -227,15 +227,15 @@ pub(crate) mod private {
         utils::extract_response(rb.send()?)
     }
 
-    fn response_header_value(resp: &Response, header_name: &str) -> String {
+    fn response_header_value(resp: &Response, header_name: &str) -> Option<String> {
         match resp.headers().get(header_name) {
             Some(header_value) => {
                 match header_value.to_str() {
-                    Ok(str) => str.to_owned(),
+                    Ok(str) => Some(str.to_owned()),
                     Err(e) => panic!("HTTP response header value '{}' is not a text: {}", header_name, e),
                 }
             },
-            None => panic!("It is unexpected that HTTP response header '{}' is nothing", header_name),
+            None => None,
         }
     }
 }
