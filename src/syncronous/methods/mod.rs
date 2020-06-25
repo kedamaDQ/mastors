@@ -207,7 +207,7 @@ pub(crate) mod private {
         }
     }
 
-    pub fn build_request<'a, E: Entity + 'a, M: MethodInternal<'a, E>>(
+    fn build_request<'a, E: Entity + 'a, M: MethodInternal<'a, E>>(
         implementer: &'a M,
         method: reqwest::Method
     ) -> crate::Result<RequestBuilder> {
@@ -223,7 +223,7 @@ pub(crate) mod private {
         Ok(req)
     }
     
-    pub fn send_request(rb: RequestBuilder) -> crate::Result<Response> {
+    fn send_request(rb: RequestBuilder) -> crate::Result<Response> {
         utils::extract_response(rb.send()?)
     }
 
