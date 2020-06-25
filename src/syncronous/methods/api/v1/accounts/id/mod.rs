@@ -2,6 +2,9 @@
 
 pub mod statuses;
 pub mod followers;
+pub mod following;
+pub mod identity_proofs;
+pub mod lists;
 
 use serde::Serialize;
 use crate::{

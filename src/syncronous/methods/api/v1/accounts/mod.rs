@@ -21,6 +21,12 @@ pub fn post(
     unimplemented!()
 }
 
+pub use id::followers::get as get_followers_by_account_id;
+pub use id::following::get as get_following_by_account_id;
+pub use id::identity_proofs::get as get_identity_proofs_by_account_id;
+pub use id::lists::get as get_lists_by_account_id;
+pub use id::statuses::get as get_statuses_by_account_id;
+
 /// Post request for `/api/v1/accounts` used to create an account.
 #[derive(Debug, Clone, Serialize, mastors_derive::Method)]
 #[method_params(POST, Account, "/api/v1/accounts")]
@@ -40,7 +46,7 @@ pub struct PostAccounts<'a> {
     reason: Option<String>,
 }
 
-impl <'a>PostAccounts<'a> {
+impl<'a> PostAccounts<'a> {
     /// Set a reason why you want to create an account if server set to manual approval mode.
     pub fn reason(mut self, reason: impl Into<String>) -> Self {
         self.reason = Some(reason.into());
@@ -83,6 +89,7 @@ pub mod verify_credentials {
     impl<'a> Method<'a, Account> for GetVerifyCredentials<'a> {}
 }
 
+/// This module provides features related to update your account.
 pub mod update_credentials {
     use crate::{
         Connection,

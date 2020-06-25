@@ -20,6 +20,10 @@ pub trait Method<'a, E: 'a + Entity>: MethodInternalWithoutRespHeader<'a, E> {
     }
 }
 
+/// An alternative to [`Method`](./trait.Method.html) and returns a tuple of `String` and `Entity` instead of just an Entity.
+/// 
+/// The returned String is the HTTP response header value associated with the Entity.
+/// For example /api/v1/accounts/:id/followers returns array of Account and `Link` HTTP response header contains pagination controll information.
 pub trait MethodWithRespHeader<'a, E: 'a + Entity>: MethodInternalWithRespHeader<'a, E> {
     fn send(&'a self) -> Result<(String, E)> {
         self.send_internal()
