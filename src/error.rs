@@ -147,6 +147,12 @@ pub enum Error {
 
     #[error(display = "Voted option is duplicate")]
     DuplicateVoteOptionError,
+
+    #[error(display = "Account IDs are duplicate")]
+    DuplicateAccountIdError,
+
+    #[error(display = "Account ID is nothing")]
+    NoAccountIdError,
 }
 
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize)]

@@ -1,5 +1,7 @@
 //! This module provides features related to accounts.
 pub mod id;
+pub mod relationships;
+pub mod search;
 
 use serde::Serialize;
 use crate::{
