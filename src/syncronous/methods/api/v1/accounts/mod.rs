@@ -10,7 +10,7 @@ use crate::{
     entities::Account,
 };
 
-/// Get a POST request for `/api/v1/accounts`.
+/// Get a request to create account.
 #[allow(unused)]
 pub fn post(
     conn: &Connection,
@@ -58,7 +58,7 @@ impl<'a> PostAccounts<'a> {
 
 impl<'a> Method<'a, Account> for PostAccounts<'a> {}
 
-/// This module provides features to check whether your access token is valid.
+/// This module provides features related to check whether your access token is valid.
 pub mod verify_credentials {
     use serde::Serialize;
     use crate::{

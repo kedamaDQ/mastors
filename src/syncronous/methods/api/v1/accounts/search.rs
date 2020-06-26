@@ -41,6 +41,7 @@ pub struct GetSearch<'a> {
 
 impl<'a> GetSearch<'a> {
 	/// Set a limit on the number of search results.
+	/// Defaults to 40.
 	pub fn limit(mut self, limit: usize) -> Self {
 		self.limit = Some(limit);
 		self

@@ -1,4 +1,4 @@
-/// This module provides features related to identity proofs of account specified by ID.
+//! This module provides features related to identity proofs of account specified by ID.
 use serde::Serialize;
 use crate::{
     Connection,
