@@ -1,14 +1,13 @@
 use serde::Deserialize;
 use crate::utils::transform_option_str_to_enum;
-use super::Entity;
-
-pub use crate::{
+use crate::{
     DateTime,
     Utc,
     Url,
 };
-pub use super::{
+use super::{
     Emoji,
+    Entity,
     Privacy,
 };
 

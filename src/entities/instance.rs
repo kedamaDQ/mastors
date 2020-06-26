@@ -1,8 +1,9 @@
 use serde::Deserialize;
-use super::Entity;
-
-pub use crate::Url;
-pub use super::Account;
+use crate::Url;
+use super::{
+    Account,
+    Entity,
+};
 
 /// Represents the software instance of Mastodon running on this domain.
 #[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize)]

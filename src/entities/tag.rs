@@ -1,8 +1,9 @@
 use serde::Deserialize;
-use super::Entity;
-
-pub use crate::Url;
-pub use super::History;
+use crate::Url;
+use super::{
+    Entity,
+    History,
+};
 
 /// Represents a hashtag used within the content of a status.
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize)]

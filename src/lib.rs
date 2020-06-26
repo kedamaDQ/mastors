@@ -50,11 +50,8 @@
 //! ```no_run
 //! //! This is a simple streaming timeline on the command-line terminal.
 //! use mastors::Method;
-//! use mastors::api::v1::streaming::{
-//!     EventType,
-//!     StreamType,
-//!     get,
-//! };
+//! use mastors::api::v1::streaming::get;
+//! use mastors::streaming_timeline::*;
 //!
 //! # use std::error::Error;
 //! #

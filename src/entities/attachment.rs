@@ -1,8 +1,10 @@
 use serde::Deserialize;
-use crate::utils::transform_str_to_enum;
+use crate::{
+    Url,
+    utils::transform_str_to_enum,
+};
 use super::Entity;
 
-pub use crate::Url;
 
 /// Represents a file or media attachment that can be added to a status.
 #[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize)]

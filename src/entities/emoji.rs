@@ -1,7 +1,7 @@
 use serde::Deserialize;
+use crate::Url;
 use super::Entity;
 
-pub use crate::Url;
 
 /// Represents a custom emoji.
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize)]

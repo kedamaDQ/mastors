@@ -1,7 +1,6 @@
 use serde::Deserialize;
+use crate::Url;
 use super::Entity;
-
-pub use crate::Url;
 
 /// Represents a mention of a user within the content of a status.
 #[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize)]

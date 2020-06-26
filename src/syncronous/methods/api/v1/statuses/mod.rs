@@ -71,9 +71,6 @@ where
     )
 }
 
-pub use id::get as get_by_id;
-pub use id::delete as delete_by_id;
-
 // Create POST request.
 fn post_internal(
     conn: &Connection,
@@ -598,7 +595,7 @@ mod tests {
             .send()
             .unwrap();
 
-        let got = get_by_id(&conn, posted.id())
+        let got = super::id::get(&conn, posted.id())
             .authorized()
             .unauthorized()
             .authorized()
@@ -607,7 +604,7 @@ mod tests {
 
         assert_eq!(posted.id(), got.id());
 
-        let deleted = delete_by_id(&conn, posted.id())
+        let deleted = super::id::delete(&conn, posted.id())
             .send()
             .unwrap();
 
@@ -626,7 +623,7 @@ mod tests {
             .unwrap();
         let posted = posted.status().unwrap();
 
-        let got = get_by_id(&conn, posted.id())
+        let got = super::id::get(&conn, posted.id())
             .authorized()
             .send()
             .unwrap();
@@ -634,7 +631,7 @@ mod tests {
         assert_eq!(posted.id(), got.id());
         assert_eq!(posted.poll().unwrap().id(), got.poll().unwrap().id());
 
-        let deleted = delete_by_id(&conn, posted.id())
+        let deleted = super::id::delete(&conn, posted.id())
             .send()
             .unwrap();
 
@@ -659,7 +656,7 @@ mod tests {
             .send()
             .unwrap();
 
-        let got = get_by_id(&conn, posted.id())
+        let got = super::id::get(&conn, posted.id())
             .send()
             .unwrap();
 
@@ -672,7 +669,7 @@ mod tests {
         assert_eq!(posted.id(), got.id());
         assert_eq!(&media_ids, &got_media_ids);
 
-        let deleted = delete_by_id(&conn, got.id())
+        let deleted = super::id::delete(&conn, got.id())
             .send()
             .unwrap();
 
