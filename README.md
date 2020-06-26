@@ -93,6 +93,15 @@ ACCESS_TOKEN="aabbcc"
 
 See `Connection` for other optional settings.
 
+# Documents
+
+Currently, you have to generate the documentation yourself if you want.
+
+```
+cargo doc --no-deps --open
+```
+
+
 # Run tests
 
 Currently, a series of tests will send too many requests to the server.
