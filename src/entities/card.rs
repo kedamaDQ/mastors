@@ -1,8 +1,9 @@
 use serde::Deserialize;
-use crate::utils::transform_str_to_enum;
+use crate::{
+    Url,
+    utils::transform_str_to_enum,
+};
 use super::Entity;
-
-pub use crate::Url;
 
 /// Represents a rich preview card that is generated using OpenGraph tags from a URL.
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize)]

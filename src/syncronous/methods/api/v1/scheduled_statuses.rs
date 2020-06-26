@@ -18,10 +18,6 @@ pub fn get(conn: &Connection) -> GetScheduledStatuses {
     }
 }
 
-pub use id::get as get_by_id;
-pub use id::put as put_by_id;
-pub use id::delete as delete_by_id;
-
 /// GET request for scheduled statuses that are created by authenticated user.
 #[derive(Debug, Clone, Serialize, mastors_derive::Method)]
 #[method_params(GET, ScheduledStatuses, "/api/v1/scheduled_statuses")]

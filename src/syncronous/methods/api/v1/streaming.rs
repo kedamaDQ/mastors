@@ -16,10 +16,9 @@ use crate::{
         Notification,
         Status,
     },
+    streaming_timeline::*,
     utils,
 };
-
-pub use crate::streaming_timeline::*;
 
 const ENDPOINT: &str = "/api/v1/streaming";
 

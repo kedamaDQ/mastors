@@ -1,15 +1,5 @@
 //! This module provides features related to poll attached to status.
 
-/// Get a request to get a poll specified by ID.
-/// 
-/// This function is an alias of `mastors::api::v1::polls::id::get()`.
-pub use id::get as get_by_id;
-
-/// Get a request to post vote to the poll specified by ID.
-/// 
-/// This function is an alias of `mastors::api::v1::polls::id::votes::post()`.
-pub use id::votes::post as post_with_id;
-
 /// This module provides features related to poll specified by ID.
 pub mod id {
     use serde::Serialize;
@@ -154,11 +144,11 @@ mod tests {
             .status()
             .unwrap();
 
-        let voted = super::post_with_id(&conn, posted.poll().unwrap().id(), [0, 1])
+        let voted = super::id::votes::post(&conn, posted.poll().unwrap().id(), [0, 1])
             .send()
             .unwrap();
 
-        let got = super::get_by_id(&conn, voted.id())
+        let got = super::id::get(&conn, voted.id())
             .authorized()
             .send()
             .unwrap();
@@ -171,13 +161,13 @@ mod tests {
         assert_eq!(got_option_0.title(), "a");
         assert_eq!(got_option_0.votes_count().unwrap(), 1);
 
-        let got = super::get_by_id(&conn, voted.id())
+        let got = super::id::get(&conn, voted.id())
             .send()
             .unwrap();
 
         assert!(got.voted().is_none());
 
-        let _deleted = crate::api::v1::statuses::delete_by_id(&conn, posted.id())
+        let _deleted = crate::api::v1::statuses::id::delete(&conn, posted.id())
             .send()
             .unwrap();
     }

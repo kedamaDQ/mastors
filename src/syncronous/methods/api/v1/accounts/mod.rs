@@ -23,12 +23,6 @@ pub fn post(
     unimplemented!()
 }
 
-pub use id::followers::get as get_followers_by_account_id;
-pub use id::following::get as get_following_by_account_id;
-pub use id::identity_proofs::get as get_identity_proofs_by_account_id;
-pub use id::lists::get as get_lists_by_account_id;
-pub use id::statuses::get as get_statuses_by_account_id;
-
 /// Post request for `/api/v1/accounts` used to create an account.
 #[derive(Debug, Clone, Serialize, mastors_derive::Method)]
 #[method_params(POST, Account, "/api/v1/accounts")]

@@ -1,12 +1,11 @@
 use serde::Deserialize;
-use super::Entity;
-
-pub use crate::{
+use crate::{
     DateTime,
     Utc,
 };
-pub use super::{
+use super::{
     Emoji,
+    Entity,
 };
 
 #[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize)]
