@@ -7,14 +7,25 @@ use crate::{
 
 pub(crate) use private::{
     FileFormInternal,
-    MethodInternal,
+    MethodInternalWithoutRespHeader,
+    MethodInternalWithRespHeader,
     UploadInternal,
 };
 
 /// The common sets of methods for API methods of the Mastodon.
-pub trait Method<'a, E: 'a + Entity>: MethodInternal<'a, E> {
+pub trait Method<'a, E: 'a + Entity>: MethodInternalWithoutRespHeader<'a, E> {
     /// Send a request to the REST API endpoint of the Mastodon.
     fn send(&'a self) -> Result<E> {
+        self.send_internal()
+    }
+}
+
+/// An alternative to [`Method`](./trait.Method.html) and returns a tuple of `Option<String>` and `Entity` instead of just an Entity.
+/// 
+/// The returned String is the HTTP response header value associated with the Entity.
+/// For example /api/v1/accounts/:id/followers returns array of Account and `Link` HTTP response header contains pagination controll information.
+pub trait MethodWithRespHeader<'a, E: 'a + Entity>: MethodInternalWithRespHeader<'a, E> {
+    fn send(&'a self) -> Result<(Option<String>, E)> {
         self.send_internal()
     }
 }
@@ -36,7 +47,6 @@ pub(crate) mod private {
     };
 
     pub trait MethodInternal<'a, E: 'a + Entity>: std::marker::Sized + Serialize {
-
         const ENDPOINT: &'a str;
 
         fn connection(&'a self) -> &'a Connection;
@@ -49,6 +59,9 @@ pub(crate) mod private {
             None
         }
  
+    }
+
+    pub trait MethodInternalWithoutRespHeader<'a, E: 'a + Entity>: MethodInternal<'a, E> {
         fn send_internal(&self) -> Result<E>;
 
         fn get(&'a self) -> Result<E> {
@@ -86,6 +99,54 @@ pub(crate) mod private {
                 .json::<E>()?
             )
         }
+    }
+
+    pub trait MethodInternalWithRespHeader<'a, E: 'a + Entity>: MethodInternal<'a, E> {
+        const RESPONSE_HEADER_NAME: &'a str;
+
+        fn response_header_name(&self) -> &'a str {
+            Self::RESPONSE_HEADER_NAME
+        }
+
+        fn send_internal(&self) -> Result<(Option<String>, E)>;
+
+        fn get(&'a self) -> Result<(Option<String>, E)> {
+            let resp = send_request(
+                build_request(self, reqwest::Method::GET)?.query(&self)
+            )?;
+            Ok((
+                response_header_value(&resp, self.response_header_name()),
+                resp.json::<E>()?
+            ))
+        }
+    
+        fn post(&'a self) -> Result<E> {
+            Ok(
+                send_request(
+                    build_request(self, reqwest::Method::POST)?.json(&self)
+                )?
+                .json::<E>()?
+            )
+        }
+
+        fn put(&'a self) -> Result<E> {
+            Ok(
+                send_request(
+                    build_request(self, reqwest::Method::PUT)?.json(&self)
+                )?
+                .json::<E>()?
+            )
+        }
+
+        fn delete(&'a self) -> Result<E> {
+            Ok(
+                send_request(
+                    build_request(self, reqwest::Method::DELETE)?.json(&self)
+                )?
+                .json::<E>()?
+            )
+        }
+
     }
 
     #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
@@ -146,7 +207,7 @@ pub(crate) mod private {
         }
     }
 
-    fn build_request<'a, E: Entity + 'a, M: MethodInternal<'a, E>>(
+    pub(crate) fn build_request<'a, E: Entity + 'a, M: MethodInternal<'a, E>>(
         implementer: &'a M,
         method: reqwest::Method
     ) -> crate::Result<RequestBuilder> {
@@ -162,8 +223,20 @@ pub(crate) mod private {
         Ok(req)
     }
     
-    fn send_request(rb: RequestBuilder) -> crate::Result<Response> {
+    pub(crate) fn send_request(rb: RequestBuilder) -> crate::Result<Response> {
         utils::extract_response(rb.send()?)
+    }
+
+    fn response_header_value(resp: &Response, header_name: &str) -> Option<String> {
+        match resp.headers().get(header_name) {
+            Some(header_value) => {
+                match header_value.to_str() {
+                    Ok(str) => Some(str.to_owned()),
+                    Err(e) => panic!("HTTP response header value '{}' is not a text: {}", header_name, e),
+                }
+            },
+            None => None,
+        }
     }
 }
 

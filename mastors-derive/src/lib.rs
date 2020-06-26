@@ -13,7 +13,7 @@ pub fn derive_method(input: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(input as syn::DeriveInput);
     let name = &input.ident;
 
-    let (http_method, entity, endpoint) = get_method_params(&input.attrs)
+    let (http_method, entity, endpoint, response_header) = get_method_params(&input.attrs)
         .expect("An attribute `method_params` is required for deriving Method");
 
     let connection_field = get_field_name_with_attribute(&input.data, IDENT_CONNECTION)
@@ -61,6 +61,25 @@ pub fn derive_method(input: TokenStream) -> TokenStream {
         panic!("Unexpected HTTP method");
     };
 
+    let trait_impl = match response_header {
+        Some(response_header) => { quote! { 
+            impl<'a> crate::syncronous::methods::private::MethodInternalWithRespHeader<'a, #entity> for #name<'a> {
+                const RESPONSE_HEADER_NAME: &'a str = #response_header;
+
+                fn send_internal(&self) -> crate::Result<(std::option::Option<String>, #entity)> {
+                    #fn_send_internal_impl
+                }
+            }
+        }},
+        None => { quote! { 
+            impl<'a> crate::syncronous::methods::private::MethodInternalWithoutRespHeader<'a, #entity> for #name<'a> {
+                fn send_internal(&self) -> crate::Result<#entity> {
+                    #fn_send_internal_impl
+                }
+            }
+        }},
+    };
+
     TokenStream::from(quote! {
         impl<'a> crate::syncronous::methods::private::MethodInternal<'a, #entity> for #name<'a> {
             const ENDPOINT: &'a str = #endpoint;
@@ -72,11 +91,9 @@ pub fn derive_method(input: TokenStream) -> TokenStream {
             #fn_path
 
             #fn_authorization
-
-            fn send_internal(&self) -> crate::Result<#entity> {
-                #fn_send_internal_impl
-            }
         }
+
+        #trait_impl
     })
 }
 
@@ -138,11 +155,11 @@ fn get_field_with_attribute<'a>(data: &'a syn::Data, attr: &str) -> Option<&'a s
     result
 }
 
-type MethodParams = (syn::Ident, syn::Ident, syn::Lit);
+type MethodParams = (syn::Ident, syn::Ident, syn::Lit, Option<syn::Lit>);
 
 fn get_method_params(attrs: &[syn::Attribute]) -> Option<MethodParams> {
     let mut result: Option<MethodParams> = None;
-    let (mut http_method, mut entity, mut endpoint);
+    let (mut http_method, mut entity, mut endpoint, mut response_header);
 
     for attr in attrs.iter() {
         let meta = match attr.parse_meta() {
@@ -191,7 +208,14 @@ fn get_method_params(attrs: &[syn::Attribute]) -> Option<MethodParams> {
                     return None;
                 }
 
-                result = Some((http_method, entity, endpoint));
+                // Fourth arg is the name of HTTP Response header to capture.
+                if let Some(syn::NestedMeta::Lit(lit)) = params.next() {
+                    response_header = Some(lit.clone());
+                } else {
+                    response_header = None;
+                }
+
+                result = Some((http_method, entity, endpoint, response_header));
             }
         };
     }

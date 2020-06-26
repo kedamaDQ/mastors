@@ -86,6 +86,12 @@ pub enum Error {
         reqwest::header::InvalidHeaderValue,
     ),
 
+    #[error(display = "HTTP header value error: {}", _0)]
+    HeaderValueToStrError(
+        #[error(source, from)]
+        reqwest::header::ToStrError,
+    ),
+
     #[error(display = "Server-sent events error")]
     SseStreamError(
         #[error(source, from)]
@@ -141,6 +147,12 @@ pub enum Error {
 
     #[error(display = "Voted option is duplicate")]
     DuplicateVoteOptionError,
+
+    #[error(display = "Account IDs are duplicate")]
+    DuplicateAccountIdError,
+
+    #[error(display = "Account ID is nothing")]
+    NoAccountIdError,
 }
 
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize)]

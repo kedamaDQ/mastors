@@ -22,3 +22,20 @@ where
     let s: &str = Deserialize::deserialize(deserializer)?;
     T::from_str(s).map_err(D::Error::custom)
 }
+
+pub(crate) fn transform_option_str_to_enum<'de, D, T>(deserializer: D) -> Result<Option<T>, D::Error>
+where
+    D: Deserializer<'de>,
+    T: FromStr<Err = crate::Error>,
+{
+    let o: Option<&str> = Deserialize::deserialize(deserializer)?;
+    match o {
+        Some(s) => {
+            match T::from_str(s).map_err(D::Error::custom) {
+                Ok(en) => Ok(Some(en)),
+                Err(e) => Err(e),
+            }
+        },
+        None => Ok(None)
+    }
+}

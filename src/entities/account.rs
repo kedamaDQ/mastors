@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use crate::utils::transform_option_str_to_enum;
 use super::Entity;
 
 pub use crate::{
@@ -27,9 +28,9 @@ pub struct Account {
     avatar_static: Url,
     header: Url,
     header_static: Url,
-    locked: bool,
+    locked: Option<bool>,
     emojis: Vec<Emoji>,
-    discoverable: bool,
+    discoverable: Option<bool>,
 
     // Statistical attributes
     created_at: DateTime<Utc>,
@@ -98,7 +99,7 @@ impl Account {
     }
 
     /// Get whether this account manually approves follow requests.
-    pub fn locked(&self) -> bool {
+    pub fn locked(&self) -> Option<bool> {
         self.locked
     }
 
@@ -108,7 +109,7 @@ impl Account {
     }
 
     /// Get whether this account has opted into discovery features such as the profile directory.
-    pub fn discoverable(&self) -> bool {
+    pub fn discoverable(&self) -> Option<bool> {
         self.discoverable
     }
 
@@ -186,6 +187,7 @@ pub struct Source {
     fields: Option<Vec<Field>>,
 
     // Nullable attributes
+    #[serde(deserialize_with="transform_option_str_to_enum")]
     privacy: Option<Privacy>,
     sensitive: Option<bool>,
     language: Option<String>, // ISO 639-1 language two-letter code

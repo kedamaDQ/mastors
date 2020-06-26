@@ -31,3 +31,11 @@ pub(crate) fn extract_response(resp: Response) -> Result<Response> {
         Err(Error::HttpUnexpectedStatusError(url, status.as_u16()))
     }
 }
+
+pub(crate) fn build_array_query<'a>(key: &'a str, values: &'a [String]) -> Vec<(&'a str, &'a str)> {
+    let mut array_query: Vec<(&'a str, &'a str)> = Vec::new();
+    for value in values {
+        array_query.push((key, value.as_ref()));
+    }
+    array_query
+}

@@ -74,7 +74,7 @@ pub mod id {
             entities::Poll,
             methods::{
                 Method,
-                MethodInternal,
+                MethodInternalWithoutRespHeader,
             },
         };
         
