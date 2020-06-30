@@ -1,19 +1,28 @@
 //! This module provides features related to status specified by ID.
 /*
-pub mod bookmark;
-pub mod context;
-pub mod favourite;
-pub mod favourited_by;
 pub mod mute;
 pub mod pin;
 pub mod reblog;
 pub mod reblogged_by;
-pub mod unbookmark;
-pub mod unfavourite;
 pub mod unmute;
 pub mod unpin;
 pub mod unreblog;
 */
+mod bookmarks;
+pub use bookmarks::{
+    bookmark as bookmark,
+    unbookmark as unbookmark
+};
+mod contexts;
+pub use contexts::{
+    context as context,
+};
+mod favourites;
+pub use favourites::{
+    favourited_by as favourited_by,
+    favourite as favourite,
+    unfavourite as unfavourite,
+};
 
 use serde::Serialize;
 use crate::{
