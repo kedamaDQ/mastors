@@ -1,18 +1,30 @@
 //! This module provides features related to account specified by ID.
 
-pub mod block;
-pub mod follow;
-pub mod followers;
-pub mod following;
+mod blocks;
+pub use blocks::{
+    block as block,
+    unblock as unblock,
+};
+mod follows;
+pub use follows::{
+    followers,
+    following,
+    follow,
+    unfollow,
+};
 pub mod identity_proofs;
 pub mod lists;
-pub mod mute;
-pub mod pin;
+mod mutes;
+pub use mutes::{
+    mute,
+    unmute,
+};
+mod pins;
+pub use pins::{
+    pin,
+    unpin,
+};
 pub mod statuses;
-pub mod unblock;
-pub mod unfollow;
-pub mod unmute;
-pub mod unpin;
 
 use serde::Serialize;
 use crate::{

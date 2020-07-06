@@ -1,43 +1,34 @@
 //! This module provides features related to status specified by ID.
-/*
-pub mod mute;
-pub mod pin;
-pub mod reblog;
-pub mod reblogged_by;
-pub mod unmute;
-pub mod unpin;
-pub mod unreblog;
-*/
 mod bookmarks;
 pub use bookmarks::{
-    bookmark as bookmark,
-    unbookmark as unbookmark
+    bookmark,
+    unbookmark
 };
 mod contexts;
 pub use contexts::{
-    context as context,
+    context,
 };
 mod favourites;
 pub use favourites::{
-    favourited_by as favourited_by,
-    favourite as favourite,
-    unfavourite as unfavourite,
+    favourited_by,
+    favourite,
+    unfavourite,
 };
 mod reblogs;
 pub use reblogs::{
-    reblogged_by as reblogged_by,
-    reblog as reblog,
-    unreblog as unreblog,
+    reblogged_by,
+    reblog,
+    unreblog,
 };
 mod pins;
 pub use pins::{
-    pin as pin,
-    unpin as unpin,
+    pin,
+    unpin,
 };
 mod mutes;
 pub use mutes::{
-    mute as mute,
-    unmute as unmute,
+    mute,
+    unmute,
 };
 
 use serde::Serialize;
