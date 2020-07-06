@@ -1,11 +1,7 @@
-use std::fmt;
-use serde::{
-    Serialize,
-    Deserialize,
-};
+use serde::Deserialize;
 
 /// Represents a privacy setting of the status.
-#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy, Deserialize)]
 pub enum Privacy {
     /// Visible to everyone, shown in public timelines.
     Public,
@@ -19,6 +15,8 @@ pub enum Privacy {
     /// Visible only to mentioned users.
     Direct,
 }
+
+use std::fmt;
 
 impl fmt::Display for Privacy {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -41,6 +39,17 @@ impl std::str::FromStr for Privacy {
             "direct" => Ok(Privacy::Direct),
             _ => Err(crate::Error::ParsePrivacyError(s.to_string())),
         }
+    }
+}
+
+use serde::ser;
+
+impl ser::Serialize for Privacy {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: ser::Serializer
+    {
+        serializer.serialize_str(self.to_string().as_ref())
     }
 }
 

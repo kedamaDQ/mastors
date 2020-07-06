@@ -23,6 +23,22 @@ pub use favourites::{
     favourite as favourite,
     unfavourite as unfavourite,
 };
+mod reblogs;
+pub use reblogs::{
+    reblogged_by as reblogged_by,
+    reblog as reblog,
+    unreblog as unreblog,
+};
+mod pins;
+pub use pins::{
+    pin as pin,
+    unpin as unpin,
+};
+mod mutes;
+pub use mutes::{
+    mute as mute,
+    unmute as unmute,
+};
 
 use serde::Serialize;
 use crate::{

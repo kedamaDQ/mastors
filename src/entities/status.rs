@@ -32,7 +32,7 @@ pub struct Status {
     sensitive: bool,
     spoiler_text: String,
     media_attachments: Vec<Attachment>,
-    application: Application,
+    application: Option<Application>,
 
     // Rendering attributes
     mentions: Vec<Mention>,
@@ -114,8 +114,8 @@ impl Status {
     }
 
     /// Get the application used to post this status.
-    pub fn application(&self) -> &Application {
-        &self.application
+    pub fn application(&self) -> Option<&Application> {
+        self.application.as_ref()
     }
 
     /// Get mentions of users within this status content.
