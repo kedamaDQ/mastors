@@ -144,8 +144,8 @@ impl<'a> PostStatuses<'a> {
     /// Set the `Visibility` to status.
     pub fn visibility(mut self, visibility: Visibility) -> Self {
         match self {
-            Self::Status(ref mut s) => s.visibility = Some(visibility.to_string()),
-            Self::ScheduledStatus(ref mut s) => s.visibility = Some(visibility.to_string()),
+            Self::Status(ref mut s) => s.visibility = Some(visibility),
+            Self::ScheduledStatus(ref mut s) => s.visibility = Some(visibility),
         };
         self
     }
@@ -154,8 +154,8 @@ impl<'a> PostStatuses<'a> {
     /// This is equivalent to `visibility(Visibility::Public)`.
     pub fn public(mut self) -> Self {
         match self {
-            Self::Status(ref mut s) => s.visibility = Some(Visibility::Public.to_string()),
-            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Public.to_string()),
+            Self::Status(ref mut s) => s.visibility = Some(Visibility::Public),
+            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Public),
         };
         self
     }
@@ -164,8 +164,8 @@ impl<'a> PostStatuses<'a> {
     /// This is equivalent to `visibility(Visibility::Unlisted)`.
     pub fn unlisted(mut self) -> Self {
         match self {
-            Self::Status(ref mut s) => s.visibility = Some(Visibility::Unlisted.to_string()),
-            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Unlisted.to_string()),
+            Self::Status(ref mut s) => s.visibility = Some(Visibility::Unlisted),
+            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Unlisted),
         };
         self
     }
@@ -174,8 +174,8 @@ impl<'a> PostStatuses<'a> {
     /// This is equivalent to `visibility(Visibility::Private)`.
     pub fn private(mut self) -> Self {
         match self {
-            Self::Status(ref mut s) => s.visibility = Some(Visibility::Private.to_string()),
-            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Private.to_string()),
+            Self::Status(ref mut s) => s.visibility = Some(Visibility::Private),
+            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Private),
         };
         self
     }
@@ -184,8 +184,8 @@ impl<'a> PostStatuses<'a> {
     /// This is equivalent to `visibility(Visibility::Direct)`.
     pub fn direct(mut self) -> Self {
         match self {
-            Self::Status(ref mut s) => s.visibility = Some(Visibility::Direct.to_string()),
-            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Direct.to_string()),
+            Self::Status(ref mut s) => s.visibility = Some(Visibility::Direct),
+            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Direct),
         };
         self
     }
@@ -291,7 +291,7 @@ pub struct PostNormalStatuses<'a> {
     in_reply_to_id: Option<String>,
     sensitive: Option<bool>,
     spoiler_text: Option<String>,
-    visibility: Option<String>,
+    visibility: Option<Visibility>,
     scheduled_at: Option<DateTime<Utc>>,
     language: Option<String>,
 }
@@ -329,7 +329,7 @@ pub struct PostScheduledStatuses<'a> {
     in_reply_to_id: Option<String>,
     sensitive: Option<bool>,
     spoiler_text: Option<String>,
-    visibility: Option<String>,
+    visibility: Option<Visibility>,
     scheduled_at: Option<DateTime<Utc>>,
     language: Option<String>,
 }
