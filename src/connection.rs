@@ -17,6 +17,7 @@ const ENV_STATUS_MAX_CHARACTERS: &str = "STATUS_MAX_CHARACTERS";
 const ENV_STATUS_MAX_MEDIAS: &str = "STATUS_MAX_MEDIAS";
 const ENV_POLL_MAX_OPTIONS: &str = "POLL_MAX_OPTIONS";
 const ENV_WHITELIST_MODE: &str = "WHITELIST_MODE";
+const ENV_PUBLIC_TIMELINE_PREVIEW_DISABLED: &str = "PUBLIC_TIMELINE_PREVIEW_DISABLED";
 
 const DEFAULT_USER_AGENT: &str = concat!(
     env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"),
@@ -36,7 +37,8 @@ const DEFAULT_POLL_MAX_OPTIONS: &str = "4";
 /// - `STATUS_MAX_CHARACTERS`: A max number of characters that can be included the status. This setting is optional and default value is 500.
 /// - `STATUS_MAX_MEDIAS`: A max number of characters that can be included the status. This setting is optional and default value is 4.
 /// - `POLL_MAX_OPTIONS`: A max number of options that can be included the poll. This setting is optional and default value is 4.
-/// - `WHITELIST_MODE`: If defined, use the access_token if required. This setting is optional and disabled by default.
+/// - `WHITELIST_MODE`: If defined, to use the access_token if required. This setting is optional and disabled by default.
+/// - `PUBLIC_TIMELINE_PREVIEW_DISABLED`: If defined, to force access_token when get the public timeline from `/api/v1/timelines/public`. This setting is optional and disabled by default.
 /// 
 /// ```bash
 /// SERVER_URL="https://mastodon.social"
@@ -47,6 +49,7 @@ const DEFAULT_POLL_MAX_OPTIONS: &str = "4";
 /// STATUS_MAX_MEDIAS="4"
 /// POLL_MAX_OPTIONS="4"
 /// WHITELIST_MODE="true"
+/// PUBLIC_TIMELINE_PREVIEW_DISABLED="true"
 /// ```
 /// 
 /// The Connection holds a `reqwest::Client` internally, and `reqwest::Client` holds a connection pool, so it is recommended that you create one Connection and **reuse** it.
@@ -61,6 +64,7 @@ pub struct Connection {
     status_max_medias: usize,
     poll_max_options: usize,
     whitelist_mode: bool,
+    public_timeline_preview_disabled: bool,
     client: Client,
 }
 
@@ -126,6 +130,8 @@ impl Connection {
 
         let whitelist_mode = env::var(ENV_WHITELIST_MODE).is_ok();
 
+        let public_timeline_preview_disabled = env::var(ENV_PUBLIC_TIMELINE_PREVIEW_DISABLED).is_ok();
+
         let client = Client::builder()
             .gzip(true)
             .user_agent(&user_agent)
@@ -141,6 +147,7 @@ impl Connection {
             status_max_medias,
             poll_max_options,
             whitelist_mode,
+            public_timeline_preview_disabled,
             client,
         })
     }
@@ -185,9 +192,14 @@ impl Connection {
         self.poll_max_options
     }
 
-    /// Get whether or not in the whitelist mode.
+    /// Get whether server is set to the whitelist mode.
     pub fn whitelist_mode(&self) -> bool {
         self.whitelist_mode
+    }
+
+    /// Get whether server is set to disabled public timeline preview.
+    pub fn public_timeline_preview_disabled(&self) -> bool {
+        self.public_timeline_preview_disabled
     }
 
     // Get the reqwest::Client.
