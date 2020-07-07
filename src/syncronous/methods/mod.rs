@@ -120,31 +120,34 @@ pub(crate) mod private {
             ))
         }
     
-        fn post(&'a self) -> Result<E> {
-            Ok(
-                send_request(
-                    build_request(self, reqwest::Method::POST)?.json(&self)
-                )?
-                .json::<E>()?
-            )
+        fn post(&'a self) -> Result<(Option<String>, E)> {
+            let resp = send_request(
+                build_request(self, reqwest::Method::POST)?.json(&self)
+            )?;
+            Ok((
+                response_header_value(&resp, self.response_header_name()),
+                resp.json::<E>()?
+            ))
         }
 
-        fn put(&'a self) -> Result<E> {
-            Ok(
-                send_request(
-                    build_request(self, reqwest::Method::PUT)?.json(&self)
-                )?
-                .json::<E>()?
-            )
+        fn put(&'a self) -> Result<(Option<String>, E)> {
+            let resp = send_request(
+                build_request(self, reqwest::Method::PUT)?.json(&self)
+            )?;
+            Ok((
+                response_header_value(&resp, self.response_header_name()),
+                resp.json::<E>()?
+            ))
         }
 
-        fn delete(&'a self) -> Result<E> {
-            Ok(
-                send_request(
-                    build_request(self, reqwest::Method::DELETE)?.json(&self)
-                )?
-                .json::<E>()?
-            )
+        fn delete(&'a self) -> Result<(Option<String>, E)> {
+            let resp = send_request(
+                build_request(self, reqwest::Method::DELETE)?.json(&self)
+            )?;
+            Ok((
+                response_header_value(&resp, self.response_header_name()),
+                resp.json::<E>()?
+            ))
         }
 
     }
