@@ -2,6 +2,20 @@
 
 The `mastors` crate provides client API for Mastodon.
 
+This is an example of simply posting a toot.
+
+```rust
+use mastors::prelude::*;
+
+let conn = Connection::new()?;
+let posted_status = toot(&conn, "Toot!")?;
+
+// Display toot that is you posted and returned fron the server.
+println!("{:#?}", posted_status);
+```
+
+## How to use
+
 Currently, mastors is not in relase version. Add mastors to your Cargo.toml with github URL.
 
 ```toml
@@ -16,7 +30,7 @@ The structure of the Mastors module is consistent with the REST API path on the 
 ```rust
 use mastors::prelude::*;
 
-let conn = Connection::from_file(".env.test")?;
+let conn = Connection::new()?;
 
 // Just get the server information from `/api/v1/instance` endpoint simply.
 let instance = mastors::api::v1::instance::get(&conn).send()?;
@@ -50,7 +64,7 @@ Mastors provides streaming timeline with server-sent events as `Iterator`.
 //! This is a simple streaming timeline on the command-line terminal.
 use mastors::prelude::*;
 
-let conn = Connection::from_file(".env.test")?;
+let conn = Connection::new()?;
 let home_timeline = home_timeline(&conn)?;
 
 for event in home_timeline {

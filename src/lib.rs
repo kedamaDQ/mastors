@@ -2,7 +2,7 @@
 //! 
 //! The `mastors` crate provides client API for Mastodon.
 //! 
-//! This is an example of simply sending toot.
+//! This is an example of simply posting a toot.
 //! 
 //! ```rust
 //! # use std::error::Error;
