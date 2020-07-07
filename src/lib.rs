@@ -95,7 +95,7 @@
 //! # }
 //! ```
 //! 
-//! # Connection settings
+//! ## Connection settings
 //! 
 //! Mastors loads the connection settings from file that is named ".env" in the current working directory by default.
 //! Connection setting requires `SERVER_URL` and `ACCESS_TOKEN` at least.
@@ -107,7 +107,9 @@
 //! 
 //! See [`Connection`](struct.Connection.html) for other optional settings.
 //! 
-//! # Run tests
+//! ## Run tests
+//! 
+//! **HIGHLY RECOMMENDED**: If you run tests, please run tests on your local server, which is localhost:3000.
 //! 
 //! In order to run the test, you need to prepare the connection settings in file `.env.test`.
 //! 
