@@ -1,9 +1,11 @@
 pub mod accounts;
 pub mod custom_emojis;
 pub mod instance;
+pub mod lists;
 pub mod media;
 pub mod polls;
 pub mod scheduled_statuses;
 pub mod statuses;
 pub mod streaming;
+pub mod timelines;
 pub mod trends;
