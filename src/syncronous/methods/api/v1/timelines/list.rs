@@ -127,6 +127,6 @@ mod tests {
             get(&conn, list.id()).send().is_ok()
         );
 
-        lists::delete(&conn, list.id()).send().unwrap();
+        lists::id::delete(&conn, list.id()).send().unwrap();
     }
 }
