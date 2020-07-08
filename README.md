@@ -79,7 +79,7 @@ for event in home_timeline {
 }
 ```
 
-# Connection settings
+## Connection settings
 
 Mastors loads the connection settings from file that is named ".env" in the current working directory by default.
 Connection setting requires `SERVER_URL` and `ACCESS_TOKEN` at least.
@@ -91,7 +91,7 @@ ACCESS_TOKEN="aabbcc"
 
 See `Connection` for other optional settings.
 
-# Documents
+## Documents
 
 Currently, you have to generate the documentation yourself if you want.
 
@@ -100,9 +100,11 @@ cargo doc --no-deps --open
 ```
 
 
-# Run tests
+## Run tests
 
 In order to run the test, you need to prepare the connection settings in file `.env.test`.
+
+### :warning: **HIGHLY RECOMMENDED**: If you run tests, please run tests on your local server, which is localhost:3000.
 
 Currently, a series of tests will send too many requests to the server.
 Only run the test against your own server or a server that is allowed to do it.
