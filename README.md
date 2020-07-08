@@ -104,7 +104,7 @@ cargo doc --no-deps --open
 
 In order to run the test, you need to prepare the connection settings in file `.env.test`.
 
-### :warning: **HIGHLY RECOMMENDED**: If you run tests, please run tests on your local server, which is localhost:3000.
+:warning: **HIGHLY RECOMMENDED**: If you run tests, please run tests on your local server, which is localhost:3000.
 
 Currently, a series of tests will send too many requests to the server.
 Only run the test against your own server or a server that is allowed to do it.
