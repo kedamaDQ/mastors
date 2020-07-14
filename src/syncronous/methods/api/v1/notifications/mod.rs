@@ -46,7 +46,7 @@ pub struct GetNotifications<'a> {
 	since_id: Option<String>,
 	min_id: Option<String>,
 	limit: Option<usize>,
-	exclude_types: Option<HashSet<NotificationType>>,
+	exclude_types: Option<Vec<String>>,
 	account_id: Option<String>,
 }
 
@@ -129,7 +129,11 @@ impl<'a> GetNotifications<'a> {
 		if exclude_types.is_empty() {
 			self
 		} else {
-			self.exclude_types = Some(exclude_types);
+			self.exclude_types = Some(exclude_types
+    			.iter()
+    			.map(|n| n.to_string())
+    			.collect::<Vec<String>>()
+			);
 			self
 		}
 	}
@@ -149,17 +153,12 @@ impl<'a> Method<'a, Notifications> for GetNotifications<'a> {
 		};
 		use crate::current_mode::utils::reqwest::build_array_query;
 
+		const QUERY_KEY: &str = "exclude_types[]";
+
 		match &self.exclude_types {
 			Some(et) => {
-				const QUERY_KEY: &str = "exclude_types";
         		let req = build_request(self, reqwest::Method::GET)?.query(
-        			&build_array_query(
-        				QUERY_KEY,
-						et.iter()
-						.map(|n| n.to_string())
-						.collect::<Vec<String>>()
-						.as_slice()
-        			)
+        			&build_array_query(QUERY_KEY, et)
 				);
 				Ok(send_request(req)?.json::<Notifications>()?)
 			},
@@ -211,6 +210,22 @@ mod tests {
 	#[test]
 	fn test_get_notifications() {
 		let conn = Connection::new().unwrap();
-		println!("{:#?}", get(&conn).exclude_types([NotificationType::Mention]).send());
+		assert!(get(&conn).send().is_ok());
+	}
+
+	#[test]
+	fn test_get_no_notifications_all_filterd() {
+		let conn = Connection::new().unwrap();
+		assert!(
+			get(&conn).exclude_types([
+				NotificationType::Follow,
+				NotificationType::Favourite,
+				NotificationType::Reblog,
+				NotificationType::Mention,
+				NotificationType::Poll,
+				NotificationType::FollowRequest,
+			])
+			.send().unwrap().is_empty()
+		);
 	}
 }
