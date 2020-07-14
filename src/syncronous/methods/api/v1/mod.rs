@@ -3,6 +3,7 @@ pub mod custom_emojis;
 pub mod instance;
 pub mod lists;
 pub mod media;
+pub mod notifications;
 pub mod polls;
 pub mod scheduled_statuses;
 pub mod statuses;

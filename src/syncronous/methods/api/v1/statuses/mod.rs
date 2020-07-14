@@ -297,7 +297,7 @@ pub struct PostNormalStatuses<'a> {
 }
 
 impl<'a> Method<'a, Status> for PostNormalStatuses<'a> {
-   fn send(&'a self) -> Result<Status> {
+    fn send(&'a self) -> Result<Status> {
         validate_status(
             &self.status,
             &self.media_ids,

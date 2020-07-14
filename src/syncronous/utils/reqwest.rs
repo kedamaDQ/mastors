@@ -32,7 +32,10 @@ pub(crate) fn extract_response(resp: Response) -> Result<Response> {
     }
 }
 
-pub(crate) fn build_array_query<'a>(key: &'a str, values: &'a [String]) -> Vec<(&'a str, &'a str)> {
+pub(crate) fn build_array_query<'a, T>(key: &'a str, values: &'a [T]) -> Vec<(&'a str, &'a str)>
+where
+    T: AsRef<str> + 'a,
+{
     let mut array_query: Vec<(&'a str, &'a str)> = Vec::new();
     for value in values {
         array_query.push((key, value.as_ref()));

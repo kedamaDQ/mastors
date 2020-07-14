@@ -32,7 +32,7 @@ pub use identity_proof::{ IdentityProof, IdentityProofs };
 pub use instance::Instance;
 pub use list::{ List, Lists };
 pub use mention::Mention;
-pub use notification::{ Notification, NotificationType };
+pub use notification::{ Notification, Notifications, NotificationType };
 pub use poll::Poll;
 pub use privacy::{ Privacy, Visibility };
 pub use relationship::{ Relationship, Relationships };

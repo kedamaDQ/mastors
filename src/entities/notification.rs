@@ -56,6 +56,10 @@ impl Notification {
 
 impl Entity for Notification {}
 
+/// Represents an Array of [`Notification`](/entities/struct.Notification.html).
+pub type Notifications = Vec<Notification>;
+impl Entity for Notifications {}
+
 use std::str::FromStr;
 
 /// Represents a type of event that resulted in the notification.
@@ -75,6 +79,24 @@ pub enum NotificationType {
 
     /// A poll you have voted in or created has ended.
     Poll,
+
+    /// Someone requested to authorize to follow you.
+    FollowRequest,
+}
+
+use std::fmt;
+
+impl fmt::Display for NotificationType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            NotificationType::Follow => write!(f, "follow"),
+            NotificationType::Mention => write!(f, "mention"),
+            NotificationType::Reblog => write!(f, "reblog"),
+            NotificationType::Favourite => write!(f, "favourite"),
+            NotificationType::Poll => write!(f, "poll"),
+            NotificationType::FollowRequest=> write!(f, "follow_request"),
+        }
+    }
 }
 
 impl FromStr for NotificationType {
@@ -87,7 +109,19 @@ impl FromStr for NotificationType {
             "reblog" => Ok(NotificationType::Reblog),
             "favourite" => Ok(NotificationType::Favourite),
             "poll" => Ok(NotificationType::Poll),
+            "follow_request" => Ok(NotificationType::FollowRequest),
             _ => Err(Error::ParseNotificationTypeError(s.to_owned()))
         }
+    }
+}
+
+use serde::ser;
+
+impl ser::Serialize for NotificationType {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: ser::Serializer
+    {
+        serializer.serialize_str(self.to_string().as_ref())
     }
 }
