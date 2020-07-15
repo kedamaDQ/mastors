@@ -10,7 +10,7 @@ use mastors::prelude::*;
 let conn = Connection::new()?;
 let posted_status = toot(&conn, "Toot!")?;
 
-// Display toot that is you posted and returned fron the server.
+// Display toot that is you posted and returned from the server.
 println!("{:#?}", posted_status);
 ```
 
