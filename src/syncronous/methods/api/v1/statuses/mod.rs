@@ -307,7 +307,7 @@ impl<'a> Method<'a, Status> for PostNormalStatuses<'a> {
             self.conn.status_max_characters()
         )?;
 
-        Ok(self.send_internal()?)
+        self.send_internal()
     }
 }
 
@@ -352,7 +352,7 @@ impl<'a> Method<'a, ScheduledStatus> for PostScheduledStatuses<'a> {
             }
         }
 
-        Ok(self.send_internal()?)
+        self.send_internal()
     }
 }
 

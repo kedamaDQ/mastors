@@ -1,3 +1,4 @@
+//! This module provides structs and enums to use streaming timelines.
 use eventsource::{
     event::Event,
     reqwest::Client,

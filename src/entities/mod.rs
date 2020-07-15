@@ -1,3 +1,6 @@
+//! This module provides entities that are the response of the API methods.
+//! 
+//! e.g. [`mastors::entities::Instance`](./struct.Instance.html) is entity returned by API method [`mastors::api::v1::instance::get()`](../api/v1/instance/fn.get.html).
 pub trait Entity: std::fmt::Debug + std::marker::Sized + for<'de> serde::Deserialize<'de> {}
 
 pub(crate) mod account;

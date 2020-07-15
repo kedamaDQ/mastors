@@ -15,7 +15,7 @@
 //! let conn = Connection::from_file(".env.test")?;
 //! let posted_status = toot(&conn, "Toot!")?;
 //! 
-//! // Display toot that is you posted and returned fron the server.
+//! // Display toot that is you posted and returned from the server.
 //! println!("{:#?}", posted_status);
 //! # Ok(())
 //! # }
@@ -122,7 +122,8 @@
 //! cargo test -- --test-threads=1
 //! ```
 //! 
-#[macro_use] extern crate lazy_static;
+// This import currently unused, used by scope.
+//#[macro_use] extern crate lazy_static;
 
 mod connection;
 mod error;
@@ -130,7 +131,7 @@ mod syncronous;
 mod utils;
 
 pub mod entities;
-pub mod scope;
+//pub mod scope;
 
 pub use connection::Connection;
 pub use error::{ Error, Result };

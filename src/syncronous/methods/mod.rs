@@ -1,3 +1,4 @@
+//! This module provides API methods and also provides some traits that are typically used internally.
 pub mod api;
 
 use crate::{

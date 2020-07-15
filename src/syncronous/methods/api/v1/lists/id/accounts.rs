@@ -156,7 +156,7 @@ impl<'a> Method<'a, Nothing> for PostListAccounts<'a> {
 			)
 		}
 
-		Ok(self.send_internal()?)
+		self.send_internal()
 	}
 }
 
@@ -198,7 +198,7 @@ impl<'a> Method<'a, Nothing> for DeleteListAccounts<'a> {
 			)
 		}
 
-		Ok(self.send_internal()?)
+		self.send_internal()
 	}
 }
 

@@ -163,7 +163,7 @@ impl<'a> Method<'a, Notifications> for GetNotifications<'a> {
 				Ok(send_request(req)?.json::<Notifications>()?)
 			},
 			None => {
-				Ok(self.send_internal()?)
+				self.send_internal()
 			}
 		}
 
