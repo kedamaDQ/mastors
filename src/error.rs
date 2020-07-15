@@ -153,6 +153,9 @@ pub enum Error {
 
     #[error(display = "Account ID is nothing")]
     NoAccountIdError,
+
+    #[error(display = "No timeline specified")]
+    NoTimelineError,
 }
 
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize)]
