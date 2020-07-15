@@ -121,7 +121,7 @@ pub mod id {
                     return Err(Error::DuplicateVoteOptionError)
                 }
         
-                Ok(self.send_internal()?)
+                self.send_internal()
             }
         }
     }
