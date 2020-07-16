@@ -94,7 +94,15 @@ impl Connection {
     pub fn from_file(env_path: &str) -> Result<Self> {
         use std::env;
 
-        dotenv::from_filename(env_path).ok();
+        match dotenv::from_filename(env_path) {
+            Ok(path) => println!("Load environment from '{}'", path.to_string_lossy()),
+            Err(e) => return Err(
+                Error::EnvNotFoundError {
+                    source: e,
+                    path: env_path.to_string(),
+                }
+            ),
+        };
 
         let server = Url::from_env(ENV_SERVER_URL, "")?;
 
