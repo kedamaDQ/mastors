@@ -9,6 +9,13 @@ pub type Result<T> = std::result::Result<T, Error>;
 /// Errors that may occur when communicating with the Mastodon.
 #[derive(Debug, Error)]
 pub enum Error {
+    #[error(display = "Environment file '{}' not found: {}", path, source)]
+    EnvNotFoundError {
+        #[error(source)]
+        source: dotenv::Error,
+        path: String,
+    },
+
     #[error(display = "Environment variable error: '{}', {}", env_var, source)]
     EnvVarError {
         #[error(source)]
