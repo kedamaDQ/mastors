@@ -56,6 +56,8 @@ pub mod followers {
         }
     
         /// Set a number of the follower accounts to get.
+        /// 
+        /// If not set, 40 by default.
         pub fn limit(mut self, limit: usize) -> Self {
             self.limit = Some(limit);
             self
