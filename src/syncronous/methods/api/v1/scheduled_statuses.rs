@@ -210,31 +210,31 @@ mod tests {
         }
 
         let posted1 = statuses::post(&conn, "first")
-            .scheduled_at(scheduled_at.clone())
+            .scheduled_at(scheduled_at)
             .send()
             .unwrap()
             .scheduled_status()
             .unwrap();
         let posted2 = statuses::post(&conn, "second")
-            .scheduled_at(scheduled_at.clone())
+            .scheduled_at(scheduled_at)
             .send()
             .unwrap()
             .scheduled_status()
             .unwrap();
         let posted3 = statuses::post(&conn, "third")
-            .scheduled_at(scheduled_at.clone())
+            .scheduled_at(scheduled_at)
             .send()
             .unwrap()
             .scheduled_status()
             .unwrap();
         let posted4 = statuses::post(&conn, "fourth")
-            .scheduled_at(scheduled_at.clone())
+            .scheduled_at(scheduled_at)
             .send()
             .unwrap()
             .scheduled_status()
             .unwrap();
         let posted5 = statuses::post(&conn, "fifth")
-            .scheduled_at(scheduled_at.clone())
+            .scheduled_at(scheduled_at)
             .send()
             .unwrap()
             .scheduled_status()
