@@ -709,7 +709,7 @@ mod tests {
 
         let extended_scheduled_at = *got.scheduled_at() + chrono::Duration::seconds(100);
         let put = crate::api::v1::scheduled_statuses::id::put(&conn, got.id())
-            .scheduled_at(extended_scheduled_at.clone())
+            .scheduled_at(extended_scheduled_at)
             .send()
             .unwrap();
 
