@@ -109,7 +109,9 @@ impl<'a> GetListAccounts<'a> {
 	}
 
 	/// Set max number of accounts. default is 40 and also max is 40.
-	/// If set 0 then return all of member accounts of list. 
+	/// If set 0 then return all of member accounts of list.
+	//  Specified by /app/controllers/api/base_controller.rb#DEFAULT_ACCOUNTS_LIMIT,
+	//  /app/controllers/api/v1/lists/accounts_controller.rb#unlimited?
 	pub fn limit(mut self, limit: usize) -> Self {
 		self.limit = Some(limit);
 		self
