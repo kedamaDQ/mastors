@@ -1,11 +1,11 @@
+// Regex for `Link` HTTP response header with captureing `id` and `rel`.
+const REGEX_CAPTURE_ID: &str = r#"\?(?:min|max|since)_id=(\w+)>\s*;\s+rel="(next|prev)""#;
 
 /// Represent informations for pagination.
 /// 
 /// Some API methods of mastodon server such as `/api/v1/accounts/:id/followers` returns `Link` HTTP response header to using pagination controll.
 /// This entity provides a raw `Link` Response header string and some convenient parsed parameters for pagination controll.
-
-const REGEX_CAPTURE_ID: &str = r#"\?(?:min|max|since)_id=(\w+)>\s*;\s+rel="(next|prev)""#;
-
+#[derive(Debug, Clone, PartialEq, PartialOrd, Hash)]
 pub struct PageNavigation {
 	raw: Option<String>,
 	newest: Option<String>,
@@ -13,7 +13,8 @@ pub struct PageNavigation {
 }
 
 impl PageNavigation {
-	pub fn new(link_header: Option<String>) -> Self {
+	// Create new parsed Link header
+	pub(crate) fn new(link_header: Option<String>) -> Self {
 		let mut pn = PageNavigation {
 			raw: link_header.clone(),
 			newest: None,
@@ -38,26 +39,32 @@ impl PageNavigation {
 		pn
 	}
 
+	/// Get the raw body body of `Link` HTTP response header.
 	pub fn raw(&self) -> Option<&String> {
 		self.raw.as_ref()
 	}
 
+	/// Get the latest ID in the acquired list.
 	pub fn newest(&self) -> Option<&String> {
 		self.newest.as_ref()
 	}
 
+	/// Get the oldes ID in the acquired list.
 	pub fn oldest(&self) -> Option<&String> {
 		self.oldest.as_ref()
 	}
 
+	/// Get an ID to set to  `since_id` for get the previous page.
 	pub fn since_id(&self) -> Option<&String> {
 		self.newest.as_ref()
 	}
 
+	/// Get an ID to set to  `min_id` for get the previous page.
 	pub fn min_id(&self) -> Option<&String> {
 		self.newest.as_ref()
 	}
 
+	/// Get an ID to set to  `max_id` for get the next page.
 	pub fn max_id(&self) -> Option<&String> {
 		self.oldest.as_ref()
 	}

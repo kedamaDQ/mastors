@@ -1,6 +1,5 @@
 #[macro_use] extern crate quote;
 use proc_macro::TokenStream;
-use syn;
 
 const IDENT_MASTORS: &str = "mastors";
 const IDENT_CONNECTION: &str = "connection";
@@ -66,7 +65,7 @@ pub fn derive_method(input: TokenStream) -> TokenStream {
             impl<'a> crate::syncronous::methods::private::MethodInternalWithRespHeader<'a, #entity> for #name<'a> {
                 const RESPONSE_HEADER_NAME: &'a str = #response_header;
 
-                fn send_internal(&self) -> crate::Result<(std::option::Option<String>, #entity)> {
+                fn send_internal(&self) -> crate::Result<(crate::entities::PageNavigation, #entity)> {
                     #fn_send_internal_impl
                 }
             }

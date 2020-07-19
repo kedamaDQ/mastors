@@ -58,6 +58,7 @@ pub mod followers {
         /// Set a number of the follower accounts to get.
         /// 
         /// If not set, 40 by default.
+        //  By app/controllers/api/base_controller.rb#DEFAULT_ACCOUNTS_LIMIT
         pub fn limit(mut self, limit: usize) -> Self {
             self.limit = Some(limit);
             self
@@ -123,6 +124,9 @@ pub mod following {
         }
     
         /// Set a number of the following accounts to get.
+        /// 
+        /// If not set, 40 by default.
+        //  By app/controllers/api/base_controller.rb#DEFAULT_ACCOUNTS_LIMIT
         pub fn limit(mut self, limit: usize) -> Self {
             self.limit = Some(limit);
             self
