@@ -135,7 +135,6 @@ pub mod entities;
 
 pub use connection::Connection;
 pub use error::{ Error, Result };
-pub use entities::*;
 
 pub use chrono::DateTime;
 pub use chrono::Utc;
@@ -166,6 +165,7 @@ pub mod prelude {
         MethodWithRespHeader,
         Result,
     };
+    pub use crate::entities::*;
     pub use crate::streaming_timeline::*;
 
     /// Toot a simple text.
