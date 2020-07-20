@@ -135,6 +135,7 @@ pub mod entities;
 
 pub use connection::Connection;
 pub use error::{ Error, Result };
+pub use entities::*;
 
 pub use chrono::DateTime;
 pub use chrono::Utc;
