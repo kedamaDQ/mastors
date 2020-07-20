@@ -25,8 +25,8 @@ impl Tag {
     }
 
     /// Get usage statistics for givn days.
-    pub fn history(&self) -> &Option<Vec<History>> {
-        &self.history
+    pub fn history(&self) -> Option<&Vec<History>> {
+        self.history.as_ref()
     }
 }
 

@@ -33,9 +33,9 @@ pub struct Account {
 
     // Statistical attributes
     created_at: DateTime<Utc>,
-    statuses_count: u64,
-    followers_count: u64,
-    following_count: u64,
+    statuses_count: usize,
+    followers_count: usize,
+    following_count: usize,
 
     // Optional attributes
     moved: Option<Box<Account>>,
@@ -118,28 +118,28 @@ impl Account {
     }
 
     /// Get the number of statuses which are attached to this account.
-    pub fn statuses_count(&self) -> u64 {
+    pub fn statuses_count(&self) -> usize {
         self.statuses_count
     }
 
     /// Get the reported followers of this profile.
-    pub fn followers_count(&self) -> u64 {
+    pub fn followers_count(&self) -> usize {
         self.followers_count
     }
 
     /// Get the reported follows of this profile.
-    pub fn following_count(&self) -> u64 {
+    pub fn following_count(&self) -> usize {
         self.following_count
     }
 
     /// Get whether a profile is currently inactive and that its user has moved to a new account.
-    pub fn moved(&self) -> &Option<Box<Account>> {
-        &self.moved
+    pub fn moved(&self) -> Option<&Account> {
+        self.moved.as_deref()
     }
 
     /// Get an additional metadata attached to a profile as name-value pairs.
-    pub fn fields(&self) -> &Option<Vec<Field>> {
-        &self.fields
+    pub fn fields(&self) -> Option<&Vec<Field>> {
+        self.fields.as_ref()
     }
 
     /// Get a presentational flag. Indicates that the account may perform automated actions, may not be monitored, or identifies as a robot.
@@ -148,8 +148,8 @@ impl Account {
     }
 
     /// Get an extra entity to be used with API methods to verify credentials and update credentials.
-    pub fn source(&self) -> &Option<Source> {
-        &self.source
+    pub fn source(&self) -> Option<&Source> {
+        self.source.as_ref()
     }
 }
 
@@ -173,8 +173,8 @@ impl Field {
     }
 
     /// Get timestamp of when the server verified a URL value for a `rel="me”` link.
-    pub fn verified_at(&self) -> &Option<DateTime<Utc>> {
-        &self.verified_at
+    pub fn verified_at(&self) -> Option<DateTime<Utc>> {
+        self.verified_at
     }
 }
 
@@ -190,7 +190,7 @@ pub struct Source {
     privacy: Option<Privacy>,
     sensitive: Option<bool>,
     language: Option<String>, // ISO 639-1 language two-letter code
-    follow_requests_count: u64,
+    follow_requests_count: usize,
 }
 
 impl Source {
@@ -200,13 +200,13 @@ impl Source {
     }
 
     /// Get metadata about the account.
-    pub fn fields(&self) -> &Option<Vec<Field>> {
-        &self.fields
+    pub fn fields(&self) -> Option<&Vec<Field>> {
+        self.fields.as_ref()
     }
 
     /// Get default post privacy for authored statuses.
-    pub fn privacy(&self) -> &Option<Privacy> {
-        &self.privacy
+    pub fn privacy(&self) -> Option<Privacy> {
+        self.privacy
     }
 
     /// Get whether new statuses should be marked sensitive by default.
@@ -215,12 +215,12 @@ impl Source {
     }
 
     /// Get default language to use for authored statuses. (ISO 639-1)
-    pub fn language(&self) -> &Option<String> {
-        &self.language
+    pub fn language(&self) -> Option<&str> {
+        self.language.as_deref()
     }
 
     /// Get the number of pending follow requests.
-    pub fn follow_requests_count(&self) -> u64 {
+    pub fn follow_requests_count(&self) -> usize {
         self.follow_requests_count
     }
 }

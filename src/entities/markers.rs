@@ -31,7 +31,7 @@ impl Entity for Markers {}
 pub struct Marker {
 	last_read_id: String,
 	updated_at: DateTime<Utc>,
-	version: u64,
+	version: u32,
 }
 
 impl Marker {
@@ -48,7 +48,7 @@ impl Marker {
 	/// Get a version number of this marker.
 	/// 
 	/// This number incremented at every update to prevent update conflict.
-	pub fn version(&self) -> u64 {
+	pub fn version(&self) -> u32 {
 		self.version
 	}
 }

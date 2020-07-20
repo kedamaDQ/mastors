@@ -75,8 +75,8 @@ impl Params {
     }
 
     /// Get a status ID that is this scheduled status will reply to.
-    pub fn in_reply_to_id(&self) -> Option<&String> {
-        self.in_reply_to_id.as_ref()
+    pub fn in_reply_to_id(&self) -> Option<&str> {
+        self.in_reply_to_id.as_deref()
     }
 
     /// Get attached media IDs of this scheduled status.
@@ -94,8 +94,8 @@ impl Params {
     }
 
     /// Get a spoiler text of this scheduled status.
-    pub fn spoiler_text(&self) -> Option<&String> {
-        self.spoiler_text.as_ref()
+    pub fn spoiler_text(&self) -> Option<&str> {
+        self.spoiler_text.as_deref()
     }
 
     /// Get a scheduled date and time of this scheduled status.

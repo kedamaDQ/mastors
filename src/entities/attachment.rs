@@ -66,13 +66,13 @@ impl Attachment {
     }
 
     /// Get an alternate text that describes what is in the media attachment, to be used for the visually impaired or when media attachments do not load.
-    pub fn description(&self) -> Option<&String> {
-        self.description.as_ref()
+    pub fn description(&self) -> Option<&str> {
+        self.description.as_deref()
     }
 
     /// Get a hash computed by the BlurHash algorithm, for generating colorful preview thumbnails when media has not been downloaded yet.
-    pub fn blurhash(&self) -> Option<&String> {
-        self.blurhash.as_ref()
+    pub fn blurhash(&self) -> Option<&str> {
+        self.blurhash.as_deref()
     }
 }
 
@@ -83,10 +83,10 @@ impl Entity for Attachment {}
 pub struct AttachmentMeta {
     length: Option<String>,
     duration: Option<f64>,
-    fps: Option<u64>,
+    fps: Option<u32>,
     size: Option<String>,
-    width: Option<u64>,
-    height: Option<u64>,
+    width: Option<u32>,
+    height: Option<u32>,
     aspect: Option<f64>,
     audio_encode: Option<String>,
     audio_bitrate: Option<String>,
@@ -98,8 +98,8 @@ pub struct AttachmentMeta {
 
 impl AttachmentMeta {
     /// For example: "0:01:28.65"
-    pub fn length(&self) -> Option<&String> {
-        self.length.as_ref()
+    pub fn length(&self) -> Option<&str> {
+        self.length.as_deref()
     }
 
     /// For example: 88.65
@@ -108,22 +108,22 @@ impl AttachmentMeta {
     }
 
     /// For example: 24
-    pub fn fps(&self) -> Option<u64> {
+    pub fn fps(&self) -> Option<u32> {
         self.fps
     }
 
     /// For example: "1280x720"
-    pub fn size(&self) -> Option<&String> {
-        self.size.as_ref()
+    pub fn size(&self) -> Option<&str> {
+        self.size.as_deref()
     }
 
     /// For example: 1280
-    pub fn width(&self) -> Option<u64> {
+    pub fn width(&self) -> Option<u32> {
         self.width
     }
 
     /// For example: 720
-    pub fn height(&self) -> Option<u64> {
+    pub fn height(&self) -> Option<u32> {
         self.height
     }
 
@@ -133,18 +133,18 @@ impl AttachmentMeta {
     }
 
     /// For example: "aac (LC) (mp4a / 0x6134706D)"
-    pub fn audio_encode(&self) -> Option<&String> {
-        self.audio_encode.as_ref()
+    pub fn audio_encode(&self) -> Option<&str> {
+        self.audio_encode.as_deref()
     }
 
     /// For example: "44100 Hz"
-    pub fn audio_bitrate(&self) -> Option<&String> {
-        self.audio_bitrate.as_ref()
+    pub fn audio_bitrate(&self) -> Option<&str> {
+        self.audio_bitrate.as_deref()
     }
 
     /// For example: "stereo"
-    pub fn audio_channels(&self) -> Option<&String> {
-        self.audio_channels.as_ref()
+    pub fn audio_channels(&self) -> Option<&str> {
+        self.audio_channels.as_deref()
     }
 
     /// Get the `AttachmentMetaSub`.
@@ -166,14 +166,14 @@ impl AttachmentMeta {
 #[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize)]
 pub struct AttachmentMetaSub {
     // for Image, Gifv, Video
-    width: Option<u64>,
-    height: Option<u64>,
+    width: Option<u32>,
+    height: Option<u32>,
     size: Option<String>,
     aspect: Option<f64>,
 
     // for Audio, Gifv, Video
     duration: Option<f64>,
-    bitrate: Option<u64>,
+    bitrate: Option<u32>,
 
     // for Gifv, Video
     frame_rate: Option<String>,
@@ -181,18 +181,18 @@ pub struct AttachmentMetaSub {
 
 impl AttachmentMetaSub {
     /// For example: 640
-    pub fn width(&self) -> Option<u64> {
+    pub fn width(&self) -> Option<u32> {
         self.width
     }
 
     /// For example: 480
-    pub fn height(&self) -> Option<u64> {
+    pub fn height(&self) -> Option<u32> {
         self.height
     }
 
     /// For example: "640x480"
-    pub fn size(&self) -> Option<&String> {
-        self.size.as_ref()
+    pub fn size(&self) -> Option<&str> {
+        self.size.as_deref()
     }
 
     /// For example: 1.3333333333333333
@@ -206,13 +206,13 @@ impl AttachmentMetaSub {
     }
 
     /// For example: 862056
-    pub fn bitrate(&self) -> Option<u64> {
+    pub fn bitrate(&self) -> Option<u32> {
         self.bitrate
     }
 
     /// For example: "6159375/249269"
-    pub fn frame_rate(&self) -> Option<&String> {
-        self.frame_rate.as_ref()
+    pub fn frame_rate(&self) -> Option<&str> {
+        self.frame_rate.as_deref()
     }
 }
 

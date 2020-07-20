@@ -1,5 +1,8 @@
 use serde::Deserialize;
-use crate::utils::transform_string_to_u64;
+use crate::utils::{
+    transform_string_to_u64,
+    transform_string_to_usize,
+};
 use super::Entity;
 
 /// Represents daily usage history of a hashtag.
@@ -8,11 +11,11 @@ pub struct History {
     #[serde(deserialize_with = "transform_string_to_u64")]
     day: u64,
 
-    #[serde(deserialize_with = "transform_string_to_u64")]
-    uses: u64,
+    #[serde(deserialize_with = "transform_string_to_usize")]
+    uses: usize,
 
-    #[serde(deserialize_with = "transform_string_to_u64")]
-    accounts: u64,
+    #[serde(deserialize_with = "transform_string_to_usize")]
+    accounts: usize,
 }
 
 impl History {
@@ -22,12 +25,12 @@ impl History {
     }
 
     /// Get the counted usage of the tag within that day.
-    pub fn uses(&self) -> u64 {
+    pub fn uses(&self) -> usize {
         self.uses
     }
 
     /// Get the total of accounts using the tag within that day.
-    pub fn accounts(&self) -> u64 {
+    pub fn accounts(&self) -> usize {
         self.accounts
     }
 }

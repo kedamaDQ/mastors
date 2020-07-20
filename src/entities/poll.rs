@@ -15,8 +15,8 @@ pub struct Poll {
     expires_at: DateTime<Utc>,
     expired: bool,
     multiple: bool,
-    votes_count: u64,
-    voters_count: Option<u64>,
+    votes_count: usize,
+    voters_count: Option<usize>,
     voted: Option<bool>,
     own_votes: Option<Vec<u8>>,
     options: Vec<PollOption>,
@@ -45,12 +45,12 @@ impl Poll {
     }
 
     /// Get the number of votes have been received.
-    pub fn votes_count(&self) -> u64 {
+    pub fn votes_count(&self) -> usize {
         self.votes_count
     }
 
     /// Get the number of unique accounts have voted if `multiple()` is `true`.
-    pub fn voters_count(&self) -> Option<u64> {
+    pub fn voters_count(&self) -> Option<usize> {
         self.voters_count
     }
 
@@ -81,7 +81,7 @@ impl Entity for Poll {}
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize)]
 pub struct PollOption {
     title: String,
-    votes_count: Option<u64>,
+    votes_count: Option<usize>,
 }
 
 impl PollOption {
@@ -91,7 +91,7 @@ impl PollOption {
     }
 
     /// Get the number of votes for this option.
-    pub fn votes_count(&self) -> &Option<u64> {
-        &self.votes_count
+    pub fn votes_count(&self) -> Option<usize> {
+        self.votes_count
     }
 }

@@ -35,8 +35,8 @@ impl Emoji {
     }
 
     /// Get the category of this custom emoji used for sorting custom emoji in the picker.
-    pub fn category(&self) -> &Option<String> {
-        &self.category
+    pub fn category(&self) -> Option<&str> {
+        self.category.as_deref()
     }
 }
 

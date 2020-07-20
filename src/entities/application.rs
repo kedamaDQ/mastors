@@ -25,22 +25,22 @@ impl Application {
     }
 
     /// Get the website associated with this application.
-    pub fn website(&self) -> &Option<String> {
-        &self.website
+    pub fn website(&self) -> Option<&str> {
+        self.website.as_deref()
     }
 
     /// Get the key used for Push Streaming API.
-    pub fn vapid_key(&self) -> &Option<String> {
-        &self.vapid_key
+    pub fn vapid_key(&self) -> Option<&str> {
+        self.vapid_key.as_deref()
     }
 
     /// Get client ID key, to be used for obtaining OAuth tokens.
-    pub fn client_id(&self) -> &Option<String> {
-        &self.client_id
+    pub fn client_id(&self) -> Option<&str> {
+        self.client_id.as_deref()
     }
 
     /// Get client secret key to be used for obtaining OAuth tokens.
-    pub fn client_secret(&self) -> &Option<String> {
-        &self.client_secret
+    pub fn client_secret(&self) -> Option<&str> {
+        self.client_secret.as_deref()
     }
 }
