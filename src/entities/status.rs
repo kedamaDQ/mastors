@@ -40,9 +40,9 @@ pub struct Status {
     emojis: Vec<Emoji>,
 
     // Information attributes
-    reblogs_count: u64,
-    favourites_count: u64,
-    replies_count: u64,
+    reblogs_count: usize,
+    favourites_count: usize,
+    replies_count: usize,
 
     // Nullable attributes
     url: Option<Url>,
@@ -74,8 +74,8 @@ impl Status {
     }
 
     /// Get the date time when this status was created.
-    pub fn created_at(&self) -> &DateTime<Utc> {
-        &self.created_at
+    pub fn created_at(&self) -> DateTime<Utc> {
+        self.created_at
     }
 
     /// Get the account that authored this status.
@@ -87,8 +87,8 @@ impl Status {
     /// 
     /// This method will returns `None` when this status returned by status deletion API.
     /// In this case, you can use the `text()` method instead to get the non-HTML content.
-    pub fn content(&self) -> Option<&String> {
-        self.content.as_ref()
+    pub fn content(&self) -> Option<&str> {
+        self.content.as_deref()
     }
 
     /// Get the `Visibility` of this status.
@@ -134,17 +134,17 @@ impl Status {
     }
 
     /// Get a number of boosts this status received.
-    pub fn reblogs_count(&self) -> u64 {
+    pub fn reblogs_count(&self) -> usize {
         self.reblogs_count
     }
 
     /// Get a number of favourites this status received.
-    pub fn favourites_count(&self) -> u64 {
+    pub fn favourites_count(&self) -> usize {
         self.favourites_count
     }
 
     /// Get a number of favourites this status received.
-    pub fn replies_count(&self) -> u64 {
+    pub fn replies_count(&self) -> usize {
         self.replies_count
     }
 
@@ -154,13 +154,13 @@ impl Status {
     }
 
     /// Get an ID of the status being replied.
-    pub fn in_reply_to_id(&self) -> Option<&String> {
-        self.in_reply_to_id.as_ref()
+    pub fn in_reply_to_id(&self) -> Option<&str> {
+        self.in_reply_to_id.as_deref()
     }
 
     /// Get an ID of the account being replied to.
-    pub fn in_reply_to_account_id(&self) -> Option<&String> {
-        self.in_reply_to_account_id.as_ref()
+    pub fn in_reply_to_account_id(&self) -> Option<&str> {
+        self.in_reply_to_account_id.as_deref()
     }
 
     /// Get the status being reblogged.
@@ -179,15 +179,15 @@ impl Status {
     }
 
     /// Get primary language of this status which is compliant to ISO 639-1.
-    pub fn language(&self) -> Option<&String> {
-        self.language.as_ref()
+    pub fn language(&self) -> Option<&str> {
+        self.language.as_deref()
     }
 
     /// Get plain-text source of this status. 
     /// 
     /// This method will return non-HTML content instead of `content()` only if this status returned by status deletion API, so the user may redraft from the source text without the client having to reverse-engineer the original text from the HTML content.
-    pub fn text(&self) -> Option<&String> {
-        self.text.as_ref()
+    pub fn text(&self) -> Option<&str> {
+        self.text.as_deref()
     }
 
     /// Get whether authorized user has favourited this status.

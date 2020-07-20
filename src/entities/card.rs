@@ -21,8 +21,8 @@ pub struct Card {
     provider_name: Option<String>,
     provider_uri: Option<Url>,
     html: Option<String>,
-    width: Option<u64>,
-    height: Option<u64>,
+    width: Option<u32>,
+    height: Option<u32>,
     image: Option<Url>,
     embed_url: Option<Url>,
 }
@@ -49,48 +49,48 @@ impl Card {
     }
 
     /// Get the author of the original resource.
-    pub fn author_name(&self) -> &Option<String> {
-        &self.author_name
+    pub fn author_name(&self) -> Option<&str> {
+        self.author_name.as_deref()
     }
 
     /// Get a link to the author of the original resource.
-    pub fn author_url(&self) -> &Option<Url> {
-        &self.author_url
+    pub fn author_url(&self) -> Option<&Url> {
+        self.author_url.as_ref()
     }
 
     /// Get the provider of the original resource.
-    pub fn provider_name(&self) -> &Option<String> {
-        &self.provider_name
+    pub fn provider_name(&self) -> Option<&str> {
+        self.provider_name.as_deref()
     }
 
     /// Get a link to the provider of the original resource.
-    pub fn provider_uri(&self) -> &Option<Url> {
-        &self.provider_uri
+    pub fn provider_uri(&self) -> Option<&Url> {
+        self.provider_uri.as_ref()
     }
 
     /// Get HTML to be used for generating the preview card.
-    pub fn html(&self) -> &Option<String> {
-        &self.html
+    pub fn html(&self) -> Option<&str> {
+        self.html.as_deref()
     }
 
     /// Get width of preview, in pixels.
-    pub fn width(&self) -> &Option<u64> {
-        &self.width
+    pub fn width(&self) -> Option<u32> {
+        self.width
     }
 
     /// Get height of preview, in pixels.
-    pub fn height(&self) -> &Option<u64> {
-        &self.height
+    pub fn height(&self) -> Option<u32> {
+        self.height
     }
 
     /// Get the location of preview thumbnail.
-    pub fn image(&self) -> &Option<Url> {
-        &self.image
+    pub fn image(&self) -> Option<&Url> {
+        self.image.as_ref()
     }
 
     /// Get the location of photo embeds which is used instead of custom html.
-    pub fn embed_url(&self) -> &Option<Url> {
-        &self.embed_url
+    pub fn embed_url(&self) -> Option<&Url> {
+        self.embed_url.as_ref()
     }
 }
 
@@ -138,4 +138,3 @@ impl FromStr for CardType {
         }
     }
 }
-

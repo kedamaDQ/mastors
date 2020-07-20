@@ -49,8 +49,8 @@ impl Notification {
     }
 
     /// Get status that was the object of the notification, e.g. in mentions, reblogs, favourites, or polls.
-    pub fn status(&self) -> &Option<Box<Status>> {
-        &self.status
+    pub fn status(&self) -> Option<&Status> {
+        self.status.as_deref()
     }
 }
 

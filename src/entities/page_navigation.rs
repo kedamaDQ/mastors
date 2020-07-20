@@ -40,33 +40,33 @@ impl PageNavigation {
 	}
 
 	/// Get the raw body body of `Link` HTTP response header.
-	pub fn raw(&self) -> Option<&String> {
-		self.raw.as_ref()
+	pub fn raw(&self) -> Option<&str> {
+		self.raw.as_deref()
 	}
 
 	/// Get the latest ID in the acquired list.
-	pub fn newest(&self) -> Option<&String> {
-		self.newest.as_ref()
+	pub fn newest(&self) -> Option<&str> {
+		self.newest.as_deref()
 	}
 
 	/// Get the oldes ID in the acquired list.
-	pub fn oldest(&self) -> Option<&String> {
-		self.oldest.as_ref()
+	pub fn oldest(&self) -> Option<&str> {
+		self.oldest.as_deref()
 	}
 
 	/// Get an ID to set to  `since_id` for get the previous page.
-	pub fn since_id(&self) -> Option<&String> {
-		self.newest.as_ref()
+	pub fn since_id(&self) -> Option<&str> {
+		self.newest.as_deref()
 	}
 
 	/// Get an ID to set to  `min_id` for get the previous page.
-	pub fn min_id(&self) -> Option<&String> {
-		self.newest.as_ref()
+	pub fn min_id(&self) -> Option<&str> {
+		self.newest.as_deref()
 	}
 
 	/// Get an ID to set to  `max_id` for get the next page.
-	pub fn max_id(&self) -> Option<&String> {
-		self.oldest.as_ref()
+	pub fn max_id(&self) -> Option<&str> {
+		self.oldest.as_deref()
 	}
 }
 

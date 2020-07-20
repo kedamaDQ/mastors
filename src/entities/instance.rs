@@ -81,18 +81,18 @@ impl Instance {
     }
 
     /// Get banner image for this website.
-    pub fn thumbnail(&self) -> &Option<Url> {
-        &self.thumbnail
+    pub fn thumbnail(&self) -> Option<&Url> {
+        self.thumbnail.as_ref()
     }
 
     // Get a user that can be contacted, as an alternative to email.
-    pub fn contact_account(&self) -> &Option<Account> {
-        &self.contact_account
+    pub fn contact_account(&self) -> Option<&Account> {
+        self.contact_account.as_ref()
     }
 
     /// Get whether the invitation is enabled.(mastodon v3.1.4 or later)
-    pub fn invites_enabled(&self) -> &Option<bool> {
-        &self.invites_enabled
+    pub fn invites_enabled(&self) -> Option<bool> {
+        self.invites_enabled
     }
 }
 
@@ -114,24 +114,24 @@ impl Urls {
 /// Statistics about how much information the instance contains.
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Copy, Deserialize)]
 pub struct Stats {
-    user_count: u64,
-    status_count: u64,
-    domain_count: u64,
+    user_count: usize,
+    status_count: usize,
+    domain_count: usize,
 }
 
 impl Stats {
     /// Get users registered on this instance.
-    pub fn user_count(&self) -> u64 {
+    pub fn user_count(&self) -> usize {
         self.user_count
     }
 
     /// Get statuses authored by users on this instance.
-    pub fn status_count(&self) -> u64 {
+    pub fn status_count(&self) -> usize {
         self.status_count
     }
 
     /// Get domains federated with this instance.
-    pub fn domain_count(&self) -> u64 {
+    pub fn domain_count(&self) -> usize {
         self.domain_count
     }
 }
