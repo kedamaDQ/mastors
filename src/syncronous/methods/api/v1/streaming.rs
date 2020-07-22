@@ -7,7 +7,7 @@ use crate::{
     Connection,
     Error,
     Result,
-    streaming_timeline::*,
+    streaming::*,
     utils,
 };
 

@@ -149,7 +149,7 @@ pub use current_mode::{
         api,
         self,
     },
-    streaming_timeline,
+    streaming,
 };
 
 /// This module provides some convenient functions and exports to use mastors.
@@ -160,16 +160,16 @@ pub mod prelude {
 
     pub use crate::{
         Connection,
-        Error,
+//        Error,
         Method,
         MethodWithRespHeader,
-        Result,
+//        Result,
     };
     pub use crate::entities::*;
-    pub use crate::streaming_timeline::*;
+    pub use crate::streaming::*;
 
     /// Toot a simple text.
-    pub fn toot(conn: &Connection, body: impl AsRef<str>) -> Result<Box<crate::entities::Status>> {
+    pub fn toot(conn: &Connection, body: impl AsRef<str>) -> crate::Result<Box<crate::entities::Status>> {
         match crate::api::v1::statuses::post(conn, body).send() {
             Ok(posted) => Ok(posted.status().unwrap()),
             Err(e) => Err(e),
@@ -177,22 +177,22 @@ pub mod prelude {
     }
 
     /// Get your home timeline stream.
-    pub fn home_timeline(conn: &Connection) -> Result<SseStream> {
+    pub fn home_timeline(conn: &Connection) -> crate::Result<impl StreamingTimeline> {
         crate::api::v1::streaming::get(conn, StreamType::User).send()
     }
 
     /// Get the local timeline stream.
-    pub fn local_timeline(conn: &Connection) -> Result<SseStream> {
+    pub fn local_timeline(conn: &Connection) -> crate::Result<impl StreamingTimeline> {
         crate::api::v1::streaming::get(conn, StreamType::PublicLocal).send()
     }
 
     /// Get the public timeline stream.
-    pub fn public_timeline(conn: &Connection) -> Result<SseStream> {
+    pub fn public_timeline(conn: &Connection) -> crate::Result<impl StreamingTimeline> {
         crate::api::v1::streaming::get(conn, StreamType::Public).send()
     }
 
     /// Get the hashtag timeline stream.
-    pub fn hashtag_timeline(conn: &Connection, tag: impl Into<String>) -> Result<SseStream> {
+    pub fn hashtag_timeline(conn: &Connection, tag: impl Into<String>) -> crate::Result<impl StreamingTimeline> {
         crate::api::v1::streaming::get(conn, StreamType::Hashtag(tag.into())).send()
     }
 }
