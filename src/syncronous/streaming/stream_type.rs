@@ -1,3 +1,4 @@
+
 /// Represents a streaming type.
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone)]
 pub enum StreamType {

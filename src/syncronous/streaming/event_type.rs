@@ -3,7 +3,7 @@ use crate::entities::{
 	Status,
 };
 
-/// Represent the event types of the server-sent events of the Mastodon.
+/// Represent the event types of the streaming timeline.
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub enum EventType {
     /// A new status has appeared in the timeline.

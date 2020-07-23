@@ -1,4 +1,4 @@
-//! This module provides structs and enums to use streaming timelines.
+//! This module provides an implementation of [`StreamingTimeline`](./trait.StreamingTimeline.html) using Server-sent events.
 use eventsource::{
     event::Event,
     reqwest::Client,
@@ -23,7 +23,7 @@ pub struct SseStream {
 }
 
 impl SseStream {
-    pub fn new(url: Url, client: reqwest::blocking::Client) -> Self {
+    pub(crate) fn new(url: Url, client: reqwest::blocking::Client) -> Self {
         SseStream {
             client: Client::new_with_client(url, client),
         }
@@ -35,6 +35,7 @@ impl StreamingTimeline for SseStream {}
 impl Iterator for SseStream {
     type Item = Result<EventType>;
 
+    /// Get the next streaming event from streaming timeline.
     fn next(&mut self) -> Option<Self::Item> {
         self.client.next().map(|result| {
             match result {
