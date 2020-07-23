@@ -1,4 +1,4 @@
 pub mod methods;
-pub mod streaming_timeline;
+pub mod streaming;
 
 pub(crate) mod utils;
