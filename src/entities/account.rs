@@ -151,6 +151,20 @@ impl Account {
     pub fn source(&self) -> Option<&Source> {
         self.source.as_ref()
     }
+
+    /// Get whether this account is a local account.
+    ///
+    /// If true, this account is registered in the server that is you are connected to.
+    pub fn is_local(&self) -> bool {
+        self.acct == self.username
+    }
+
+    /// Get whether this account is a remote account.
+    /// 
+    /// If true, this account is registered on the server other than the server you are connected to.
+    pub fn is_remote(&self) -> bool {
+        !self.is_local()
+    }
 }
 
 /// Represents a profile field as a name-value pair with optional verification.
