@@ -74,6 +74,14 @@ impl Attachment {
     pub fn blurhash(&self) -> Option<&str> {
         self.blurhash.as_deref()
     }
+
+    /// Get the type of this attachment as `AttachmentType`.
+    /// 
+    /// This method is an alias of `r#type()`.
+    pub fn attachment_type(&self) -> AttachmentType {
+        self.r#type()
+    }
+
 }
 
 impl Entity for Attachment {}

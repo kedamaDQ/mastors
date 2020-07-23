@@ -41,8 +41,8 @@ impl Marker {
 	}
 
 	/// Get updated date and time of this marker.
-	pub fn updated_at(&self) -> &DateTime<Utc> {
-		&self.updated_at
+	pub fn updated_at(&self) -> DateTime<Utc> {
+		self.updated_at
 	}
 
 	/// Get a version number of this marker.

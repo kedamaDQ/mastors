@@ -214,6 +214,26 @@ impl Status {
     pub fn pinned(&self) -> bool {
         self.pinned.unwrap_or(false)
     }
+
+    /// Get whether visibility of this status is set to `public`.
+    pub fn is_public(&self) -> bool {
+        self.visibility == Visibility::Public
+    }
+
+    /// Get whether visibility of this status is set to `unlisted`.
+    pub fn is_unlisted(&self) -> bool {
+        self.visibility == Visibility::Unlisted
+    }
+
+    /// Get whether visibility of this status is set to `private`.
+    pub fn is_private(&self) -> bool {
+        self.visibility == Visibility::Private
+    }
+
+    /// Get whether visibility of this status is set to `direct`.
+    pub fn is_direct(&self) -> bool {
+        self.visibility == Visibility::Direct
+    }
 }
 
 impl Entity for Status {}

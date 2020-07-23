@@ -30,8 +30,8 @@ impl Poll {
     }
 
     /// Get the date time when the poll ends.
-    pub fn expires_at(&self) -> &DateTime<Utc> {
-        &self.expires_at
+    pub fn expires_at(&self) -> DateTime<Utc> {
+        self.expires_at
     }
 
     /// Get whether the poll currently expired.

@@ -92,6 +92,13 @@ impl Card {
     pub fn embed_url(&self) -> Option<&Url> {
         self.embed_url.as_ref()
     }
+
+    /// Get the type of the preview card as `CardType`.
+    /// 
+    /// This method is an alias of `r#type()`.
+    pub fn card_type(&self) -> CardType {
+        self.r#type()
+    }
 }
 
 impl Entity for Card {}
