@@ -127,7 +127,7 @@
 
 mod connection;
 mod error;
-mod syncronous;
+mod synchronous;
 mod utils;
 
 pub mod entities;
@@ -141,7 +141,7 @@ pub use chrono::Utc;
 pub use url::Url;
 
 // Use to switch to asynchronous mode if ready in the future...
-use syncronous as current_mode;
+use synchronous as current_mode;
 
 pub use current_mode::{
     methods::{
