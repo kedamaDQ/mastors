@@ -76,7 +76,7 @@ impl PostedStatus {
     }
 
     /// Get scheduled date and time if this status is scheduled.
-    pub fn scheduled_at(&self) -> Option<&DateTime<Utc>> {
+    pub fn scheduled_at(&self) -> Option<DateTime<Utc>> {
         match self {
             Self::Status(_) => None,
             Self::ScheduledStatus(s) => Some(s.scheduled_at()),

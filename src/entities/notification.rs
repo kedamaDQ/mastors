@@ -39,8 +39,8 @@ impl Notification {
     }
 
     /// Get the timestamp of the notification.
-    pub fn created_at(&self) -> &DateTime<Utc> {
-        &self.created_at
+    pub fn created_at(&self) -> DateTime<Utc> {
+        self.created_at
     }
 
     /// Get the account that performed the action that generated the notification.
@@ -52,6 +52,14 @@ impl Notification {
     pub fn status(&self) -> Option<&Status> {
         self.status.as_deref()
     }
+
+    /// Get the type of event that resulted in the notification.
+    /// 
+    /// This method is an alias of `r#type()`.
+    pub fn notification_type(&self) -> NotificationType {
+        self.r#type()
+    }
+
 }
 
 impl Entity for Notification {}

@@ -27,8 +27,8 @@ impl ScheduledStatus {
     }
 
     /// Get a scheduled date and time of this scheduled status.
-    pub fn scheduled_at(&self) -> &DateTime<Utc> {
-        &self.scheduled_at
+    pub fn scheduled_at(&self) -> DateTime<Utc> {
+        self.scheduled_at
     }
 
     /// Get a params of this scheduled status.
@@ -49,7 +49,7 @@ impl Entity for ScheduledStatus {}
 pub struct Params {
     text: String,
     application_id: u64,
-    visibility: Option<Visibility>,
+    visibility: Visibility,
     in_reply_to_id: Option<String>,
     media_ids: Option<Vec<String>>,
     sensitive: Option<bool>,
@@ -70,7 +70,7 @@ impl Params {
     }
 
     /// Get a visibility of status that will posted at scheduled date and time.
-    pub fn visibility(&self) -> Option<Visibility> {
+    pub fn visibility(&self) -> Visibility {
         self.visibility
     }
 
@@ -99,12 +99,32 @@ impl Params {
     }
 
     /// Get a scheduled date and time of this scheduled status.
-    pub fn scheduled_at(&self) -> Option<&DateTime<Utc>> {
-        self.scheduled_at.as_ref()
+    pub fn scheduled_at(&self) -> Option<DateTime<Utc>> {
+        self.scheduled_at
     }
 
     pub fn poll(&self) -> Option<&ScheduledPoll> {
         self.poll.as_ref()
+    }
+
+    /// Get whether visibility of this status is set to `public`.
+    pub fn is_public(&self) -> bool {
+        self.visibility == Visibility::Public
+    }
+
+    /// Get whether visibility of this status is set to `unlisted`.
+    pub fn is_unlisted(&self) -> bool {
+        self.visibility == Visibility::Unlisted
+    }
+
+    /// Get whether visibility of this status is set to `private`.
+    pub fn is_private(&self) -> bool {
+        self.visibility == Visibility::Private
+    }
+
+    /// Get whether visibility of this status is set to `direct`.
+    pub fn is_direct(&self) -> bool {
+        self.visibility == Visibility::Direct
     }
 }
 

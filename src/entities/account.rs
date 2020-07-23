@@ -113,8 +113,8 @@ impl Account {
     }
 
     /// Get date time when this account was created.
-    pub fn created_at(&self) -> &DateTime<Utc> {
-        &self.created_at
+    pub fn created_at(&self) -> DateTime<Utc> {
+        self.created_at
     }
 
     /// Get the number of statuses which are attached to this account.

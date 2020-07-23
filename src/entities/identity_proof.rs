@@ -38,8 +38,8 @@ impl IdentityProof {
     }
 
     /// Get updated date and time of the account owner on the identity provider.
-    pub fn updated_at(&self) -> &DateTime<Utc> {
-        &self.updated_at
+    pub fn updated_at(&self) -> DateTime<Utc> {
+        self.updated_at
     }
 }
 impl Entity for IdentityProof {}
