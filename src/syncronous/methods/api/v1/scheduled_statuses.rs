@@ -2,8 +2,8 @@
 use serde::Serialize;
 use crate::{
     Connection,
+    Method,
     entities::ScheduledStatuses,
-    methods::Method,
 };
 
 /// Get a request to get scheduled statuses that are created by the authenticated user.
@@ -70,12 +70,12 @@ pub mod id {
     use crate::{
         Connection,
         DateTime,
+        Method,
         Utc,
         entities::{
             DeletedScheduledStatus,
             ScheduledStatus,
         },
-        methods::Method,
     };
 
     /// Get a scheduled status specified by `id`.

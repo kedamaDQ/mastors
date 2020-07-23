@@ -2,8 +2,8 @@
 use serde::Serialize;
 use crate::{
     Connection,
+    Method,
     entities::Instance,
-    methods::Method,
 };
 
 /// Get a request to get the instance information.
@@ -34,8 +34,8 @@ pub mod peers {
     use serde::Serialize;
     use crate::{
         Connection,
+        Method,
         entities::instance::Peers,
-        methods::Method,
     };
 
     /// Get a request to get the list of the server connected domains.
@@ -62,8 +62,8 @@ pub mod activity {
     use serde::Serialize;
     use crate::{
         Connection,
+        Method,
         entities::Activities,
-        methods::Method,
     };
 
     /// Get a request to get the server weekly activity.

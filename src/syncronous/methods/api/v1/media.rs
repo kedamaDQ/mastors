@@ -3,10 +3,10 @@ use serde::Serialize;
 use crate::{
     Connection,
     Error,
+    Method,
     Result,
     entities::Attachment,
-    methods::{
-        Method,
+    private::{
         UploadInternal,
         FileFormInternal,
     }

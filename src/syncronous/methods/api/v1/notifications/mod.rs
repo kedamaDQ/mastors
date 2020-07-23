@@ -9,7 +9,7 @@ use crate::{
 	Method,
 	Result,
 	entities::{ Notifications, NotificationType },
-	methods::MethodInternalWithoutRespHeader,
+	private::MethodInternalWithoutRespHeader,
 };
 
 /// Get a request to get your received notifications.
@@ -147,7 +147,7 @@ impl<'a> GetNotifications<'a> {
 
 impl<'a> Method<'a, Notifications> for GetNotifications<'a> {
 	fn send(&self) -> Result<Notifications> {
-		use crate::methods::private::{
+		use crate::private::{
 			build_request,
 			send_request,
 		};

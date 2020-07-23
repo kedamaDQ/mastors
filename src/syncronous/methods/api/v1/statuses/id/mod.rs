@@ -34,8 +34,8 @@ pub use mutes::{
 use serde::Serialize;
 use crate::{
     Connection,
+    Method,
     entities::Status,
-    methods::Method,
 };
 
 /// Create a request to get a status specified by `id`.

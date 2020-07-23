@@ -140,6 +140,7 @@ pub use chrono::DateTime;
 pub use chrono::Utc;
 pub use url::Url;
 
+// Use to switch to asynchronous mode if ready in the future...
 use syncronous as current_mode;
 
 pub use current_mode::{
@@ -147,10 +148,11 @@ pub use current_mode::{
         Method,
         MethodWithRespHeader,
         api,
-        self,
     },
     streaming,
 };
+
+use current_mode::methods::private;
 
 /// This module provides some convenient functions and exports to use mastors.
 pub mod prelude {
@@ -160,10 +162,8 @@ pub mod prelude {
 
     pub use crate::{
         Connection,
-//        Error,
         Method,
         MethodWithRespHeader,
-//        Result,
     };
     pub use crate::entities::*;
     pub use crate::streaming::*;

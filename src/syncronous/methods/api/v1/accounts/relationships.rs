@@ -3,7 +3,7 @@
 //! ## Note
 //! This module requires importing `Method` to use.
 //! ```rust
-//! use mastors::methods::Method;
+//! use mastors::Method;
 //! ```
 use serde::Serialize;
 use crate::{
@@ -45,7 +45,7 @@ pub struct GetRelationships<'a> {
 
 impl<'a> Method<'a, Relationships> for GetRelationships<'a> {
 	fn send(&self) -> Result<Relationships> {
-		use crate::methods::private::{
+		use crate::private::{
 			build_request,
 			send_request,
 		};
