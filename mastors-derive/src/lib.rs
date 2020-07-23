@@ -62,7 +62,7 @@ pub fn derive_method(input: TokenStream) -> TokenStream {
 
     let trait_impl = match response_header {
         Some(response_header) => { quote! { 
-            impl<'a> crate::syncronous::methods::private::MethodInternalWithRespHeader<'a, #entity> for #name<'a> {
+            impl<'a> crate::synchronous::methods::private::MethodInternalWithRespHeader<'a, #entity> for #name<'a> {
                 const RESPONSE_HEADER_NAME: &'a str = #response_header;
 
                 fn send_internal(&self) -> crate::Result<(crate::entities::PageNavigation, #entity)> {
@@ -71,7 +71,7 @@ pub fn derive_method(input: TokenStream) -> TokenStream {
             }
         }},
         None => { quote! { 
-            impl<'a> crate::syncronous::methods::private::MethodInternalWithoutRespHeader<'a, #entity> for #name<'a> {
+            impl<'a> crate::synchronous::methods::private::MethodInternalWithoutRespHeader<'a, #entity> for #name<'a> {
                 fn send_internal(&self) -> crate::Result<#entity> {
                     #fn_send_internal_impl
                 }
@@ -80,7 +80,7 @@ pub fn derive_method(input: TokenStream) -> TokenStream {
     };
 
     TokenStream::from(quote! {
-        impl<'a> crate::syncronous::methods::private::MethodInternal<'a, #entity> for #name<'a> {
+        impl<'a> crate::synchronous::methods::private::MethodInternal<'a, #entity> for #name<'a> {
             const ENDPOINT: &'a str = #endpoint;
 
             fn connection(&self) -> &Connection {
