@@ -7,6 +7,7 @@ use crate::{
     Connection,
     DateTime,
     Error,
+    Method,
     Result,
     Utc,
     entities::{
@@ -15,10 +16,7 @@ use crate::{
         Status,
         Visibility,
     },
-    methods::{
-        Method,
-        MethodInternalWithoutRespHeader,
-    },
+    private::MethodInternalWithoutRespHeader,
 };
 
 pub const LEAST_SCHEDULABLE_PERIOD: i64 = 300;

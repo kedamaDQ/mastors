@@ -65,7 +65,7 @@ impl<'a> Method<'a, Markers> for GetMarkers<'a> {
 	/// 
 	/// - No timeline specified
 	fn send(&self) -> Result<Markers> {
-		use crate::methods::private::{
+		use crate::private::{
 			build_request,
 			send_request,
 		};
@@ -133,7 +133,7 @@ impl<'a> PostMarkers<'a> {
 
 impl<'a> Method<'a, Markers> for PostMarkers<'a> {
 	fn send(&self) -> Result<Markers> {
-		use crate::methods::private::MethodInternalWithoutRespHeader;
+		use crate::private::MethodInternalWithoutRespHeader;
 
 		self.validate()?;
 		self.send_internal()

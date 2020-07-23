@@ -10,10 +10,8 @@ use crate::{
 };
 
 pub(crate) use private::{
-    FileFormInternal,
     MethodInternalWithoutRespHeader,
     MethodInternalWithRespHeader,
-    UploadInternal,
 };
 
 /// The common sets of methods for API methods of the Mastodon.
@@ -24,7 +22,7 @@ pub trait Method<'a, E: 'a + Entity>: MethodInternalWithoutRespHeader<'a, E> {
     }
 }
 
-/// An alternative to [`Method`](./trait.Method.html) and returns a tuple of `Option<String>` and `Entity` instead of just an Entity.
+/// An alternative to [`Method`](./trait.Method.html) and returns a tuple of `PageNavitation` and `Entity` instead of just an Entity.
 /// 
 /// The returned String is the HTTP response header value associated with the Entity.
 /// For example /api/v1/accounts/:id/followers returns array of Account and `Link` HTTP response header contains pagination controll information.
@@ -44,13 +42,13 @@ pub(crate) mod private {
     use crate::{
         Connection,
         Error,
+        Method,
         Result,
         entities::{
             Entity,
             PageNavigation,
         },
         utils,
-        methods::Method,
     };
 
     pub trait MethodInternal<'a, E: 'a + Entity>: std::marker::Sized + Serialize {
@@ -126,7 +124,7 @@ pub(crate) mod private {
                 resp.json::<E>()?
             ))
         }
-    
+ 
         fn post(&'a self) -> Result<(PageNavigation, E)> {
             let resp = send_request(
                 build_request(self, reqwest::Method::POST)?.json(&self)

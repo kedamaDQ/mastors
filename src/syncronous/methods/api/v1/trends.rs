@@ -2,8 +2,8 @@
 use serde::Serialize;
 use crate::{
     Connection,
+    Method,
     entities::Trends,
-    methods::Method,
 };
 
 /// Get a request to get trending hashtags.

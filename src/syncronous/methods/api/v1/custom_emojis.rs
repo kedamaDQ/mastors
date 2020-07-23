@@ -2,8 +2,8 @@
 use serde::Serialize;
 use crate::{
     Connection,
+    Method,
     entities::Emojis,
-    methods::Method,
 };
 
 /// Get a request to get all the custom emojis registered on the server.

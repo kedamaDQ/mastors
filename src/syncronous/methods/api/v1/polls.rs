@@ -5,8 +5,8 @@ pub mod id {
     use serde::Serialize;
     use crate:: {
         Connection,
+        Method,
         entities::Poll,
-        methods::Method,
     };
 
     /// Get a request to get a poll specified by ID.
@@ -60,12 +60,10 @@ pub mod id {
         use crate::{
             Connection,
             Error,
+            Method,
             Result,
             entities::Poll,
-            methods::{
-                Method,
-                MethodInternalWithoutRespHeader,
-            },
+            private::MethodInternalWithoutRespHeader,
         };
         
         /// Get a request to vote to the poll.
@@ -131,7 +129,7 @@ pub mod id {
 mod tests {
     use crate::{
         Connection,
-        methods::Method,
+        Method,
     };
 
     #[test]

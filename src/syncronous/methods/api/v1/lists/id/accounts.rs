@@ -6,8 +6,8 @@ use crate::{
 	Method,
 	MethodWithRespHeader,
 	Result,
-	methods::MethodInternalWithoutRespHeader,
 	entities::{ Accounts, Nothing },
+	private::MethodInternalWithoutRespHeader,
 };
 
 /// Get a request to get member accounts of list specified by `id`.
