@@ -17,6 +17,8 @@
 //! 
 //! // Display toot that is you posted and returned from the server.
 //! println!("{:#?}", posted_status);
+//! #
+//! # let _deleted = mastors::api::v1::statuses::id::delete(&conn, posted_status.id()).send()?;
 //! # Ok(())
 //! # }
 //! ```
