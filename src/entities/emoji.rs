@@ -4,7 +4,7 @@ use super::Entity;
 
 
 /// Represents a custom emoji.
-#[derive(Debug, Hash, Clone, Deserialize, mastors_derive::Entity)]
+#[derive(Debug, Clone, Deserialize, mastors_derive::Entity)]
 pub struct Emoji {
     #[mastors(identifier)]
     shortcode: String,

@@ -2,7 +2,7 @@ use serde::Deserialize;
 use super::Entity;
 
 /// Represents a list of some users that the authenticated user follows.
-#[derive(Debug, Hash, Clone, Deserialize, mastors_derive::Entity)]
+#[derive(Debug, Clone, Deserialize, mastors_derive::Entity)]
 pub struct List {
     #[mastors(identifier)]
     id: String,

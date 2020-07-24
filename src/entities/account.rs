@@ -12,7 +12,7 @@ use super::{
 };
 
 /// Represents a user of Mastodon and their associated profile.
-#[derive(Debug, Hash, Clone, Deserialize, mastors_derive::Entity)]
+#[derive(Debug, Clone, Deserialize, mastors_derive::Entity)]
 pub struct Account {
     // Base attributes
     #[mastors(identifier)]

@@ -121,6 +121,11 @@ pub fn derive_entity(input: TokenStream) -> TokenStream {
                     self.#id_field.cmp(&other.#id_field)
                 }
             }
+            impl std::hash::Hash for #name {
+                fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+                    self.#id_field.hash(state)
+                }
+            }
         },
         None => quote! {},
     };
