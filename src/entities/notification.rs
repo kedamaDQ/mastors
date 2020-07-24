@@ -60,6 +60,35 @@ impl Notification {
         self.r#type()
     }
 
+    /// Get whether this is `follow` notification.
+    pub fn is_follow(&self) -> bool {
+        self.r#type == NotificationType::Follow
+    }
+
+    /// Get whether this is `mention` notification.
+    pub fn is_mention(&self) -> bool {
+        self.r#type == NotificationType::Mention
+    }
+
+    /// Get whether this is `reblog` notification.
+    pub fn is_reblog(&self) -> bool {
+        self.r#type == NotificationType::Reblog
+    }
+
+    /// Get whether this is `favourite` notification.
+    pub fn is_favourite(&self) -> bool {
+        self.r#type == NotificationType::Favourite
+    }
+
+    /// Get whether this is `poll` notification.
+    pub fn is_poll(&self) -> bool {
+        self.r#type == NotificationType::Poll
+    }
+
+    /// Get whether this is `follow_request` notification.
+    pub fn is_follow_request(&self) -> bool {
+        self.r#type == NotificationType::FollowRequest
+    }
 }
 
 impl Entity for Notification {}

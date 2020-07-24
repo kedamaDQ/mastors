@@ -99,6 +99,26 @@ impl Card {
     pub fn card_type(&self) -> CardType {
         self.r#type()
     }
+
+    /// Get whether this card is a `link`.
+    pub fn is_link(&self) -> bool {
+        self.r#type == CardType::Link
+    }
+
+    /// Get whether this card is a `photo`.
+    pub fn is_photo(&self) -> bool {
+        self.r#type == CardType::Photo
+    }
+
+    /// Get whether this card is a `video`.
+    pub fn is_video(&self) -> bool {
+        self.r#type == CardType::Video
+    }
+
+    /// Get whether this card is a `rich`.
+    pub fn is_rich(&self) -> bool {
+        self.r#type == CardType::Rich
+    }
 }
 
 impl Entity for Card {}

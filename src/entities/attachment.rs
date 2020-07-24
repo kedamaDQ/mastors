@@ -82,6 +82,30 @@ impl Attachment {
         self.r#type()
     }
 
+    /// Get whether this attachment is an `image`.
+    pub fn is_image(&self) -> bool {
+        self.r#type == AttachmentType::Image
+    }
+
+    /// Get whether this attachment is a `gifv`.
+    pub fn is_gifv(&self) -> bool {
+        self.r#type == AttachmentType::Gifv
+    }
+
+    /// Get whether this attachment is a `video`.
+    pub fn is_video(&self) -> bool {
+        self.r#type == AttachmentType::Video
+    }
+
+    /// Get whether this attachment is an `audio`.
+    pub fn is_audio(&self) -> bool {
+        self.r#type == AttachmentType::Audio
+    }
+
+    /// Get whether this attachment is an `unknown`.
+    pub fn is_unknown(&self) -> bool {
+        self.r#type == AttachmentType::Unknown
+    }
 }
 
 impl Entity for Attachment {}
