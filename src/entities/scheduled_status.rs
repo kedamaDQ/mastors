@@ -49,7 +49,7 @@ impl Entity for ScheduledStatus {}
 pub struct Params {
     text: String,
     application_id: u64,
-    visibility: Visibility,
+    visibility: Option<Visibility>,
     in_reply_to_id: Option<String>,
     media_ids: Option<Vec<String>>,
     sensitive: Option<bool>,
@@ -70,7 +70,7 @@ impl Params {
     }
 
     /// Get a visibility of status that will posted at scheduled date and time.
-    pub fn visibility(&self) -> Visibility {
+    pub fn visibility(&self) -> Option<Visibility> {
         self.visibility
     }
 
@@ -105,26 +105,6 @@ impl Params {
 
     pub fn poll(&self) -> Option<&ScheduledPoll> {
         self.poll.as_ref()
-    }
-
-    /// Get whether visibility of this status is set to `public`.
-    pub fn is_public(&self) -> bool {
-        self.visibility == Visibility::Public
-    }
-
-    /// Get whether visibility of this status is set to `unlisted`.
-    pub fn is_unlisted(&self) -> bool {
-        self.visibility == Visibility::Unlisted
-    }
-
-    /// Get whether visibility of this status is set to `private`.
-    pub fn is_private(&self) -> bool {
-        self.visibility == Visibility::Private
-    }
-
-    /// Get whether visibility of this status is set to `direct`.
-    pub fn is_direct(&self) -> bool {
-        self.visibility == Visibility::Direct
     }
 }
 
