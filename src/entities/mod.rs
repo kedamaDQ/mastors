@@ -53,14 +53,13 @@ use crate::{
 };
 
 /// Represents a no body response.
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Copy, serde::Deserialize, mastors_derive::Entity)]
 pub struct Nothing {}
-impl Entity for Nothing {}
 
 /// The return value of POST /api/v1/statuses.
 /// 
 /// This endpoint returns `Status` or `ScheduledStatus` depending on whether the posted `Status` has a `scheduled_at` set.
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, mastors_derive::Entity)]
 pub enum PostedStatus {
     Status(Box<Status>),
     ScheduledStatus(Box<ScheduledStatus>),
@@ -99,5 +98,3 @@ impl PostedStatus {
         }
     }
 }
-
-impl Entity for PostedStatus {}
