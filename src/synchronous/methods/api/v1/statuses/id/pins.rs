@@ -104,6 +104,6 @@ mod tests {
 		assert_eq!(posted.id(), got.id());
 		assert!(! got.pinned());
 
-		statuses::id::delete(&conn, posted.id());
+		assert!(statuses::id::delete(&conn, posted.id()).send().is_ok());
 	}
 }
