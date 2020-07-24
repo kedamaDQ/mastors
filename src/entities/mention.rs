@@ -1,12 +1,13 @@
 use serde::Deserialize;
 use crate::Url;
-use super::Entity;
 
 /// Represents a mention of a user within the content of a status.
-#[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, mastors_derive::Entity)]
 pub struct Mention {
     // Required attributes
+    #[mastors(identifier)]
     id: String,
+
     username: String,
     url: Url,
     acct: String,
@@ -33,5 +34,3 @@ impl Mention {
         &self.acct
     }
 }
-
-impl Entity for Mention {}

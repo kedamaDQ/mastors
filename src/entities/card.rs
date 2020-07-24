@@ -3,10 +3,9 @@ use crate::{
     Url,
     utils::transform_str_to_enum,
 };
-use super::Entity;
 
 /// Represents a rich preview card that is generated using OpenGraph tags from a URL.
-#[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize)]
+#[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize, mastors_derive::Entity)]
 pub struct Card {
     // Required attributes
     url: Url,
@@ -120,8 +119,6 @@ impl Card {
         self.r#type == CardType::Rich
     }
 }
-
-impl Entity for Card {}
 
 /// The type of the preview card.
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy, Deserialize)]

@@ -3,14 +3,14 @@ use crate::{
     Url,
     utils::transform_str_to_enum,
 };
-use super::Entity;
-
 
 /// Represents a file or media attachment that can be added to a status.
-#[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, mastors_derive::Entity)]
 pub struct Attachment {
     // Required attributes
+    #[mastors(identifier)]
     id: String,
+
     #[serde(deserialize_with = "transform_str_to_enum")]
     r#type: AttachmentType,
     url: crate::Url,
@@ -107,8 +107,6 @@ impl Attachment {
         self.r#type == AttachmentType::Unknown
     }
 }
-
-impl Entity for Attachment {}
 
 /// Metadata returned by Paperclip.
 #[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize)]

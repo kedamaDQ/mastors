@@ -1,12 +1,11 @@
 use serde::Deserialize;
 use crate::{ DateTime, Utc };
-use super::Entity;
 
 /// Represents the last read ID of the status and notification.
 /// 
 /// Any element to be None if call for the api method without specified elements.
 /// See [`/api/v1/markers`](../syncronous/methods/api/v1/markers).
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, mastors_derive::Entity)]
 pub struct Markers {
 	home: Option<Marker>,
 	notifications: Option<Marker>,
@@ -23,8 +22,6 @@ impl Markers {
 		self.notifications.as_ref()
 	}
 }
-
-impl Entity for Markers {}
 
 /// Represents the last read ID of the status or notification.
 #[derive(Debug, Clone, Deserialize)]
@@ -52,5 +49,3 @@ impl Marker {
 		self.version
 	}
 }
-
-impl Entity for Marker {}

@@ -12,9 +12,10 @@ use super::{
 };
 
 /// Represents a receive notification for activity on your account or statuses.
-#[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, mastors_derive::Entity)]
 pub struct Notification {
     // Required attributes
+    #[mastors(identifier)]
     id: String,
 
     #[serde(deserialize_with = "transform_str_to_enum")]
@@ -90,8 +91,6 @@ impl Notification {
         self.r#type == NotificationType::FollowRequest
     }
 }
-
-impl Entity for Notification {}
 
 /// Represents an Array of [`Notification`](/entities/struct.Notification.html).
 pub type Notifications = Vec<Notification>;

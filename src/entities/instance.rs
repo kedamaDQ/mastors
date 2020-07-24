@@ -6,7 +6,7 @@ use super::{
 };
 
 /// Represents the software instance of Mastodon running on this domain.
-#[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize, mastors_derive::Entity)]
 pub struct Instance {
     uri: String,
     title: String,
@@ -96,8 +96,6 @@ impl Instance {
     }
 }
 
-impl Entity for Instance {}
-
 /// URLs of interest for clients apps.
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize)]
 pub struct Urls {
@@ -112,7 +110,7 @@ impl Urls {
 }
 
 /// Statistics about how much information the instance contains.
-#[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Copy, Deserialize)]
+#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Hash, Clone, Copy, Deserialize)]
 pub struct Stats {
     user_count: usize,
     status_count: usize,

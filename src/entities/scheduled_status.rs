@@ -11,10 +11,12 @@ use super::{
 };
 
 /// Represents a status that will be published at a future scheduled date.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, mastors_derive::Entity)]
 pub struct ScheduledStatus {
     // Required attributes
+    #[mastors(identifier)]
     id: String,
+
     scheduled_at: DateTime<Utc>,
     params: Box<Params>,
     media_attachments: Vec<Attachment>,
@@ -41,8 +43,6 @@ impl ScheduledStatus {
         &self.media_attachments
     }
 }
-
-impl Entity for ScheduledStatus {}
 
 /// Represents parameters of ScheduledStatus that will toot at scheduled date and time.
 #[derive(Debug, Clone, Deserialize)]

@@ -3,7 +3,7 @@ use crate::utils::transform_string_to_usize;
 use super::Entity;
 
 /// Represents a weekly bucket of instance activity.
-#[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Copy, Deserialize)]
+#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Hash, Clone, Copy, Deserialize, mastors_derive::Entity)]
 pub struct Activity {
     #[serde(deserialize_with = "transform_string_to_usize")]
     week: usize,
@@ -39,8 +39,6 @@ impl Activity {
         self.registrations
     }
 }
-
-impl Entity for Activity {}
 
 /// Represents an array of [`Activity`](./struct.Activity.html)s.
 pub type Activities = Vec<Activity>;

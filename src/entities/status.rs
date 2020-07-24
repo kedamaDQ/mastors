@@ -19,10 +19,12 @@ use super::{
 };
 
 /// Represents a status posted by an account.
-#[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, mastors_derive::Entity)]
 pub struct Status {
     // Base attributes
+    #[mastors(identifier)]
     id: String,
+
     uri: Url,
     created_at: DateTime<Utc>,
     account: Box<Account>,
@@ -235,8 +237,6 @@ impl Status {
         self.visibility == Visibility::Direct
     }
 }
-
-impl Entity for Status {}
 
 /// Represents an array of [`Status`](./struct.Status.html)es.
 pub type Statuses = Vec<Status>;
