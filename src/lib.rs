@@ -55,7 +55,7 @@
 //! assert_eq!(posted_status.id(), got_status.id());
 //! 
 //! // Delete a toot.
-//! let deleted_status = mastors::api::v1::statuses::id::get(&conn, got_status.id())
+//! let deleted_status = mastors::api::v1::statuses::id::delete(&conn, got_status.id())
 //!     .send()?;
 //! assert_eq!(got_status.id(), deleted_status.id());
 //! # Ok(())
