@@ -1,8 +1,5 @@
 use serde::Deserialize;
-use crate::{
-    Url,
-    utils::transform_str_to_enum,
-};
+use crate::Url;
 
 /// Represents a file or media attachment that can be added to a status.
 #[derive(Debug, Clone, Deserialize, mastors_derive::Entity)]
@@ -10,8 +7,6 @@ pub struct Attachment {
     // Required attributes
     #[mastors(identifier)]
     id: String,
-
-    #[serde(deserialize_with = "transform_str_to_enum")]
     r#type: AttachmentType,
     url: crate::Url,
     preview_url: crate::Url,
@@ -275,7 +270,7 @@ impl Focus {
 }
 
 /// The type of the attachment.
-#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
 pub enum AttachmentType {
     /// Static image.
     Image,
@@ -319,5 +314,20 @@ impl FromStr for AttachmentType {
             "unknown" => Ok(AttachmentType::Unknown),
             _ => Err(crate::Error::ParseAttachmentTypeError(s.to_owned())),
         }
+    }
+}
+
+use serde::de;
+
+impl<'de> de::Deserialize<'de> for AttachmentType {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: de::Deserializer<'de>,
+    {
+		let s = String::deserialize(deserializer)?;
+		match AttachmentType::from_str(s.as_str()) {
+			Ok(r) => Ok(r),
+			Err(e) => Err(de::Error::custom(e)),
+		}
     }
 }

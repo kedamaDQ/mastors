@@ -3,7 +3,6 @@ use crate::{
     DateTime,
     Utc,
     Url,
-    utils::transform_str_to_enum,
 };
 use super::{
     Account,
@@ -29,7 +28,6 @@ pub struct Status {
     created_at: DateTime<Utc>,
     account: Box<Account>,
     content: Option<String>,
-    #[serde(deserialize_with = "transform_str_to_enum")]
     visibility: Visibility,
     sensitive: bool,
     spoiler_text: String,
