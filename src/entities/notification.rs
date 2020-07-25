@@ -3,7 +3,6 @@ use crate::{
     DateTime,
     Error,
     Utc,
-    utils::transform_str_to_enum,
 };
 use super::{
     Account,
@@ -17,8 +16,6 @@ pub struct Notification {
     // Required attributes
     #[mastors(identifier)]
     id: String,
-
-    #[serde(deserialize_with = "transform_str_to_enum")]
     r#type: NotificationType,
 
     created_at: DateTime<Utc>,
@@ -99,7 +96,7 @@ impl Entity for Notifications {}
 use std::str::FromStr;
 
 /// Represents a type of event that resulted in the notification.
-#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
 pub enum NotificationType {
     /// Someone followed you.
     Follow,
@@ -151,7 +148,7 @@ impl FromStr for NotificationType {
     }
 }
 
-use serde::ser;
+use serde::{ ser, de };
 
 impl ser::Serialize for NotificationType {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
@@ -159,5 +156,18 @@ impl ser::Serialize for NotificationType {
         S: ser::Serializer
     {
         serializer.serialize_str(self.to_string().as_ref())
+    }
+}
+
+impl<'de> de::Deserialize<'de> for NotificationType {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: de::Deserializer<'de>,
+    {
+		let s = String::deserialize(deserializer)?;
+		match NotificationType::from_str(s.as_str()) {
+			Ok(r) => Ok(r),
+			Err(e) => Err(de::Error::custom(e)),
+		}
     }
 }

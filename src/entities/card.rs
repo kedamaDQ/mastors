@@ -1,8 +1,5 @@
 use serde::Deserialize;
-use crate::{
-    Url,
-    utils::transform_str_to_enum,
-};
+use crate::Url;
 
 /// Represents a rich preview card that is generated using OpenGraph tags from a URL.
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize, mastors_derive::Entity)]
@@ -11,7 +8,6 @@ pub struct Card {
     url: Url,
     title: String,
     description: String,
-    #[serde(deserialize_with = "transform_str_to_enum")]
     r#type: CardType,
 
     //Optional attributes
@@ -121,7 +117,7 @@ impl Card {
 }
 
 /// The type of the preview card.
-#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
 pub enum CardType {
     /// Link OEmbed
     Link,
@@ -160,5 +156,20 @@ impl FromStr for CardType {
             "rich" => Ok(CardType::Rich),
             _ => Err(crate::Error::ParseCardTypeError(s.to_owned())),
         }
+    }
+}
+
+use serde::de;
+
+impl<'de> de::Deserialize<'de> for CardType {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: de::Deserializer<'de>,
+    {
+		let s = String::deserialize(deserializer)?;
+		match CardType::from_str(s.as_str()) {
+			Ok(r) => Ok(r),
+			Err(e) => Err(de::Error::custom(e)),
+		}
     }
 }

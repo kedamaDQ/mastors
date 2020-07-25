@@ -1,7 +1,5 @@
-use serde::Deserialize;
-
 /// Represents a privacy setting of the status.
-#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
 pub enum Privacy {
     /// Visible to everyone, shown in public timelines.
     Public,
@@ -17,6 +15,7 @@ pub enum Privacy {
 }
 
 use std::fmt;
+use std::str::FromStr;
 
 impl fmt::Display for Privacy {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -29,7 +28,7 @@ impl fmt::Display for Privacy {
     }
 }
 
-impl std::str::FromStr for Privacy {
+impl FromStr for Privacy {
     type Err = crate::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -42,7 +41,7 @@ impl std::str::FromStr for Privacy {
     }
 }
 
-use serde::ser;
+use serde::{ ser, de };
 
 impl ser::Serialize for Privacy {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
@@ -53,6 +52,19 @@ impl ser::Serialize for Privacy {
     }
 }
 
+impl<'de> de::Deserialize<'de> for Privacy {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: de::Deserializer<'de>,
+    {
+		let s = String::deserialize(deserializer)?;
+		match Privacy::from_str(s.as_str()) {
+			Ok(r) => Ok(r),
+			Err(e) => Err(de::Error::custom(e)),
+		}
+    }
+
+}
 /// Represents a visibility of the status.
 /// 
 /// This enum is an alias of `Privacy`
