@@ -2,8 +2,9 @@ use serde::Deserialize;
 use super::Entity;
 
 /// Represents a list of some users that the authenticated user follows.
-#[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, mastors_derive::Entity)]
 pub struct List {
+    #[mastors(identifier)]
     id: String,
     title: String,
 }
@@ -19,8 +20,6 @@ impl List {
         self.title.as_str()
     }
 }
-
-impl Entity for List {}
 
 /// Represents an array of [`List`](./struct.List.html)s.
 pub type Lists = Vec<List>;

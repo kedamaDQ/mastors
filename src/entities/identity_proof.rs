@@ -1,13 +1,13 @@
 use serde::Deserialize;
-use super::Entity;
 use crate::{
     DateTime,
     Url,
     Utc,
 };
+use super::Entity;
 
 /// Represents a proof from an external identity provider.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize, mastors_derive::Entity)]
 pub struct IdentityProof {
     provider: String,
     provider_username: String,
@@ -42,7 +42,6 @@ impl IdentityProof {
         self.updated_at
     }
 }
-impl Entity for IdentityProof {}
 
 /// Represents an array of [`IdentityProof`](./struct.IdentityProof.html)s.
 pub type IdentityProofs = Vec<IdentityProof>;

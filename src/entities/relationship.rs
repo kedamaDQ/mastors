@@ -2,9 +2,11 @@
 use serde::Deserialize;
 use super::Entity;
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Deserialize)]
+#[derive(Debug, Clone, Deserialize, mastors_derive::Entity)]
 pub struct Relationship {
+    #[mastors(identifier)]
     id: String,
+
     following: bool,
     requested: bool,
     endorsed: bool,
@@ -73,8 +75,6 @@ impl Relationship {
         self.blocked_by
     }
 }
-
-impl Entity for Relationship {}
 
 /// Represents an array of [`Relationship`](./struct.Relationship.html)s.
 pub type Relationships = Vec<Relationship>;

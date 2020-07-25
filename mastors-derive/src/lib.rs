@@ -7,6 +7,8 @@ const IDENT_PATH_PARAM: &str = "path_param";
 const IDENT_AUTHORIZATION: &str = "authorization";
 const IDENT_METHOD_PARAMS: &str = "method_params";
 
+const IDENT_ENTITY_ID: &str = "identifier";
+
 #[proc_macro_derive(Method, attributes(mastors, method_params))]
 pub fn derive_method(input: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(input as syn::DeriveInput);
@@ -93,6 +95,44 @@ pub fn derive_method(input: TokenStream) -> TokenStream {
         }
 
         #trait_impl
+    })
+}
+
+#[proc_macro_derive(Entity, attributes(mastors))]
+pub fn derive_entity(input: TokenStream) -> TokenStream {
+    let input = syn::parse_macro_input!(input as syn::DeriveInput);
+    let name = &input.ident;
+
+    let compare_impl = match get_field_name_with_attribute(&input.data, IDENT_ENTITY_ID) {
+        Some(id_field) => quote! {
+            impl std::cmp::PartialEq<#name> for #name {
+                fn eq(&self, other: &Self) -> bool {
+                    self.#id_field == other.#id_field
+                }
+            }
+            impl std::cmp::PartialOrd<#name> for #name {
+                fn partial_cmp(&self, other: &Self) -> std::option::Option<std::cmp::Ordering> {
+                    Some(self.cmp(&other))
+                }
+            }
+            impl std::cmp::Eq for #name {}
+            impl std::cmp::Ord for #name {
+                fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+                    self.#id_field.cmp(&other.#id_field)
+                }
+            }
+            impl std::hash::Hash for #name {
+                fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+                    self.#id_field.hash(state)
+                }
+            }
+        },
+        None => quote! {},
+    };
+
+    TokenStream::from(quote! {
+        impl crate::entities::Entity for #name {}
+        #compare_impl
     })
 }
 

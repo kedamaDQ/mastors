@@ -1,11 +1,10 @@
 use serde::Deserialize;
 use super::{
     Status,
-    Entity,
 };
 
 /// Represents the tree around the given status.
-#[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize, mastors_derive::Entity)]
 pub struct Context {
     // Required attributes
     ancestors: Vec<Status>,
@@ -23,5 +22,3 @@ impl Context {
         &self.descendants
     }
 }
-
-impl Entity for Context {}

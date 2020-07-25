@@ -4,8 +4,9 @@ use super::Entity;
 
 
 /// Represents a custom emoji.
-#[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, mastors_derive::Entity)]
 pub struct Emoji {
+    #[mastors(identifier)]
     shortcode: String,
     url: Url,
     static_url: Url,
@@ -39,8 +40,6 @@ impl Emoji {
         self.category.as_deref()
     }
 }
-
-impl Entity for Emoji {}
 
 /// Represents an array of [`Emoji`](./struct.Emoji.html)s.
 pub type Emojis = Vec<Emoji>;

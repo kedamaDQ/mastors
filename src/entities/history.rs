@@ -3,10 +3,9 @@ use crate::utils::{
     transform_string_to_u64,
     transform_string_to_usize,
 };
-use super::Entity;
 
 /// Represents daily usage history of a hashtag.
-#[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Copy, Deserialize)]
+#[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Copy, Deserialize, mastors_derive::Entity)]
 pub struct History {
     #[serde(deserialize_with = "transform_string_to_u64")]
     day: u64,
@@ -34,5 +33,3 @@ impl History {
         self.accounts
     }
 }
-
-impl Entity for History {}

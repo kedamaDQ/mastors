@@ -3,15 +3,14 @@ use crate::{
     DateTime,
     Utc,
 };
-use super::{
-    Emoji,
-    Entity,
-};
+use super::Emoji;
 
-#[derive(Debug, PartialEq, PartialOrd, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, mastors_derive::Entity)]
 /// Represents a poll attached to a status.
 pub struct Poll {
+    #[mastors(identifier)]
     id: String,
+
     expires_at: DateTime<Utc>,
     expired: bool,
     multiple: bool,
@@ -74,8 +73,6 @@ impl Poll {
         &self.emojis
     }
 }
-
-impl Entity for Poll {}
 
 /// One of the answers for the poll.
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize)]

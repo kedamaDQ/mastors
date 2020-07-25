@@ -1,8 +1,7 @@
 use serde::Deserialize;
-use super::Entity;
 
 /// Represents an application that interfaces with the REST API to access accounts or post statuses.
-#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Clone, Deserialize)]
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Clone, Deserialize, mastors_derive::Entity)]
 pub struct Application {
     // Required attributes
     name: String,
@@ -15,8 +14,6 @@ pub struct Application {
     client_id: Option<String>,
     client_secret: Option<String>,
 }
-
-impl Entity for Application {}
 
 impl Application {
     /// Get the name of this application.

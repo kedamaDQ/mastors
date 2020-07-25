@@ -12,10 +12,12 @@ use super::{
 };
 
 /// Represents a user of Mastodon and their associated profile.
-#[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, mastors_derive::Entity)]
 pub struct Account {
     // Base attributes
+    #[mastors(identifier)]
     id: String, // cast from an integer, but not guaranteed to be a number
+
     username: String,
     acct: String,
     url: Url,
@@ -43,8 +45,6 @@ pub struct Account {
     bot: Option<bool>,
     source: Option<Source>,
 }
-
-impl Entity for Account {}
 
 impl Account {
     /// Get an ID of this account.
