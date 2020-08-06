@@ -88,8 +88,19 @@ mod tests {
 	#[test]
 	fn test_mute_unmute() {
 		let conn = Connection::new().unwrap();
-		let posted = statuses::post(&conn, "mute unmute").send().unwrap().status().unwrap();
-		let replied = statuses::post(&conn, "mute unmute reply").in_reply_to_id(posted.id()).send().unwrap().status().unwrap();
+		let posted = statuses::post(&conn, "mute unmute")
+			.send()
+			.unwrap()
+			.status()
+			.unwrap()
+			.clone();
+		let replied = statuses::post(&conn, "mute unmute reply")
+			.in_reply_to_id(posted.id())
+			.send()
+			.unwrap()
+			.status()
+			.unwrap()
+			.clone();
 
 		let muted = mute::post(&conn, posted.id()).send().unwrap();
 		assert_eq!(posted.id(), muted.id());

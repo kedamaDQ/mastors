@@ -153,7 +153,12 @@ mod tests {
 	#[test]
 	fn test_reblog_unreblog() {
 		let conn = Connection::new().unwrap();
-		let posted = statuses::post(&conn, "reblog unreblog").send().unwrap().status().unwrap();
+		let posted = statuses::post(&conn, "reblog unreblog")
+			.send()
+			.unwrap()
+			.status()
+			.unwrap()
+			.clone();
 		let myself = posted.account();
 
 		let reblogged = reblog::post(&conn, posted.id()).send().unwrap();
