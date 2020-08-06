@@ -691,7 +691,8 @@ mod tests {
             .send()
             .unwrap()
             .scheduled_status()
-            .unwrap();
+            .unwrap()
+            .clone();
 
         // Mastodon rounds down nano-secs, following:
         //  left: `2020-05-26T11:11:34.730Z`'
@@ -739,7 +740,8 @@ mod tests {
             .send()
             .unwrap()
             .scheduled_status()
-            .unwrap();
+            .unwrap()
+            .clone();
 
         let _deleted = crate::api::v1::scheduled_statuses::id::delete(&conn, posted.id())
             .send()
@@ -763,7 +765,8 @@ mod tests {
             .send()
             .unwrap()
             .scheduled_status()
-            .unwrap();
+            .unwrap()
+            .clone();
 
         let _deleted = crate::api::v1::scheduled_statuses::id::delete(&conn, posted.id())
             .send()

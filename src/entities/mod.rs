@@ -83,7 +83,7 @@ impl PostedStatus {
     }
 
     /// Unwrap this `Posted` and get `Status` if this enum is Posted::Status.
-    pub fn status(self) -> Option<Box<crate::entities::Status>> {
+    pub fn status(&self) -> Option<&crate::entities::Status> {
         match self {
             Self::Status(s) => Some(s),
             Self::ScheduledStatus(_) => None,
@@ -91,7 +91,7 @@ impl PostedStatus {
     }
 
     /// Unwrap this `Posted` and get `ScheduledStatus` if this enum is Posted::ScheduledStatus.
-    pub fn scheduled_status(self) -> Option<Box<crate::entities::ScheduledStatus>> {
+    pub fn scheduled_status(&self) -> Option<&crate::entities::ScheduledStatus> {
         match self {
             Self::Status(_) => None,
             Self::ScheduledStatus(s) => Some(s),

@@ -140,7 +140,8 @@ mod tests {
             .send()
             .unwrap()
             .status()
-            .unwrap();
+            .unwrap()
+            .clone();
 
         let voted = super::id::votes::post(&conn, posted.poll().unwrap().id(), [0, 1])
             .send()

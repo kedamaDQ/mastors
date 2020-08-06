@@ -48,7 +48,8 @@
 //!     .unlisted()
 //!     .send()?
 //!     .status()
-//!     .unwrap();
+//!     .unwrap()
+//!     .clone();
 //! println!("{:#?}", posted_status);
 //! 
 //! // Get a toot that posted in the previous step.
@@ -171,9 +172,9 @@ pub mod prelude {
     pub use crate::streaming::*;
 
     /// Toot a simple text.
-    pub fn toot(conn: &Connection, body: impl AsRef<str>) -> crate::Result<Box<crate::entities::Status>> {
+    pub fn toot(conn: &Connection, body: impl AsRef<str>) -> crate::Result<crate::entities::Status> {
         match crate::api::v1::statuses::post(conn, body).send() {
-            Ok(posted) => Ok(posted.status().unwrap()),
+            Ok(posted) => Ok(posted.status().unwrap().clone()),
             Err(e) => Err(e),
         }
     }

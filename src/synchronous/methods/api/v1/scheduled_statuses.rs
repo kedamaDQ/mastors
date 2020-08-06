@@ -214,31 +214,36 @@ mod tests {
             .send()
             .unwrap()
             .scheduled_status()
-            .unwrap();
+            .unwrap()
+            .clone();
         let posted2 = statuses::post(&conn, "second")
             .scheduled_at(scheduled_at)
             .send()
             .unwrap()
             .scheduled_status()
-            .unwrap();
+            .unwrap()
+            .clone();
         let posted3 = statuses::post(&conn, "third")
             .scheduled_at(scheduled_at)
             .send()
             .unwrap()
             .scheduled_status()
-            .unwrap();
+            .unwrap()
+            .clone();
         let posted4 = statuses::post(&conn, "fourth")
             .scheduled_at(scheduled_at)
             .send()
             .unwrap()
             .scheduled_status()
-            .unwrap();
+            .unwrap()
+            .clone();
         let posted5 = statuses::post(&conn, "fifth")
             .scheduled_at(scheduled_at)
             .send()
             .unwrap()
             .scheduled_status()
-            .unwrap();
+            .unwrap()
+            .clone();
 
         let mut posted_ids = vec![
             posted1.id().to_string(),
