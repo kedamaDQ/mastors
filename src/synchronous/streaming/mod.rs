@@ -20,12 +20,12 @@ use crate::{
 /// Streaming timeline implements an `Iterator` it means you can use in loop and process events sequentially.
 /// Also you can pass the [`EventListener`](./trait.EventListener.html) to `StreamingTimeline` with [`attach()`](#method.attach) to process events.
 pub trait StreamingTimeline: Iterator<Item = Result<EventType>> {
-    /// To attach an implementation of [`EventListener`](./trait.EventListener.html).
-	fn attach(&mut self, listener: impl EventListener) -> StdResult<(), Box<dyn StdError>> {
+    /// Attach an implementation of [`EventListener`](./trait.EventListener.html) to this streaming timeline.
+	fn attach(&mut self, listener: &impl EventListener) -> StdResult<(), Box<dyn StdError>> {
 		for event in self.into_iter() {
             match event {
                 Ok(event_type) => {
-                    if let Err(e) = dispatch_event(&listener, event_type) {
+                    if let Err(e) = dispatch_event(listener, event_type) {
                         return Err(e.into());
                     }
                 },
