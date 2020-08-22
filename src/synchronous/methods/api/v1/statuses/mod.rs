@@ -550,11 +550,11 @@ fn validate_status(
     let mut total_chars: usize = 0;
 
     if let Some(status) = status.as_ref() {
-        total_chars += status.len();
+        total_chars += status.chars().count();
     }
 
     if let Some(spoiler_text) = spoiler_text.as_ref() {
-        total_chars += spoiler_text.len();
+        total_chars += spoiler_text.chars().count();
     }
 
     if total_chars > status_max_characters {
