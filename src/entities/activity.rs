@@ -1,12 +1,13 @@
 use serde::Deserialize;
 use crate::utils::transform_string_to_usize;
+use crate::utils::transform_string_to_i64;
 use super::Entity;
 
 /// Represents a weekly bucket of instance activity.
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Hash, Clone, Copy, Deserialize, mastors_derive::Entity)]
 pub struct Activity {
-    #[serde(deserialize_with = "transform_string_to_usize")]
-    week: usize,
+    #[serde(deserialize_with = "transform_string_to_i64")]
+    week: i64,
 
     #[serde(deserialize_with = "transform_string_to_usize")]
     statuses: usize,
@@ -20,7 +21,7 @@ pub struct Activity {
 
 impl Activity {
     /// Get midnight at the first day of the week.
-    pub fn week(&self) -> usize {
+    pub fn week(&self) -> i64 {
         self.week
     }
 
