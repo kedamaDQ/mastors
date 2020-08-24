@@ -21,3 +21,12 @@ where
     let s: &str = Deserialize::deserialize(deserializer)?;
     u64::from_str_radix(s, 10).map_err(D::Error::custom)
 }
+
+pub(crate) fn transform_string_to_i64<'de, D>(deserializer: D) -> Result<i64, D::Error>
+where
+    D: Deserializer<'de>
+{
+
+    let s: &str = Deserialize::deserialize(deserializer)?;
+    i64::from_str_radix(s, 10).map_err(D::Error::custom)
+}
