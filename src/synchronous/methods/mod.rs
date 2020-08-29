@@ -250,14 +250,6 @@ pub(crate) mod private {
         Ok(req)
     }
     
-    /*
-    pub(crate) fn send_request(conn: &Connection, rb: RequestBuilder) -> crate::Result<Response> {
-        let req = rb.build()?;
-        debug!("Send {} request to {}", req.method(), req.url());
-        utils::check_response(conn.client().execute(req)?)
-    }
-    */
-
     fn trace_body(req: &Request) -> Option<String> {
         req.body().map(
             |b| b.as_bytes().map(
