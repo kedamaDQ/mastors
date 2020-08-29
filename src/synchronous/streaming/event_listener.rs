@@ -3,14 +3,14 @@
 //! ## Note
 //! 
 //! This module is experimental.
+use std::result::Result as StdResult;
+use std::error::Error as StdError;
 use crate::{
 	entities::{
 		Notification,
 		Status,
 	},
 };
-use std::result::Result as StdResult;
-use std::error::Error as StdError;
 
 /// This trait provides feature for handling streaming events.
 /// 

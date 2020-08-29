@@ -45,20 +45,25 @@ pub struct GetRelationships<'a> {
 
 impl<'a> Method<'a, Relationships> for GetRelationships<'a> {
 	fn send(&self) -> Result<Relationships> {
+		use log::trace;
 		use crate::private::{
 			build_request,
-			send_request,
 		};
-		use crate::current_mode::utils::reqwest::build_array_query;
+		use crate::utils;
 
 		const QUERY_KEY: &str = "id[]";
 
 		self.id.validate()?;
-		let req = build_request(self, reqwest::Method::GET)?.query(
-			build_array_query(QUERY_KEY, &self.id.inner).as_slice()
-		);
 
-		Ok(send_request(req)?.json::<Relationships>()?)
+		let req = build_request(self, reqwest::Method::GET)?.query(
+			utils::build_array_query(QUERY_KEY, &self.id.inner).as_slice()
+		).build()?;
+		trace!("Send a {} request to {}", req.method(), req.url());
+
+		let res = self.conn.client().execute(req)?;
+		trace!("{:?}", res);
+
+		Ok(utils::check_response(res)?.json::<Relationships>()?)
 	}
 }
 

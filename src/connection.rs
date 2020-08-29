@@ -1,3 +1,4 @@
+use log::{ debug, trace };
 use isolang::Language;
 use reqwest::blocking::Client;
 use crate::{
@@ -94,8 +95,9 @@ impl Connection {
     pub fn from_file(env_path: &str) -> Result<Self> {
         use std::env;
 
+        debug!("Start to load env: {}", env_path);
         match dotenv::from_filename(env_path) {
-            Ok(path) => println!("Load environment from '{}'", path.to_string_lossy()),
+            Ok(_) => debug!("Completed to load env"),
             Err(e) => return Err(
                 Error::EnvNotFoundError {
                     source: e,
@@ -105,14 +107,17 @@ impl Connection {
         };
 
         let server = Url::from_env(ENV_SERVER_URL, "")?;
+        trace!("SERVER_URL: {}", server);
 
         let access_token = env::var(ENV_ACCESS_TOKEN)
             .map_err(|e| Error::EnvVarError {
                 source: e,
                 env_var: ENV_ACCESS_TOKEN,
             })?;
+        trace!("ACCESS_TOCEN: {}", access_token);
 
         let user_agent = env::var(ENV_USER_AGENT).unwrap_or_else(|_| DEFAULT_USER_AGENT.to_owned());
+        trace!("USER_AGENT: {}", user_agent);
 
         let default_language = match env::var(ENV_DEFAULT_LANGUAGE).ok() {
             Some(lang) => {
@@ -120,25 +125,31 @@ impl Connection {
             },
             None => None,
         };
+        trace!("DEFAULT_LANGUAGE: {:?}", default_language);
 
         let status_max_characters = usize::from_env(
             ENV_STATUS_MAX_CHARACTERS,
             DEFAULT_STATUS_MAX_CHARACTERS
         )?;
+        trace!("STATUS_MAX_CHARACTERS: {}", status_max_characters);
 
         let status_max_medias = usize::from_env(
             ENV_STATUS_MAX_MEDIAS,
             DEFAULT_STATUS_MAX_MEDIAS
         )?;
+        trace!("STATUS_MAX_MEDIAS: {}", status_max_medias);
 
         let poll_max_options = usize::from_env(
             ENV_POLL_MAX_OPTIONS,
             DEFAULT_POLL_MAX_OPTIONS
         )?;
+        trace!("POLL_MAX_OPTIONS: {}", poll_max_options);
 
         let whitelist_mode = env::var(ENV_WHITELIST_MODE).is_ok();
+        trace!("WHITELIST_MODE: {}", whitelist_mode);
 
         let public_timeline_preview_disabled = env::var(ENV_PUBLIC_TIMELINE_PREVIEW_DISABLED).is_ok();
+        trace!("PUBLIC_TIMELINE_PREVIEW_DISABLED: {}", public_timeline_preview_disabled);
 
         let client = Client::builder()
             .gzip(true)
@@ -146,6 +157,7 @@ impl Connection {
             .build()
             .map_err(Error::HttpClientError)?;
 
+        debug!("Completed to construct a Connection");
         Ok(Connection {
             server,
             access_token,

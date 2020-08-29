@@ -7,7 +7,7 @@ use crate::{
 
 const EXPECTED_CONTENT_TYPE: &str = "application/json";
 
-pub(crate) fn extract_response(resp: Response) -> Result<Response> {
+pub(crate) fn check_response(resp: Response) -> Result<Response> {
     let status = resp.status();
     let url = resp.url().clone();
 
@@ -16,7 +16,7 @@ pub(crate) fn extract_response(resp: Response) -> Result<Response> {
     } else if status.is_client_error() {
         if let Some(content_type) = resp.headers().get(reqwest::header::CONTENT_TYPE) {
             if content_type.to_str().unwrap_or("").starts_with(EXPECTED_CONTENT_TYPE) {
-                Err(
+               Err(
                     Error::HttpClientStatusError(url, status.as_u16(), resp.json::<ReceivedMessage>()?)
                 )
             } else {

@@ -65,18 +65,18 @@ impl<'a> Method<'a, Markers> for GetMarkers<'a> {
 	/// 
 	/// - No timeline specified
 	fn send(&self) -> Result<Markers> {
+		use log::trace;
 		use crate::private::{
 			build_request,
-			send_request,
 		};
-		use crate::current_mode::utils::reqwest::build_array_query;
+		use crate::utils;
 
 		const QUERY_KEY: &str = "timeline[]";
 
 		self.timelines.validate()?;
 
 		let req = build_request(self, reqwest::Method::GET)?.query(
-			&build_array_query(
+			&utils::build_array_query(
 				QUERY_KEY,
 				self.timelines.inner
 					.iter()
@@ -84,9 +84,13 @@ impl<'a> Method<'a, Markers> for GetMarkers<'a> {
 					.collect::<Vec<String>>()
 					.as_slice()
 			)
-		).query(self);
+		).query(self).build()?;
+		trace!("Send a {} request to {}", req.method(), req.url());
 
-		Ok(send_request(req)?.json::<Markers>()?)
+		let res = self.conn.client().execute(req)?;
+		trace!("{:?}", res);
+
+		Ok(utils::check_response(res)?.json::<Markers>()?)
 	}
 }
 

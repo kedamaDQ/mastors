@@ -33,7 +33,9 @@ pub trait MethodWithRespHeader<'a, E: 'a + Entity>: MethodInternalWithRespHeader
 }
 
 pub(crate) mod private {
+    use log::{ trace };
     use reqwest::blocking::{
+        Request,
         RequestBuilder,
         Response,
         multipart,
@@ -70,39 +72,43 @@ pub(crate) mod private {
         fn send_internal(&self) -> Result<E>;
 
         fn get(&'a self) -> Result<E> {
-            Ok(
-                send_request(
-                    build_request(self, reqwest::Method::GET)?.query(&self)
-                )?
-                .json::<E>()?
-            )
+            let req = build_request(self, reqwest::Method::GET)?.query(&self).build()?;
+            trace!("Send a {} request to {}", req.method(), req.url());
+
+            let res = self.connection().client().execute(req)?;
+            trace!("{:?}", res);
+
+            Ok(utils::check_response(res)?.json::<E>()?)
         }
     
         fn post(&'a self) -> Result<E> {
-            Ok(
-                send_request(
-                    build_request(self, reqwest::Method::POST)?.json(&self)
-                )?
-                .json::<E>()?
-            )
+            let req = build_request(self, reqwest::Method::POST)?.json(&self).build()?;
+            trace!("Send a {} request to {}: body: {:?}", req.method(), req.url(), trace_body(&req));
+
+            let res = self.connection().client().execute(req)?;
+            trace!("{:?}", res);
+
+            Ok(utils::check_response(res)?.json::<E>()?)
         }
 
         fn put(&'a self) -> Result<E> {
-            Ok(
-                send_request(
-                    build_request(self, reqwest::Method::PUT)?.json(&self)
-                )?
-                .json::<E>()?
-            )
+            let req = build_request(self, reqwest::Method::PUT)?.json(&self).build()?;
+            trace!("Send a {} request to {}: body: {:?}", req.method(), req.url(), trace_body(&req));
+
+            let res = self.connection().client().execute(req)?;
+            trace!("{:?}", res);
+
+            Ok(utils::check_response(res)?.json::<E>()?)
         }
 
         fn delete(&'a self) -> Result<E> {
-            Ok(
-                send_request(
-                    build_request(self, reqwest::Method::DELETE)?.json(&self)
-                )?
-                .json::<E>()?
-            )
+            let req = build_request(self, reqwest::Method::DELETE)?.json(&self).build()?;
+            trace!("Send a {} request to {}: body: {:?}", req.method(), req.url(), trace_body(&req));
+
+            let res = self.connection().client().execute(req)?;
+            trace!("{:?}", res);
+
+            Ok(utils::check_response(res)?.json::<E>()?)
         }
     }
 
@@ -116,42 +122,54 @@ pub(crate) mod private {
         fn send_internal(&self) -> Result<(PageNavigation, E)>;
 
         fn get(&'a self) -> Result<(PageNavigation, E)> {
-            let resp = send_request(
-                build_request(self, reqwest::Method::GET)?.query(&self)
-            )?;
+            let req = build_request(self, reqwest::Method::GET)?.query(&self).build()?;
+            trace!("Send a {} request to {}", req.method(), req.url());
+
+            let res = self.connection().client().execute(req)?;
+            trace!("{:?}", res);
+
             Ok((
-                response_header_value(&resp, self.response_header_name()),
-                resp.json::<E>()?
+                response_header_value(&res, self.response_header_name()),
+                utils::check_response(res)?.json::<E>()?
             ))
         }
  
         fn post(&'a self) -> Result<(PageNavigation, E)> {
-            let resp = send_request(
-                build_request(self, reqwest::Method::POST)?.json(&self)
-            )?;
+            let req = build_request(self, reqwest::Method::POST)?.json(&self).build()?;
+            trace!("Send a {} request to {}: body: {:?}", req.method(), req.url(), trace_body(&req));
+
+            let res = self.connection().client().execute(req)?;
+            trace!("{:?}", res);
+
             Ok((
-                response_header_value(&resp, self.response_header_name()),
-                resp.json::<E>()?
+                response_header_value(&res, self.response_header_name()),
+                utils::check_response(res)?.json::<E>()?
             ))
         }
 
         fn put(&'a self) -> Result<(PageNavigation, E)> {
-            let resp = send_request(
-                build_request(self, reqwest::Method::PUT)?.json(&self)
-            )?;
+            let req = build_request(self, reqwest::Method::PUT)?.json(&self).build()?;
+            trace!("Send a {} request to {}: body: {:?}", req.method(), req.url(), trace_body(&req));
+
+            let res = self.connection().client().execute(req)?;
+            trace!("{:?}", res);
+
             Ok((
-                response_header_value(&resp, self.response_header_name()),
-                resp.json::<E>()?
+                response_header_value(&res, self.response_header_name()),
+                utils::check_response(res)?.json::<E>()?
             ))
         }
 
         fn delete(&'a self) -> Result<(PageNavigation, E)> {
-            let resp = send_request(
-                build_request(self, reqwest::Method::DELETE)?.json(&self)
-            )?;
+            let req = build_request(self, reqwest::Method::DELETE)?.json(&self).build()?;
+            trace!("Send a {} request to {}: body: {:?}", req.method(), req.url(), trace_body(&req));
+
+            let res = self.connection().client().execute(req)?;
+            trace!("{:?}", res);
+
             Ok((
-                response_header_value(&resp, self.response_header_name()),
-                resp.json::<E>()?
+                response_header_value(&res, self.response_header_name()),
+                utils::check_response(res)?.json::<E>()?
             ))
         }
 
@@ -205,13 +223,14 @@ pub(crate) mod private {
                 self.file_form().form_name.to_owned(),
                 Part::bytes(buf).file_name(self.file_form().file_name.to_owned())
             );
-    
-            Ok(
-                send_request(
-                    build_request(self, reqwest::Method::POST)?.multipart(multipart)
-                )?
-                .json::<E>()?
-            )
+
+            let req = build_request(self, reqwest::Method::POST)?.multipart(multipart).build()?;
+            trace!("Send a {} request to {}", req.method(), req.url());
+
+            let res = self.connection().client().execute(req)?;
+            trace!("{:?}", res);
+
+            Ok(utils::check_response(res)?.json::<E>()?)
         }
     }
 
@@ -231,8 +250,12 @@ pub(crate) mod private {
         Ok(req)
     }
     
-    pub(crate) fn send_request(rb: RequestBuilder) -> crate::Result<Response> {
-        utils::extract_response(rb.send()?)
+    fn trace_body(req: &Request) -> Option<String> {
+        req.body().map(
+            |b| b.as_bytes().map(
+                    |bb| String::from_utf8_lossy(bb).to_string()
+                )
+            ).flatten()
     }
 
     fn response_header_value(resp: &Response, header_name: &str) -> PageNavigation {
