@@ -59,6 +59,7 @@ impl<'a> GetStreaming<'a> {
 /// This module provides features related to check about streaming of the server is alives.
 pub mod health {
     use super::*;
+    use log::trace;
 
     /// Gets whether the server's streaming is alive.
     pub fn get(conn: &Connection) -> GetHealth {
@@ -77,9 +78,13 @@ pub mod health {
 
         /// If streaming of the server is alive, will returns a text 'OK'.
         pub fn send(&self) -> Result<String>{
-            Ok(utils::extract_response(
-               self.conn.client().get(self.conn.url(Self::ENDPOINT)?).send()?
-            )?.text()?)
+            let req = self.conn.client().get(self.conn.url(Self::ENDPOINT)?).build()?;
+            trace!("Send a {} request to {}", req.method(), req.url());
+
+            let res = self.conn.client().execute(req)?;
+            trace!("{:?}", res);
+
+            Ok(utils::check_response(res)?.text()?)
         }
     }
 }

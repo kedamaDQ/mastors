@@ -147,20 +147,25 @@ impl<'a> GetNotifications<'a> {
 
 impl<'a> Method<'a, Notifications> for GetNotifications<'a> {
 	fn send(&self) -> Result<Notifications> {
+		use log::trace;
 		use crate::private::{
 			build_request,
-			send_request,
 		};
-		use crate::current_mode::utils::reqwest::build_array_query;
+		use crate::utils;
 
 		const QUERY_KEY: &str = "exclude_types[]";
 
 		match &self.exclude_types {
 			Some(et) => {
         		let req = build_request(self, reqwest::Method::GET)?.query(
-        			&build_array_query(QUERY_KEY, et)
-				);
-				Ok(send_request(req)?.json::<Notifications>()?)
+        			&utils::build_array_query(QUERY_KEY, et)
+				).build()?;
+				trace!("Send a {} request to {}", req.method(), req.url());
+
+				let res = self.conn.client().execute(req)?;
+				trace!("{:?}", res);
+
+				Ok(utils::check_response(res)?.json::<Notifications>()?)
 			},
 			None => {
 				self.send_internal()
