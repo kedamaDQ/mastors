@@ -113,7 +113,7 @@ pub enum Error {
     ),
     */
 
-    #[error(display = "Failed to deserialize entity, perhaps, this is a bug of mastors")]
+    #[error(display = "Failed to deserialize entity, perhaps, this is a bug of mastors: {}", _0)]
     DeserializeJsonError(
         #[error(source, from)]
         serde_json::error::Error,
