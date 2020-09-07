@@ -1,5 +1,9 @@
 use serde::Deserialize;
 use crate::Url;
+use crate::utils::{
+    transform_string_to_option_string,
+    transform_string_to_option_url,
+};
 
 /// Represents a rich preview card that is generated using OpenGraph tags from a URL.
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize, mastors_derive::Entity)]
@@ -10,15 +14,24 @@ pub struct Card {
     description: String,
     r#type: CardType,
 
-    //Optional attributes
+    /* Optional attributes
+     *
+     * These are optional, but they are never set to null or the key itself is omitted.
+     * If nothing a value, an empty string is set.
+     */
+    #[serde(deserialize_with = "transform_string_to_option_string")]
     author_name: Option<String>,
+    #[serde(deserialize_with = "transform_string_to_option_url")]
     author_url: Option<Url>,
+    #[serde(deserialize_with = "transform_string_to_option_string")]
     provider_name: Option<String>,
-    provider_uri: Option<Url>,
+    #[serde(deserialize_with = "transform_string_to_option_url")]
+    provider_url: Option<Url>,
     html: Option<String>,
     width: Option<u32>,
     height: Option<u32>,
     image: Option<Url>,
+    #[serde(deserialize_with = "transform_string_to_option_url")]
     embed_url: Option<Url>,
 }
 
@@ -59,8 +72,8 @@ impl Card {
     }
 
     /// Get a link to the provider of the original resource.
-    pub fn provider_uri(&self) -> Option<&Url> {
-        self.provider_uri.as_ref()
+    pub fn provider_url(&self) -> Option<&Url> {
+        self.provider_url.as_ref()
     }
 
     /// Get HTML to be used for generating the preview card.
