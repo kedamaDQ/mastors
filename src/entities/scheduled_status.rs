@@ -47,7 +47,7 @@ impl ScheduledStatus {
 /// Represents parameters of ScheduledStatus that will toot at scheduled date and time.
 #[derive(Debug, Clone, Deserialize)]
 pub struct Params {
-    text: String,
+    text: Option<String>,
     application_id: u64,
     visibility: Option<Visibility>,
     in_reply_to_id: Option<String>,
@@ -60,8 +60,8 @@ pub struct Params {
 
 impl Params {
     /// Get a text of status that will posted at scheduled date and time.
-    pub fn text(&self) -> &str {
-        &self.text
+    pub fn text(&self) -> Option<&String> {
+        self.text.as_ref()
     }
 
     /// Get an application ID that used to create this scheduled status.

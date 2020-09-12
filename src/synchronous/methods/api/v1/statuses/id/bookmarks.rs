@@ -86,12 +86,10 @@ mod tests {
 	fn test_bookmark_and_unbookmark() {
 		let conn = crate::Connection::new().unwrap();
 
-		let status = crate::api::v1::statuses::post(&conn, "bookmark and unbookmark.")
+		let status = crate::api::v1::statuses::post(&conn)
+			.status("bookmark and unbookmark.")
 			.send()
-			.unwrap()
-			.status()
-			.unwrap()
-			.clone();
+			.unwrap();
 
 		let bookmarked = bookmark::post(&conn, status.id()).send().unwrap();
 		assert_eq!(status.id(), bookmarked.id());

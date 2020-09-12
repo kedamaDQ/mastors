@@ -88,12 +88,10 @@ mod tests {
 	#[test]
 	fn test_pin_unpin() {
 		let conn = Connection::new().unwrap();
-		let posted = statuses::post(&conn, "pin unpin")
+		let posted = statuses::post(&conn)
+			.status("pin unpin")
 			.send()
-			.unwrap()
-			.status()
-			.unwrap()
-			.clone();
+			.unwrap();
 
 		let pinned = pin::post(&conn, posted.id()).send().unwrap();
 		assert_eq!(posted.id(), pinned.id());

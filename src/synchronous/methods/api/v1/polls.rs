@@ -135,13 +135,12 @@ mod tests {
     #[test]
     fn test_vote_to_poll() {
         let conn = Connection::new().unwrap();
-        let posted = crate::api::v1::statuses::post_with_poll(&conn, "test_vote_to_poll", ["a", "b", "c"], 3600)
+        let posted = crate::api::v1::statuses::post(&conn)
+            .status("test_vote_to_poll")
+            .poll(["a", "b", "c"], 3600)
             .poll_multiple()
             .send()
-            .unwrap()
-            .status()
-            .unwrap()
-            .clone();
+            .unwrap();
 
         let voted = super::id::votes::post(&conn, posted.poll().unwrap().id(), [0, 1])
             .send()

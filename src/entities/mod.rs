@@ -47,54 +47,6 @@ pub use scheduled_status::{ DeletedScheduledStatus, Params, ScheduledStatus, Sch
 pub use status::{ Status, Statuses };
 pub use tag::{ Tag, Trends };
 
-use crate::{
-    DateTime,
-    Utc,
-};
-
 /// Represents a no body response.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Copy, serde::Deserialize, mastors_derive::Entity)]
 pub struct Nothing {}
-
-/// The return value of POST /api/v1/statuses.
-/// 
-/// This endpoint returns `Status` or `ScheduledStatus` depending on whether the posted `Status` has a `scheduled_at` set.
-#[derive(Debug, Clone, serde::Deserialize, mastors_derive::Entity)]
-pub enum PostedStatus {
-    Status(Box<Status>),
-    ScheduledStatus(Box<ScheduledStatus>),
-}
-
-impl PostedStatus {
-    /// Get an ID of this status or scheduled status.
-    pub fn id(&self) -> &str {
-        match self {
-            Self::Status(s) => s.id(),
-            Self::ScheduledStatus(s) => s.id(),
-        }
-    }
-
-    /// Get scheduled date and time if this status is scheduled.
-    pub fn scheduled_at(&self) -> Option<DateTime<Utc>> {
-        match self {
-            Self::Status(_) => None,
-            Self::ScheduledStatus(s) => Some(s.scheduled_at()),
-        }
-    }
-
-    /// Unwrap this `Posted` and get `Status` if this enum is Posted::Status.
-    pub fn status(&self) -> Option<&crate::entities::Status> {
-        match self {
-            Self::Status(s) => Some(s),
-            Self::ScheduledStatus(_) => None,
-        }
-    }
-
-    /// Unwrap this `Posted` and get `ScheduledStatus` if this enum is Posted::ScheduledStatus.
-    pub fn scheduled_status(&self) -> Option<&crate::entities::ScheduledStatus> {
-        match self {
-            Self::Status(_) => None,
-            Self::ScheduledStatus(s) => Some(s),
-        }
-    }
-}

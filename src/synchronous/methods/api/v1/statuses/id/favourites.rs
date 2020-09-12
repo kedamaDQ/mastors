@@ -122,12 +122,10 @@ mod tests {
     #[test]
     fn test_favourite_unfavourite_status() {
         let conn = crate::Connection::new().unwrap();
-        let status = crate::api::v1::statuses::post(&conn, "favourite unfavourite.")
+        let status = crate::api::v1::statuses::post(&conn)
+            .status("favourite unfavourite.")
             .send()
-            .unwrap()
-            .status()
-            .unwrap()
-            .clone();
+            .unwrap();
         let myself = status.account();
 
         let favourited = favourite::post(&conn, status.id()).send().unwrap();

@@ -59,33 +59,25 @@ mod tests {
 
         let conn = crate::Connection::new().unwrap();
 
-        let first = statuses::post(&conn, "first")
+        let first = statuses::post(&conn)
+            .status("first")
             .send()
-            .unwrap()
-            .status()
-            .unwrap()
-            .clone();
-        let second = statuses::post(&conn, "second")
+            .unwrap();
+        let second = statuses::post(&conn)
+            .status("second")
             .in_reply_to_id(first.id())
             .send()
-            .unwrap()
-            .status()
-            .unwrap()
-            .clone();
-        let third = statuses::post(&conn, "third")
+            .unwrap();
+        let third = statuses::post(&conn)
+            .status("third")
             .in_reply_to_id(second.id())
             .send()
-            .unwrap()
-            .status()
-            .unwrap()
-            .clone();
-        let fourth = statuses::post(&conn, "fourth")
+            .unwrap();
+        let fourth = statuses::post(&conn)
+            .status("fourth")
             .in_reply_to_id(third.id())
             .send()
-            .unwrap()
-            .status()
-            .unwrap()
-            .clone();
+            .unwrap();
 
         let contexts = context::get(&conn, third.id()).send().unwrap();
         let ancestors = contexts.ancestors().iter().map(|status| status.id().to_owned()).collect::<Vec<String>>();

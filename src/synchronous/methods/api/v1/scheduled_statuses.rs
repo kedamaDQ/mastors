@@ -209,41 +209,31 @@ mod tests {
             id::delete(&conn, ss.id()).send().unwrap();
         }
 
-        let posted1 = statuses::post(&conn, "first")
+        let posted1 = statuses::post(&conn)
+            .status("first")
             .scheduled_at(scheduled_at)
             .send()
-            .unwrap()
-            .scheduled_status()
-            .unwrap()
-            .clone();
-        let posted2 = statuses::post(&conn, "second")
+            .unwrap();
+        let posted2 = statuses::post(&conn)
+            .status("second")
             .scheduled_at(scheduled_at)
             .send()
-            .unwrap()
-            .scheduled_status()
-            .unwrap()
-            .clone();
-        let posted3 = statuses::post(&conn, "third")
+            .unwrap();
+        let posted3 = statuses::post(&conn)
+            .status("third")
             .scheduled_at(scheduled_at)
             .send()
-            .unwrap()
-            .scheduled_status()
-            .unwrap()
-            .clone();
-        let posted4 = statuses::post(&conn, "fourth")
+            .unwrap();
+        let posted4 = statuses::post(&conn)
+            .status("fourth")
             .scheduled_at(scheduled_at)
             .send()
-            .unwrap()
-            .scheduled_status()
-            .unwrap()
-            .clone();
-        let posted5 = statuses::post(&conn, "fifth")
+            .unwrap();
+        let posted5 = statuses::post(&conn)
+            .status("fifth")
             .scheduled_at(scheduled_at)
             .send()
-            .unwrap()
-            .scheduled_status()
-            .unwrap()
-            .clone();
+            .unwrap();
 
         let mut posted_ids = vec![
             posted1.id().to_string(),
