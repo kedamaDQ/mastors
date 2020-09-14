@@ -1,3 +1,4 @@
+use chrono::{ DateTime, Utc };
 use err_derive::Error;
 use serde::Deserialize;
 
@@ -122,8 +123,8 @@ pub enum Error {
     #[error(display = "Received Unknown event type '{}'", _0)]
     UnknownEventTypeError(String),
 
-    #[error(display = "Status requires status or media_ids and does not allows attach both of media and polls: {}", _0)]
-    InvalidStatusError(String),
+    #[error(display = "Status requires status content text")]
+    InvalidStatusError,
 
     #[error(display = "Too many characters in a status (max: {}, got: {})", _1, _0)]
     TooManyCharactersError(usize, usize),
@@ -150,7 +151,10 @@ pub enum Error {
     DuplicatePollOptionError,
 
     #[error(display = "{} is a past date time", _0)]
-    PastDateTimeError(crate::DateTime<crate::Utc>),
+    PastDateTimeError(DateTime<Utc>),
+
+    #[error(display = "Schedule is too close: now: {}, scheduled: {}", _0, _1)]
+    ScheduleTooCloseError(DateTime<Utc>, DateTime<Utc>),
 
     #[error(display = "Voted option is duplicate")]
     DuplicateVoteOptionError,

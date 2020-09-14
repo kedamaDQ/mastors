@@ -43,13 +43,11 @@
 //! println!("{:#?}", instance);
 //! 
 //! // Post a toot with spoiler text and unlisted visibility.
-//! let posted_status = mastors::api::v1::statuses::post(&conn, "Toot!")
+//! let posted_status = mastors::api::v1::statuses::post(&conn)
+//!     .status("Toot!")
 //!     .spoiler_text("Spoiler!")
 //!     .unlisted()
-//!     .send()?
-//!     .status()
-//!     .unwrap()
-//!     .clone();
+//!     .send()?;
 //! println!("{:#?}", posted_status);
 //! 
 //! // Get a toot that posted in the previous step.
@@ -173,8 +171,8 @@ pub mod prelude {
 
     /// Toot a simple text.
     pub fn toot(conn: &Connection, body: impl AsRef<str>) -> crate::Result<crate::entities::Status> {
-        match crate::api::v1::statuses::post(conn, body).send() {
-            Ok(posted) => Ok(posted.status().unwrap().clone()),
+        match crate::api::v1::statuses::post(conn).status(body).send() {
+            Ok(posted) => Ok(posted),
             Err(e) => Err(e),
         }
     }

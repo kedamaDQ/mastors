@@ -1,280 +1,100 @@
 //! This module provides features related to status that are post a status, get a status, and reaction to status.
 pub mod id;
 
+use std::ops::Deref;
+use chrono::{ DateTime, Duration, Utc };
 use isolang::Language;
 use serde::Serialize;
 use crate::{
     Connection,
-    DateTime,
     Error,
     Method,
     Result,
-    Utc,
     entities::{
-        PostedStatus,
         ScheduledStatus,
         Status,
         Visibility,
     },
-    private::MethodInternalWithoutRespHeader,
 };
+use crate::synchronous::methods::private::MethodInternalWithoutRespHeader;
 
-pub const LEAST_SCHEDULABLE_PERIOD: i64 = 300;
+pub const LEAST_SCHEDULABLE_PERIOD: i64 = 302;
 
-/// Create a request to post the status.
-pub fn post(
-    conn: &Connection,
-    status: impl AsRef<str>,
-) -> PostStatuses {
-
-    post_internal(conn, str_to_option(status), None, None)
+/// Get the base of POST request for `/api/v1/statuses`.
+pub fn post(conn: &Connection) -> PostStatusesBase {
+    PostStatusesBase {
+        conn,
+        language: conn.default_language().and_then(
+            |lang| lang.to_639_1().map(|lang| lang.to_owned())
+        ),
+    }
 }
 
-/// Create a request to post the status with attached medias.
+/// Base parameters to post status.
 /// 
-/// If you want to create the status without the text, set `status` to an empty string such as `""`.
-pub fn post_with_media<T, U>(
-    conn: &Connection,
-    status: impl AsRef<str>,
-    media_ids: T,
-) -> PostStatuses
-where
-    T: AsRef<[U]>,
-    U: AsRef<str>,
-{
-    post_internal(
-        conn,
-        str_to_option(status),
-        Some(MediaIds::new(media_ids, conn.status_max_medias())),
-        None
-    )
+/// This struct cannot send yet, add a status content text by `[status()](#status)` or attachment medias by `[media_ids()](#media_ids)` at least.
+/// If you want to post the poll, set a status content text first.
+pub struct PostStatusesBase<'a> {
+    conn: &'a Connection,
+    language: Option<String>,
 }
 
-/// Create a request to post the status with poll.
-pub fn post_with_poll<T, U>(
-    conn: &Connection,
-    status: impl AsRef<str>,
-    poll_options: T,
-    poll_expires_in: u64,
-) -> PostStatuses
-where
-    T: AsRef<[U]>,
-    U: AsRef<str>,
-{
-    post_internal(
-        conn,
-        str_to_option(status),
-        None,
-        Some(Poll::new(poll_options, poll_expires_in, conn.poll_max_options()))
-    )
-}
-
-// Create POST request.
-fn post_internal(
-    conn: &Connection,
-    status: Option<String>,
-    media_ids: Option<MediaIds>,
-    poll: Option<Poll>,
-) -> PostStatuses {
-
-    PostStatuses::Status(
-        PostNormalStatuses {
-            conn,
+impl<'a> PostStatusesBase<'a> {
+    /// Add status content text to this POST request.
+    pub fn status(self, status: impl AsRef<str>) -> PostStatusesSimple<'a> {
+        PostStatusesSimple {
+            conn: self.conn,
             auth: true,
-            status,
-            media_ids,
-            poll,
+            status: Some(status.as_ref().trim().to_string()),
             in_reply_to_id: None,
-            sensitive: None,
             spoiler_text: None,
             visibility: None,
-            scheduled_at: None,
-            language: conn.default_language().and_then(|lang| lang.to_639_1().map(|lang| lang.to_owned())),
+            language: self.language,
         }
-    )
-}
-
-/// POST request for `/api/v1/statuses`.
-/// 
-/// The endpoint `/api/v1/statuses` returns response that are `Status` or `ScheduledStatus`.
-/// This request absorbs those differences, but you need to get the true response using either `mastors::entities::PostedStatus.status()` or `mastors::entities::PostedStatus.scheduled_status()` on the response.
-pub enum PostStatuses<'a> {
-    Status(PostNormalStatuses<'a>),
-    ScheduledStatus(PostScheduledStatuses<'a>),
-}
-
-impl<'a> PostStatuses<'a> {
-    /// Add an in_reply_to_id to status.
-    pub fn in_reply_to_id(mut self, in_reply_to_id: impl AsRef<str>) -> Self {
-        match self {
-            Self::Status(ref mut s) => s.in_reply_to_id = str_to_option(in_reply_to_id),
-            Self::ScheduledStatus(ref mut s) => s.in_reply_to_id = str_to_option(in_reply_to_id),
-        };
-        self
     }
 
-    /// Set status to sensitive if media_ids is set.
-    pub fn sensitive(mut self) -> Self {
-        match self {
-            Self::Status(ref mut s) => {
-                if s.media_ids.is_some() {
-                    s.sensitive = Some(true)
-                }
+    /// Add attachment medias to this POST request.
+    pub fn media_ids<T, U>(self, media_ids: T) -> PostStatusesWithMediaAttachments<'a>
+    where
+        T: AsRef<[U]>,
+        U: AsRef<str>,
+    {
+        PostStatusesWithMediaAttachments {
+            conn: self.conn,
+            auth: true,
+            inner: PostStatusesSimple {
+                conn: self.conn,
+                auth: true,
+                status: None,
+                in_reply_to_id: None,
+                spoiler_text: None,
+                visibility: None,
+                language: self.language,
             },
-            Self::ScheduledStatus(ref mut s) => {
-                if s.media_ids.is_some() {
-                    s.sensitive = Some(true)
-                }
-            },
-        };
-        self
+            media_ids: MediaIds::new(media_ids, self.conn.status_max_medias()),
+        }
     }
 
-    /// Add a spoiler_text to status.
-    pub fn spoiler_text(mut self, spoiler_text: impl AsRef<str>) -> Self {
-        match self {
-            Self::Status(ref mut s) => s.spoiler_text = str_to_option(spoiler_text),
-            Self::ScheduledStatus(ref mut s) => s.spoiler_text = str_to_option(spoiler_text),
-        };
-        self
-    }
+    pub fn poll<T, U>(self, status: impl AsRef<str>, options: T, expires_in: u64) -> PostStatusesWithPoll<'a>
+    where
+        T: AsRef<[U]>,
+        U: AsRef<str>
+    {
+        let poll_max_options = self.conn.poll_max_options();
 
-    /// Set the `Visibility` to status.
-    pub fn visibility(mut self, visibility: Visibility) -> Self {
-        match self {
-            Self::Status(ref mut s) => s.visibility = Some(visibility),
-            Self::ScheduledStatus(ref mut s) => s.visibility = Some(visibility),
-        };
-        self
-    }
-
-    /// Set status visibility to `public`.
-    /// This is equivalent to `visibility(Visibility::Public)`.
-    pub fn public(mut self) -> Self {
-        match self {
-            Self::Status(ref mut s) => s.visibility = Some(Visibility::Public),
-            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Public),
-        };
-        self
-    }
-
-    /// Set status visibility to `unlisted`.
-    /// This is equivalent to `visibility(Visibility::Unlisted)`.
-    pub fn unlisted(mut self) -> Self {
-        match self {
-            Self::Status(ref mut s) => s.visibility = Some(Visibility::Unlisted),
-            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Unlisted),
-        };
-        self
-    }
-
-    /// Set status visibility to `private`.
-    /// This is equivalent to `visibility(Visibility::Private)`.
-    pub fn private(mut self) -> Self {
-        match self {
-            Self::Status(ref mut s) => s.visibility = Some(Visibility::Private),
-            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Private),
-        };
-        self
-    }
-
-    /// Set status visibility to `direct`.
-    /// This is equivalent to `visibility(Visibility::Direct)`.
-    pub fn direct(mut self) -> Self {
-        match self {
-            Self::Status(ref mut s) => s.visibility = Some(Visibility::Direct),
-            Self::ScheduledStatus(ref mut s) => s.visibility = Some(Visibility::Direct),
-        };
-        self
-    }
-
-    /// Set a status to scheduled.
-    /// `DateTime<Utc>`, the type of `scheduled_at`, is re-export from [`chrono`](https://docs.rs/chrono/). For example to create a `DateTime<Utc>` of **NOW**:
-    /// 
-    /// ```rust
-    /// use mastors::{ DateTime, Utc };
-    /// 
-    /// let now: DateTime<Utc> = Utc::now();
-    /// ```
-    /// Refer to the [original document](https://docs.rs/chrono/) for details.
-    pub fn scheduled_at(mut self, scheduled_at: DateTime<Utc>) -> Self {
-        match self {
-            Self::Status(s) => {
-                return Self::ScheduledStatus(
-                    PostScheduledStatuses {
-                        conn: s.conn,
-                        auth: true,
-                        status: s.status,
-                        media_ids: s.media_ids,
-                        poll: s.poll,
-                        in_reply_to_id: s.in_reply_to_id,
-                        sensitive: s.sensitive,
-                        spoiler_text: s.spoiler_text,
-                        visibility: s.visibility,
-                        scheduled_at: Some(scheduled_at),
-                        language: s.language,
-                    }
-                );
-            },
-            Self::ScheduledStatus(ref mut s) => {
-                s.scheduled_at = Some(scheduled_at)
-            },
-        };
-        self
-    }
-
-    /// Set language to status.
-    pub fn language(mut self, language: impl Into<String>) -> Self {
-        match self {
-            Self::Status(ref mut s) => s.language = Some(language.into()),
-            Self::ScheduledStatus(ref mut s) => s.language = Some(language.into()),
-        };
-        self
-    }
-
-    /// Set to allow multiple choices if poll is present.
-    pub fn poll_multiple(mut self) -> Self {
-        match self {
-            Self::Status(ref mut s) => s.poll.as_mut().map(|p| p.multiple = true),
-            Self::ScheduledStatus(ref mut s) => s.poll.as_mut().map(|p| p.multiple = true),
-        };
-        self
-    }
-
-    /// Set to hide number of total votes if poll is present.
-    pub fn poll_hide_totals(mut self) -> Self {
-        match self {
-            Self::Status(ref mut s) => s.poll.as_mut().map(|p| p.hide_totals = true),
-            Self::ScheduledStatus(ref mut s) => s.poll.as_mut().map(|p| p.hide_totals = true),
-        };
-        self
-    }
-
-    /// Send a status to the server.
-    /// 
-    /// # Errors
-    /// 
-    /// This method will return the error if:
-    /// 
-    /// - Both of `status` and media_ids are nothing
-    /// - `media_ids` is empty or contains number of elements more than `STATUS_MAX_MEDIAS`
-    /// - `media_ids` contains duplicate media_id
-    /// - `scheduled_at` is set a date time in the past
-    /// - `poll_options` contains options less than 2 or more than `POLL_MAX_OPTIONS`
-    /// - `poll_options` contains duplicate option
-    /// - Total number of characters of `status` and `spoiler_text` exceeds `STATUS_MAX_CHARACTERS`
-    pub fn send(&self) -> Result<PostedStatus> {
-        match self {
-            Self::Status(status) => Ok(PostedStatus::Status(Box::new(status.send()?))),
-            Self::ScheduledStatus(status) => Ok(PostedStatus::ScheduledStatus(Box::new(status.send()?))),
+        PostStatusesWithPoll {
+            conn: self.conn,
+            auth: true,
+            inner: self.status(status),
+            poll: Poll::new(options, expires_in, poll_max_options),
         }
     }
 }
 
 /// POST request for `/api/v1/statuses`.
-#[derive(Debug, Serialize, mastors_derive::Method)]
+#[derive(Debug, Clone, Serialize, mastors_derive::Method)]
 #[method_params(POST, Status, "/api/v1/statuses")]
-pub struct PostNormalStatuses<'a> {
+pub struct PostStatusesSimple<'a> {
     #[serde(skip_serializing)]
     #[mastors(connection)]
     conn: &'a Connection,
@@ -284,33 +104,284 @@ pub struct PostNormalStatuses<'a> {
     auth: bool,
 
     status: Option<String>,
-    media_ids: Option<MediaIds>,
-    poll: Option<Poll>,
     in_reply_to_id: Option<String>,
-    sensitive: Option<bool>,
     spoiler_text: Option<String>,
     visibility: Option<Visibility>,
-    scheduled_at: Option<DateTime<Utc>>,
     language: Option<String>,
 }
 
-impl<'a> Method<'a, Status> for PostNormalStatuses<'a> {
-    fn send(&'a self) -> Result<Status> {
-        validate_status(
-            &self.status,
-            &self.media_ids,
-            &self.poll,
-            &self.language,
-            &self.spoiler_text,
-            self.conn.status_max_characters()
-        )?;
+impl<'a> PostStatusesSimple<'a> {
+    /// Add content text to this status.
+    pub fn status(mut self, status: impl AsRef<str>) -> Self {
+        let status = status.as_ref().trim();
 
+        if !status.is_empty() {
+            self.status = Some(status.to_string());
+        }
+        self
+    }
+
+    /// Add the status ID that is reply to. 
+    pub fn in_reply_to_id(mut self, in_reply_to_id: impl AsRef<str>) -> Self {
+        let in_reply_to_id = in_reply_to_id.as_ref().trim();
+
+        if !in_reply_to_id.is_empty() {
+            self.in_reply_to_id = Some(in_reply_to_id.to_string());
+        }
+        self
+    }
+
+    /// Add spoiler text to this status.
+    pub fn spoiler_text(mut self, spoiler_text: impl AsRef<str>) -> Self {
+        let spoiler_text = spoiler_text.as_ref().trim();
+
+        if !spoiler_text.is_empty() {
+            self.spoiler_text = Some(spoiler_text.to_string());
+        }
+        self
+    }
+
+    /// Set language to this status.
+    pub fn language(mut self, language: impl AsRef<str>) -> Self {
+        let language = language.as_ref().trim();
+
+        if !language.is_empty() {
+            self.language = Some(language.to_string());
+        }
+        self
+    }
+
+    /// Set the `Visibility` to this status.
+    pub fn visibility(mut self, visibility: Visibility) -> Self {
+        self.visibility = Some(visibility);
+        self
+    }
+
+    /// Set status visibility to `public`.
+    /// This is equivalent to `visibility(Visibility::Public)`.
+    pub fn public(self) -> Self {
+        self.visibility(Visibility::Public)
+    }
+
+    /// Set status visibility to `unlisted`.
+    /// This is equivalent to `visibility(Visibility::Unlisted)`.
+    pub fn unlisted(self) -> Self {
+        self.visibility(Visibility::Unlisted)
+    }
+
+    /// Set status visibility to `private`.
+    /// This is equivalent to `visibility(Visibility::Private)`.
+    pub fn private(self) -> Self {
+        self.visibility(Visibility::Private)
+    }
+
+    /// Set status visibility to `direct`.
+    /// This is equivalent to `visibility(Visibility::Direct)`.
+    pub fn direct(self) -> Self {
+        self.visibility(Visibility::Direct)
+    }
+
+    /// Add media attachments to this status.
+    pub fn media_ids<T, U>(self, media_ids: T) -> PostStatusesWithMediaAttachments<'a>
+    where
+        T: AsRef<[U]>,
+        U: AsRef<str>,
+    {
+        let status_max_characters = self.conn.status_max_characters();
+        PostStatusesWithMediaAttachments {
+            conn: self.conn,
+            auth: true,
+            inner: self,
+            media_ids: MediaIds::new(media_ids, status_max_characters),
+        }
+    }
+
+    /// Add poll to this status.
+    pub fn poll<T, U>(self, options: T, expires_in: u64) -> PostStatusesWithPoll<'a>
+    where
+        T: AsRef<[U]>,
+        U: AsRef<str>,
+    {
+        PostStatusesWithPoll {
+            conn: self.conn,
+            auth: true,
+            poll: Poll::new(options, expires_in, self.conn.poll_max_options()),
+            inner: self,
+        }
+    }
+
+    /// Set scheduled datetime to post this status.
+    pub fn scheduled_at(self, scheduled_at: DateTime<Utc>) -> PostScheduledStatuses<'a> {
+        PostScheduledStatuses {
+            conn: self.conn,
+            auth: true,
+            inner: self,
+            scheduled_at: ScheduledAt::new(scheduled_at),
+        }
+    }
+
+    fn validate(&self) -> Result<()> {
+        let mut total_chars: usize = 0;
+
+        // Check status is not empty if set
+        if let Some(status) = &self.status {
+            if status.is_empty() {
+                return Err(
+                    Error::InvalidStatusError
+                );
+            }
+
+            total_chars += status.chars().count();
+        }
+
+        // Check language if set
+        if let Some(lang) = self.language.as_ref() {
+            if Language::from_639_1(lang).is_none() {
+                return Err(
+                    Error::ParseIso639_1Error(lang.to_owned())
+                );
+            }
+        }
+    
+        // Check total number of characters
+        if let Some(spoiler_text) = self.spoiler_text.as_ref() {
+            total_chars += spoiler_text.chars().count();
+        }
+    
+        if total_chars > self.conn.status_max_characters() {
+            return Err(
+                Error::TooManyCharactersError(total_chars, self.conn.status_max_characters())
+            );
+        }
+    
+        Ok(())
+    }
+}
+
+impl<'a> Method<'a, Status> for PostStatusesSimple<'a> {
+    fn send(&self) -> Result<Status> {
+        self.validate()?;
         self.send_internal()
     }
 }
 
-/// POST request with scheduled date and time request for `/api/v1/statuses`.
-#[derive(Debug, Serialize, mastors_derive::Method)]
+/// POST request with attachment medias for `/api/v1/statuses`.
+#[derive(Debug, Clone, Serialize, mastors_derive::Method)]
+#[method_params(POST, Status, "/api/v1/statuses")]
+pub struct PostStatusesWithMediaAttachments<'a> {
+    #[serde(skip_serializing)]
+    #[mastors(connection)]
+    conn: &'a Connection,
+
+    #[serde(skip_serializing)]
+    #[mastors(authorization)]
+    auth: bool,
+
+    #[serde(flatten)]
+    inner: PostStatusesSimple<'a>,
+
+    #[serde(flatten)]
+    media_ids: MediaIds,
+}
+
+impl<'a> PostStatusesWithMediaAttachments<'a> {
+    /// Set scheduled datetime to post this status.
+    pub fn scheduled_at(self, scheduled_at: DateTime<Utc>) -> PostScheduledStatusesWithMediaAttachments<'a> {
+        PostScheduledStatusesWithMediaAttachments {
+            conn: self.conn,
+            auth: true,
+            inner: self,
+            scheduled_at: ScheduledAt::new(scheduled_at),
+        }
+    }
+
+    fn validate(&self) -> Result<()> {
+        self.inner.validate()?;
+        self.media_ids.validate()?;
+        Ok(())
+    }
+}
+
+impl<'a> Deref for PostStatusesWithMediaAttachments<'a> {
+    type Target = PostStatusesSimple<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl<'a> Method<'a, Status> for PostStatusesWithMediaAttachments<'a> {
+    fn send(&self) -> Result<Status> {
+        self.validate()?;
+        self.send_internal()
+    }
+}
+
+/// POST request with a poll for `/api/v1/statuses`.
+#[derive(Debug, Clone, Serialize, mastors_derive::Method)]
+#[method_params(POST, Status, "/api/v1/statuses")]
+pub struct PostStatusesWithPoll<'a> {
+    #[serde(skip_serializing)]
+    #[mastors(connection)]
+    conn: &'a Connection,
+
+    #[serde(skip_serializing)]
+    #[mastors(authorization)]
+    auth: bool,
+
+    #[serde(flatten)]
+    inner: PostStatusesSimple<'a>,
+
+    poll: Poll,
+}
+
+impl<'a> PostStatusesWithPoll<'a> {
+    /// Set to hide total number of votes of poll.
+    pub fn poll_hide_totals(mut self) -> Self {
+        self.poll.hide_totals();
+        self
+    }
+
+    /// Set to allow multiple vote for poll.
+    pub fn poll_multiple(mut self) -> Self {
+        self.poll.multiple();
+        self
+    }
+
+    /// Set scheduled datetime to post this status.
+    pub fn scheduled_at(self, scheduled_at: DateTime<Utc>) -> PostScheduledStatusesWithPoll<'a> {
+        PostScheduledStatusesWithPoll{
+            conn: self.conn,
+            auth: true,
+            inner: self,
+            scheduled_at: ScheduledAt::new(scheduled_at),
+        }
+    }
+
+    fn validate(&self) -> Result<()> {
+        self.inner.validate()?;
+        self.poll.validate()?;
+        Ok(())
+    }
+}
+
+impl<'a> Deref for PostStatusesWithPoll<'a> {
+    type Target = PostStatusesSimple<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl<'a> Method<'a, Status> for PostStatusesWithPoll<'a> {
+    fn send(&self) -> Result<Status> {
+        self.validate()?;
+        self.send_internal()
+    }
+}
+
+/// POST request for `/api/v1/scheduled_statuses`.
+#[derive(Debug, Clone, Serialize, mastors_derive::Method)]
 #[method_params(POST, ScheduledStatus, "/api/v1/statuses")]
 pub struct PostScheduledStatuses<'a> {
     #[serde(skip_serializing)]
@@ -321,43 +392,136 @@ pub struct PostScheduledStatuses<'a> {
     #[mastors(authorization)]
     auth: bool,
 
-    status: Option<String>,
-    media_ids: Option<MediaIds>,
-    poll: Option<Poll>,
-    in_reply_to_id: Option<String>,
-    sensitive: Option<bool>,
-    spoiler_text: Option<String>,
-    visibility: Option<Visibility>,
-    scheduled_at: Option<DateTime<Utc>>,
-    language: Option<String>,
+    #[serde(flatten)]
+    inner: PostStatusesSimple<'a>,
+
+    #[serde(flatten)]
+    scheduled_at: ScheduledAt,
+}
+
+impl<'a> PostScheduledStatuses<'a> {
+    fn validate(&self) -> Result<()> {
+        self.inner.validate()?;
+        self.scheduled_at.validate()?;
+        Ok(())
+    }
+}
+
+impl<'a> Deref for PostScheduledStatuses<'a> {
+    type Target = PostStatusesSimple<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
 }
 
 impl<'a> Method<'a, ScheduledStatus> for PostScheduledStatuses<'a> {
-    fn send(&'a self) -> Result<ScheduledStatus> {
-        validate_status(
-            &self.status,
-            &self.media_ids,
-            &self.poll,
-            &self.language,
-            &self.spoiler_text,
-            self.conn.status_max_characters()
-        )?;
+    fn send(&self) -> Result<ScheduledStatus> {
+        self.validate()?;
+        self.send_internal()
+    }
+}
 
-        // Check shceduled date time is future.
-        if let Some(scheduled_at) = self.scheduled_at {
-            if scheduled_at < Utc::now() + chrono::Duration::seconds(LEAST_SCHEDULABLE_PERIOD) {
-                return Err(Error::PastDateTimeError(scheduled_at));
-            }
-        }
+/// POST request with attachment medias for `/api/v1/scheduled_statuses`.
+#[derive(Debug, Clone, Serialize, mastors_derive::Method)]
+#[method_params(POST, ScheduledStatus, "/api/v1/statuses")]
+pub struct PostScheduledStatusesWithMediaAttachments<'a> {
+    #[serde(skip_serializing)]
+    #[mastors(connection)]
+    conn: &'a Connection,
 
+    #[serde(skip_serializing)]
+    #[mastors(authorization)]
+    auth: bool,
+
+    #[serde(flatten)]
+    inner: PostStatusesWithMediaAttachments<'a>,
+
+    #[serde(flatten)]
+    scheduled_at: ScheduledAt,
+}
+
+impl<'a> PostScheduledStatusesWithMediaAttachments<'a> {
+    fn validate(&self) -> Result<()> {
+        self.inner.validate()?;
+        self.scheduled_at.validate()?;
+        Ok(())
+    }
+}
+
+impl<'a> Deref for PostScheduledStatusesWithMediaAttachments<'a> {
+    type Target = PostStatusesWithMediaAttachments<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl<'a> Method<'a, ScheduledStatus> for PostScheduledStatusesWithMediaAttachments<'a> {
+    fn send(&self) -> Result<ScheduledStatus> {
+        self.validate()?;
+        self.send_internal()
+    }
+}
+
+/// POST request with a poll for `/api/v1/scheduled_statuses`.
+#[derive(Debug, Clone, Serialize, mastors_derive::Method)]
+#[method_params(POST, ScheduledStatus, "/api/v1/statuses")]
+pub struct PostScheduledStatusesWithPoll<'a> {
+    #[serde(skip_serializing)]
+    #[mastors(connection)]
+    conn: &'a Connection,
+
+    #[serde(skip_serializing)]
+    #[mastors(authorization)]
+    auth: bool,
+
+    #[serde(flatten)]
+    inner: PostStatusesWithPoll<'a>,
+
+    #[serde(flatten)]
+    scheduled_at: ScheduledAt,
+}
+
+impl<'a> PostScheduledStatusesWithPoll<'a> {
+    pub fn poll_hide_totals(mut self) -> Self {
+        self.inner.poll.hide_totals();
+        self
+    }
+
+    pub fn poll_multiple(mut self) -> Self {
+        self.inner.poll.multiple();
+        self
+    }
+
+    fn validate(&self) -> Result<()> {
+        self.inner.validate()?;
+        self.scheduled_at.validate()?;
+        Ok(())
+    }
+}
+
+impl<'a> Deref for PostScheduledStatusesWithPoll<'a> {
+    type Target = PostStatusesWithPoll<'a>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.inner
+    }
+}
+
+impl<'a> Method<'a, ScheduledStatus> for PostScheduledStatusesWithPoll<'a> {
+    fn send(&self) -> Result<ScheduledStatus> {
+        self.validate()?;
         self.send_internal()
     }
 }
 
 /// Wrapper for the media_ids.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 struct MediaIds {
     media_ids: Vec<String>,
+
+    #[serde(skip_serializing)]
     status_max_medias: usize,
 }
 
@@ -413,6 +577,7 @@ impl MediaIds {
     }
 }
 
+/*
 impl serde::ser::Serialize for MediaIds {
     fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
     where
@@ -427,14 +592,16 @@ impl serde::ser::Serialize for MediaIds {
         seq.end()
     }
 }
+*/
 
 /// Poll options.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 struct Poll {
     options: Vec<String>,
     expires_in: u64,
     multiple: bool,
     hide_totals: bool,
+
     #[serde(skip_serializing)]
     max_options: usize,
 }
@@ -471,16 +638,12 @@ impl Poll {
         self.options.is_empty()
     }
 
-    #[allow(dead_code)]
-    fn multiple(mut self) -> Self {
+    fn multiple(&mut self) {
         self.multiple = true;
-        self
     }
 
-    #[allow(dead_code)]
-    fn hide_totals(mut self) -> Self {
+    fn hide_totals(&mut self) {
         self.hide_totals = true;
-        self
     }
 
     fn validate(&self) -> Result<()> {
@@ -508,70 +671,28 @@ impl Poll {
     }
 }
 
-fn validate_status(
-    status: &Option<String>,
-    media_ids: &Option<MediaIds>,
-    poll: &Option<Poll>,
-    language: &Option<String>,
-    spoiler_text: &Option<String>,
-    status_max_characters: usize,
-) -> Result<()> {
+#[derive(Debug, Clone, Copy, Serialize)]
+struct ScheduledAt {
+    scheduled_at: DateTime<Utc>,
+}
 
-    if media_ids.is_some() && poll.is_some() {
-        panic!("Cannot attach both media and poll.");
-    }
-
-    if status.is_none() && media_ids.is_none() {
-        return Err(
-            Error::InvalidStatusError("There is neither status nor media".to_owned())
-        );
-    }
-
-    // Check media_ids
-    if let Some(media_ids) = media_ids {
-        media_ids.validate()?;
-    }
-
-    // Check poll options
-    if let Some(poll) = poll {
-        poll.validate()?;
-    }
-
-    // Check language
-    if let Some(lang) = language {
-        if Language::from_639_1(lang).is_none() {
-            return Err(
-                Error::ParseIso639_1Error(lang.to_owned())
-            );
+impl ScheduledAt {
+    fn new(scheduled_at: DateTime<Utc>) -> Self {
+        ScheduledAt {
+            scheduled_at,
         }
     }
 
-    // Check total number of characters
-    let mut total_chars: usize = 0;
+    fn validate(&self) -> Result<()> {
+        let now = Utc::now();
 
-    if let Some(status) = status.as_ref() {
-        total_chars += status.chars().count();
-    }
+        if self.scheduled_at - now < Duration::seconds(LEAST_SCHEDULABLE_PERIOD) {
+            return Err(
+                Error::ScheduleTooCloseError(now, self.scheduled_at)
+            );
+        }
 
-    if let Some(spoiler_text) = spoiler_text.as_ref() {
-        total_chars += spoiler_text.chars().count();
-    }
-
-    if total_chars > status_max_characters {
-        return Err(
-            Error::TooManyCharactersError(total_chars, status_max_characters)
-        );
-    }
-
-    Ok(())
-}
-
-fn str_to_option(s: impl AsRef<str>) -> Option<String> {
-    let s = s.as_ref().trim();
-    if s.is_empty() {
-        None
-    } else {
-        Some(s.to_owned())
+        Ok(())
     }
 }
 
@@ -583,7 +704,8 @@ mod tests {
     fn test_statuses() {
         let conn = Connection::new().unwrap();
         let content = body("toot!");
-        let posted = post(&conn, &content)
+        let posted = post(&conn)
+            .status(&content)
             .spoiler_text("spoiler text")
             .unlisted()
             .private()
@@ -614,12 +736,12 @@ mod tests {
     fn test_statuses_with_poll() {
         let conn = Connection::new().unwrap();
         let content = body("with poll!");
-        let posted = post_with_poll(&conn, &content, &(vec!["poll1", "poll2", "poll3"]), 3600)
+        let posted = post(&conn)
+            .poll(&content, &(vec!["poll1", "poll2", "poll3"]), 3600)
             .poll_multiple()
             .poll_hide_totals()
             .send()
             .unwrap();
-        let posted = posted.status().unwrap();
 
         let got = super::id::get(&conn, posted.id())
             .authorized()
@@ -650,7 +772,9 @@ mod tests {
             media::post(&conn, "./test-resources/test2.png").send().unwrap().id().to_owned(),
         ];
 
-        let posted = post_with_media(&conn, &content, &media_ids)
+        let posted = post(&conn)
+            .status(&content)
+            .media_ids(&media_ids)
             .send()
             .unwrap();
 
@@ -686,13 +810,11 @@ mod tests {
         let conn = Connection::new().unwrap();
         let scheduled_at = Utc::now() + chrono::Duration::seconds(310);
 
-        let posted = post(&conn, body("scheduled!"))
+        let posted = post(&conn)
+            .status(body("scheduled"))
             .scheduled_at(scheduled_at)
             .send()
-            .unwrap()
-            .scheduled_status()
-            .unwrap()
-            .clone();
+            .unwrap();
 
         // Mastodon rounds down nano-secs, following:
         //  left: `2020-05-26T11:11:34.730Z`'
@@ -735,13 +857,11 @@ mod tests {
             crate::api::v1::media::post(&conn, "./test-resources/test2.png").send().unwrap().id().to_owned(),
         ];
 
-        let posted = post_with_media(&conn, "scheduled status with media", media_ids)
+        let posted = post(&conn)
+            .media_ids(&media_ids)
             .scheduled_at(scheduled_at)
             .send()
-            .unwrap()
-            .scheduled_status()
-            .unwrap()
-            .clone();
+            .unwrap();
 
         let _deleted = crate::api::v1::scheduled_statuses::id::delete(&conn, posted.id())
             .send()
@@ -749,7 +869,7 @@ mod tests {
 
         let got = crate::api::v1::scheduled_statuses::id::get(&conn, posted.id())
             .send();
-        
+
         assert!(got.is_err());
     }
 
@@ -758,15 +878,14 @@ mod tests {
         let conn = Connection::new().unwrap();
         let scheduled_at = Utc::now() + chrono::Duration::seconds(310);
 
-        let posted = post_with_poll(&conn, "scheduled status with poll", ["a", "b"], 3600)
+        let posted = post(&conn)
+            .status("scheduled status with poll")
+            .poll(&["a", "b"], 3600)
             .scheduled_at(scheduled_at)
             .poll_hide_totals()
             .poll_multiple()
             .send()
-            .unwrap()
-            .scheduled_status()
-            .unwrap()
-            .clone();
+            .unwrap();
 
         let _deleted = crate::api::v1::scheduled_statuses::id::delete(&conn, posted.id())
             .send()

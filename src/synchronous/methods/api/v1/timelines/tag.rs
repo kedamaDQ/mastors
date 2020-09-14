@@ -147,12 +147,11 @@ mod tests {
     fn test_get_hashtag_timeline() {
         let conn = Connection::new().unwrap();
 
-        let posted = statuses::post(&conn, "test hashtag timeline #mastorstesthashtagmastorstesthashtag")
+        let posted = statuses::post(&conn)
+            .status("test hashtag timeline #mastorstesthashtagmastorstesthashtag")
             .send()
-            .unwrap()
-            .status()
-            .unwrap()
-            .clone();
+            .unwrap();
+
         let got = get(&conn, "mastorstesthashtagmastorstesthashtag").send().unwrap();
         assert!(! got.is_empty());
         assert_eq!(got.get(0).unwrap().id(), posted.id());
