@@ -115,6 +115,9 @@ pub enum NotificationType {
 
     /// Someone requested to authorize to follow you.
     FollowRequest,
+
+    /// Someone you enabled notifications for has posted a status
+    Status,
 }
 
 use std::fmt;
@@ -128,6 +131,7 @@ impl fmt::Display for NotificationType {
             NotificationType::Favourite => write!(f, "favourite"),
             NotificationType::Poll => write!(f, "poll"),
             NotificationType::FollowRequest=> write!(f, "follow_request"),
+            NotificationType::Status=> write!(f, "status"),
         }
     }
 }
@@ -143,6 +147,7 @@ impl FromStr for NotificationType {
             "favourite" => Ok(NotificationType::Favourite),
             "poll" => Ok(NotificationType::Poll),
             "follow_request" => Ok(NotificationType::FollowRequest),
+            "status" => Ok(NotificationType::Status),
             _ => Err(Error::ParseNotificationTypeError(s.to_owned()))
         }
     }
