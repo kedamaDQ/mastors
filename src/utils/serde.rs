@@ -10,7 +10,7 @@ where
 {
 
     let s: &str = Deserialize::deserialize(deserializer)?;
-    usize::from_str_radix(s, 10).map_err(D::Error::custom)
+    s.parse::<usize>().map_err(D::Error::custom)
 }
 
 pub(crate) fn transform_string_to_u64<'de, D>(deserializer: D) -> Result<u64, D::Error>
@@ -19,7 +19,7 @@ where
 {
 
     let s: &str = Deserialize::deserialize(deserializer)?;
-    u64::from_str_radix(s, 10).map_err(D::Error::custom)
+    s.parse::<u64>().map_err(D::Error::custom)
 }
 
 pub(crate) fn transform_string_to_i64<'de, D>(deserializer: D) -> Result<i64, D::Error>
@@ -28,7 +28,7 @@ where
 {
 
     let s: &str = Deserialize::deserialize(deserializer)?;
-    i64::from_str_radix(s, 10).map_err(D::Error::custom)
+    s.parse::<i64>().map_err(D::Error::custom)
 }
 
 use crate::Url;
