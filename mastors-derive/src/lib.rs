@@ -51,13 +51,13 @@ pub fn derive_method(input: TokenStream) -> TokenStream {
     };
 
     let fn_send_internal_impl = if http_method == "GET" {
-        quote! { Ok(self.get()?) }
+        quote! { self.get() }
     } else if http_method == "POST" {
-        quote! { Ok(self.post()?) }
+        quote! { self.post() }
     } else if http_method == "DELETE" {
-        quote! { Ok(self.delete()?) }
+        quote! { self.delete() }
     } else if http_method == "PUT" {
-        quote! { Ok(self.put()?) }
+        quote! { self.put() }
     } else {
         panic!("Unexpected HTTP method");
     };
