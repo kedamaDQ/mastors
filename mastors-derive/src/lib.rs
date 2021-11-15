@@ -175,7 +175,7 @@ fn get_field_with_attribute<'a>(data: &'a syn::Data, attr: &str) -> Option<&'a s
                                     /* Need the nightly build.
                                     ident.span().unwrap().error("Attribute `".to_owned() + attr + "` duplicated").emit();
                                     */
-                                    panic!("Attribute `".to_owned() + attr + "` duplicated")
+                                    panic!("{}", "Attribute `".to_owned() + attr + "` duplicated")
                                 } else {
                                     result = Some(field);
                                 }
