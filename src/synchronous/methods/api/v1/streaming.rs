@@ -32,19 +32,14 @@ impl<'a> GetStreaming<'a> {
 
         let mut headers = header::HeaderMap::new();
 
-        match self.stream_type {
-            StreamType::User | StreamType::List(_) | StreamType::Direct => {
-                headers.insert(
-                    header::AUTHORIZATION,
-                    header::HeaderValue::from_str(
-                        format!(
-                            "Bearer {}", self.conn.access_token()
-                        ).as_str()
-                    )?
-                );
-            },
-            _ => (),
-        };
+        headers.insert(
+            header::AUTHORIZATION,
+            header::HeaderValue::from_str(
+            format!(
+                "Bearer {}", self.conn.access_token()
+                ).as_str()
+            )?
+        );
 
         let custom_client = ReqwestClient::builder()
             .default_headers(headers)
@@ -91,5 +86,13 @@ pub mod health {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use crate::api::v1::streaming;
 
+    #[test]
+    fn test_get_streaming() {
+        let conn = Connection::new().unwrap();
+        let stream = streaming::get(&conn, StreamType::PublicLocal).send();
+        assert!(stream.is_ok());
+    }
 }
