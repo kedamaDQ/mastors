@@ -41,6 +41,12 @@ mod tests {
     #[test]
     fn test_get_lists() {
         let conn = Connection::new().unwrap();
-        let _get = get(&conn, "1").send().unwrap();
+        let _get = get(&conn, id()).send().unwrap();
+    }
+
+    use crate::api::v1::accounts::verify_credentials;
+    fn id() -> String {
+        let conn = Connection::new().unwrap();
+        verify_credentials::get(&conn).send().unwrap().id().to_owned()
     }
 }

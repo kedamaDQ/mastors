@@ -141,25 +141,22 @@ mod tests {
             .poll_multiple()
             .send()
             .unwrap();
-
+/* mastodon became to be error a self vote
         let voted = super::id::votes::post(&conn, posted.poll().unwrap().id(), [0, 1])
             .send()
             .unwrap();
-
-        let got = super::id::get(&conn, voted.id())
+*/
+        let got = super::id::get(&conn, posted.poll().unwrap().id())
             .authorized()
             .send()
             .unwrap();
 
-        assert_eq!(got.voted().unwrap(), true);
-        assert_eq!(got.own_votes().unwrap(), &vec![0, 1]);
-
         let got_option_0 = got.options().iter().next().unwrap();
 
         assert_eq!(got_option_0.title(), "a");
-        assert_eq!(got_option_0.votes_count().unwrap(), 1);
+        assert_eq!(got_option_0.votes_count().unwrap(), 0);
 
-        let got = super::id::get(&conn, voted.id())
+        let got = super::id::get(&conn, posted.poll().unwrap().id())
             .send()
             .unwrap();
 
