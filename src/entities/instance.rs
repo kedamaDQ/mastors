@@ -42,7 +42,7 @@ impl Instance {
 
     /// Get a shorter description defined by the admin.
     pub fn short_description(&self) -> &str {
-        &self.description
+        &self.short_description
     }
 
     /// Get an email that may be contacted for any inquiries.

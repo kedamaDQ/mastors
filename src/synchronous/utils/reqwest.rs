@@ -16,12 +16,11 @@ pub(crate) fn check_response(resp: Response) -> Result<Response> {
     } else if status.is_client_error() {
         if let Some(content_type) = resp.headers().get(reqwest::header::CONTENT_TYPE) {
             if content_type.to_str().unwrap_or("").starts_with(EXPECTED_CONTENT_TYPE) {
-               Err(
-                    Error::HttpClientStatusError(url, status.as_u16(), resp.json::<ReceivedMessage>()?)
-                )
-            } else {
-                Err(Error::HttpUnexpectedStatusError(url, status.as_u16()))
+               return Err(
+                    Error::HttpClientStatusError(url, status.as_u16(), Box::new(resp.json::<ReceivedMessage>()?))
+                );
             }
+            Err(Error::HttpUnexpectedStatusError(url, status.as_u16()))
         } else {
             Err(Error::HttpUnexpectedStatusError(url, status.as_u16()))
         }

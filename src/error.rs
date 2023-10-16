@@ -80,7 +80,7 @@ pub enum Error {
     ),
 
     #[error(display = "HTTP client error: {} ({}) {}", _0, _1, _2)]
-    HttpClientStatusError(Url, u16, ReceivedMessage),
+    HttpClientStatusError(Url, u16, Box<ReceivedMessage>),
 
     #[error(display = "HTTP server error: {} ({})", _0, _1)]
     HttpServerStatusError(Url, u16),
