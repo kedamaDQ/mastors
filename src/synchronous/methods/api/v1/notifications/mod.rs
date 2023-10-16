@@ -229,6 +229,9 @@ mod tests {
 				NotificationType::Mention,
 				NotificationType::Poll,
 				NotificationType::FollowRequest,
+				NotificationType::Update,
+				NotificationType::AdminSignUp,
+				NotificationType::AdminReport,
 			])
 			.send().unwrap().is_empty()
 		);
