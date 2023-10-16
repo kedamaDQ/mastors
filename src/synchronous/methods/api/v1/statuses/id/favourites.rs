@@ -118,6 +118,10 @@ pub mod unfavourite {
 mod tests {
     use super::*;
     use crate::Method;
+    use std::{
+        thread,
+        time,
+    };
 
     #[test]
     fn test_favourite_unfavourite_status() {
@@ -128,20 +132,30 @@ mod tests {
             .unwrap();
         let myself = status.account();
 
+        thread::sleep(time::Duration::from_millis(500));
+
         let favourited = favourite::post(&conn, status.id()).send().unwrap();
         assert_eq!(status.id(), favourited.id());
         assert!(favourited.favourited());
         
+        thread::sleep(time::Duration::from_millis(500));
+
         let favourited_by = favourited_by::get(&conn, status.id()).send().unwrap();
         assert_eq!(favourited_by.len(), 1);
         assert_eq!(favourited_by.get(0).unwrap().id(), myself.id());
+
+        thread::sleep(time::Duration::from_millis(500));
 
         let unfavourited = unfavourite::post(&conn, status.id()).send().unwrap();
         assert_eq!(status.id(), unfavourited.id());
         assert!(! unfavourited.favourited());
 
+        thread::sleep(time::Duration::from_millis(500));
+
         let favourited_by = favourited_by::get(&conn, status.id()).send().unwrap();
         assert!(favourited_by.is_empty());
+
+        thread::sleep(time::Duration::from_millis(500));
 
         crate::api::v1::statuses::id::delete(&conn, status.id()).send().unwrap();
     }

@@ -229,13 +229,14 @@ mod tests {
     use super::*;
 	use crate::{
 		Connection,
+        Method,
 		MethodWithRespHeader,
 	};
 
     #[test]
     fn test_get_accounts_followers() {
         let conn = Connection::new().unwrap();
-        let _got = followers::get(&conn, "1")
+        let _got = followers::get(&conn, id())
             .limit(1)
             .send()
             .unwrap();
@@ -244,10 +245,15 @@ mod tests {
     #[test]
     fn test_get_accounts_following() {
         let conn = Connection::new().unwrap();
-        let _got = following::get(&conn, "1")
+        let _got = following::get(&conn, id())
             .limit(1)
             .send()
             .unwrap();
     }
 
+    use crate::api::v1::accounts::verify_credentials;
+    fn id() -> String {
+        let conn = Connection::new().unwrap();
+        verify_credentials::get(&conn).send().unwrap().id().to_owned()
+    }
 }
