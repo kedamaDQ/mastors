@@ -251,11 +251,11 @@ pub(crate) mod private {
     }
     
     fn trace_body(req: &Request) -> Option<String> {
-        req.body().map(
+        req.body().and_then(
             |b| b.as_bytes().map(
-                    |bb| String::from_utf8_lossy(bb).to_string()
-                )
-            ).flatten()
+                |bb| String::from_utf8_lossy(bb).to_string()
+            )
+        )
     }
 
     fn response_header_value(resp: &Response, header_name: &str) -> PageNavigation {

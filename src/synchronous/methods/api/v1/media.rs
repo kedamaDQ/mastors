@@ -63,7 +63,7 @@ impl<'a> Method<'a, Attachment> for PostMedia<'a> {
         if let Some(focus) = &self.focus {
             focus.validate()?;
         }
-        Ok(self.post_with_media()?)
+        self.post_with_media()
     }
 }
 
@@ -96,7 +96,7 @@ struct Focus {
     y: f64,
 }
 
-impl<'a> Focus {
+impl Focus {
     const MIN_FOCUS_VALUE: f64 = -1.0;
     const MAX_FOCUS_VALUE: f64 = 1.0;
 

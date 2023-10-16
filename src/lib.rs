@@ -171,10 +171,7 @@ pub mod prelude {
 
     /// Toot a simple text.
     pub fn toot(conn: &Connection, body: impl AsRef<str>) -> crate::Result<crate::entities::Status> {
-        match crate::api::v1::statuses::post(conn).status(body).send() {
-            Ok(posted) => Ok(posted),
-            Err(e) => Err(e),
-        }
+        crate::api::v1::statuses::post(conn).status(body).send()
     }
 
     /// Get your home timeline stream.
