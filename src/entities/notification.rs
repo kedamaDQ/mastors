@@ -87,6 +87,18 @@ impl Notification {
     pub fn is_follow_request(&self) -> bool {
         self.r#type == NotificationType::FollowRequest
     }
+
+    pub fn is_update(&self) -> bool {
+        self.r#type == NotificationType::Update
+    }
+
+    pub fn is_admin_sign_up(&self) -> bool {
+        self.r#type == NotificationType::AdminSignUp
+    }
+
+    pub fn is_admin_report(&self) -> bool {
+        self.r#type == NotificationType::AdminReport
+    }
 }
 
 /// Represents an Array of [`Notification`](/entities/struct.Notification.html).
@@ -118,6 +130,15 @@ pub enum NotificationType {
 
     /// Someone you enabled notifications for has posted a status
     Status,
+
+    /// A status you boosted with has been edited
+    Update,
+
+    /// Someone signed up (optionally sent to admins)
+    AdminSignUp,
+
+    /// A new report has been filed
+    AdminReport
 }
 
 use std::fmt;
@@ -130,8 +151,11 @@ impl fmt::Display for NotificationType {
             NotificationType::Reblog => write!(f, "reblog"),
             NotificationType::Favourite => write!(f, "favourite"),
             NotificationType::Poll => write!(f, "poll"),
-            NotificationType::FollowRequest=> write!(f, "follow_request"),
-            NotificationType::Status=> write!(f, "status"),
+            NotificationType::FollowRequest => write!(f, "follow_request"),
+            NotificationType::Status => write!(f, "status"),
+            NotificationType::Update => write!(f, "update"),
+            NotificationType::AdminSignUp => write!(f, "admin.sign_up"),
+            NotificationType::AdminReport => write!(f, "admin.report"),
         }
     }
 }
@@ -148,6 +172,9 @@ impl FromStr for NotificationType {
             "poll" => Ok(NotificationType::Poll),
             "follow_request" => Ok(NotificationType::FollowRequest),
             "status" => Ok(NotificationType::Status),
+            "update" => Ok(NotificationType::Update),
+            "admin.sign_up" => Ok(NotificationType::AdminSignUp),
+            "admin.report" => Ok(NotificationType::AdminReport),
             _ => Err(Error::ParseNotificationTypeError(s.to_owned()))
         }
     }
