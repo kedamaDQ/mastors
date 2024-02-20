@@ -2,6 +2,10 @@
 //! 
 //! If any API method had breaking changes, v2 method will be created and v1 method will be maintained for backward compatibility.
 pub mod accounts;
+pub mod admin;
+pub use {
+    admin::accounts::id::action::ActionType,
+};
 pub mod custom_emojis;
 pub mod instance;
 pub mod lists;
@@ -9,6 +13,7 @@ pub mod markers;
 pub mod media;
 pub mod notifications;
 pub mod polls;
+pub mod reports;
 pub mod scheduled_statuses;
 pub mod statuses;
 pub mod streaming;
