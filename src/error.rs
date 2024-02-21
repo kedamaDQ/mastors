@@ -167,6 +167,12 @@ pub enum Error {
 
     #[error(display = "No timeline specified")]
     NoTimelineError,
+
+    #[error(display = "Unknown report category: {}", _0)]
+    ParseReportCategoryError(String),
+
+    #[error(display = "Unknown moderation action type: {}", _0)]
+    ParseActionTypeError(String),
 }
 
 #[derive(Debug, PartialEq, PartialOrd, Hash, Clone, Deserialize)]
